@@ -105,30 +105,6 @@ task 'release' do
     end
   end.call
 
-  # Update doap file for current release.
-  lambda do
-    doap_file = "doap.rdf"
-    release_date = File.read("_release/#{spec.version}/CHANGES").scan(/#{spec.version} \((.*)\)/).flatten[0]
-    changes = File.read("_release/#{spec.version}/CHANGES")[/.*?\n(.*)/m, 1]
-    doap_entry = <<DOAP
-    <release>
-      <Version>
-        <name>#{spec.version}</name>
-        <created>#{release_date}</created>
-        <revision>#{spec.version}</revision>
-        <dc:description>
-#{changes}
-        </dc:description>
-      </Version>
-    </release>
-DOAP
-    modified = File.read(doap_file).sub(/^    \<category.* \/\>$/) { |category_line| "#{category_line}\n#{doap_entry}" }
-    File.open doap_file, 'w' do |file|
-      file.write modified
-    end
-    puts "[X] Updated #{doap_file} for current release"
-  end.call
-
   # Prepare release announcement email.
   lambda do
     changes = File.read("_release/#{spec.version}/CHANGES")[/.*?\n(.*)/m, 1]
