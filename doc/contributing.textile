@@ -225,19 +225,6 @@ rvm install ruby-1.9.3-p194
 
 It should also be noted that jruby-1.6.7 release has a native library that is compiled using a more modern version of libc than is available on this variant of the operating system. We could download the source release and recompile the library but instead we have just avoided the need for any use of the ruby native interface library in our CI infrastructure.
 
-h3(#ciwindows).  Windows Setup
-
-The ci infrastructure on the windows host (hudson-win.apache.org) is a little fragile. First you need to RDP in and download the support libraries. We have manually installed the tools in the following locations. Note: it is important to make the locations read-write access to the hudson user.
-
-{% highlight sh %}
-F:\hudson\tools\Ruby193-p194
-F:\hudson\tools\Ruby192-p290
-F:\hudson\tools\Ruby187-p370
-F:\hudson\tools\jruby-1.6.7
-{% endhighlight %}
-
-WARNING: Several attempts were made to use GEM_HOME to install the dependent gems for each test in a separate location but we were unable to figure out the mechanisms via which sub-shells would inherit the paths and the ability to run tools such as rspec.
-
 h2(#contributors).  Contributors
 
 Here is the list of people who are actively working and committing on Buildr:
