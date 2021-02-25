@@ -142,17 +142,17 @@ module URI
         # If download breaks we end up with a partial file which is
         # worse than not having a file at all, so download to temporary
         # file and then move over.
-        modified = File.stat(target).mtime if File.exist?(target)
-        temp = Tempfile.new(File.basename(target))
+        modified = ::File.stat(target).mtime if ::File.exist?(target)
+        temp = Tempfile.new(::File.basename(target))
         temp.binmode
         written = false
-        read({:progress=>verbose}.merge(options || {}).merge(:modified=>modified)) { |chunk| written = true; temp.write chunk }
+        read({ :progress => verbose }.merge(options || {}).merge(:modified => modified)) { |chunk| written = true; temp.write chunk }
         temp.close
-        mkpath File.dirname(target)
+        mkpath ::File.dirname(target)
         # Only attempt to override file if it was actually written to, i.e. "HTTP Not Modified" was not returned.
         mv temp.path, target if written
-      when File
-        read({:progress=>verbose}.merge(options || {}).merge(:modified=>target.mtime)) { |chunk| target.write chunk }
+      when ::File
+        read({ :progress => verbose }.merge(options || {}).merge(:modified => target.mtime)) { |chunk| target.write chunk }
         target.flush
       else
         raise ArgumentError, 'Expecting a target that is either a file name (string, task) or object that responds to write (file, pipe).' unless target.respond_to?(:write)
@@ -200,14 +200,14 @@ module URI
       source = source.name if Rake::Task === source
       options ||= {}
       if String === source
-        raise NotFoundError, 'No source file/directory to upload.' unless File.exist?(source)
-        if File.directory?(source)
-          Dir.glob("#{source}/**/*").reject { |file| File.directory?(file) }.each do |file|
-            uri = self + (File.join(self.path, file.sub(source, '')))
-            uri.upload file, {:digests=>[]}.merge(options)
+        raise NotFoundError, 'No source file/directory to upload.' unless ::File.exist?(source)
+        if ::File.directory?(source)
+          Dir.glob("#{source}/**/*").reject { |file| ::File.directory?(file) }.each do |file|
+            uri = self + (::File.join(self.path, file.sub(source, '')))
+            uri.upload file, { :digests => [] }.merge(options)
           end
         else
-          File.open(source, 'rb') { |input| upload input, options }
+          ::File.open(source, 'rb') { |input| upload input, options }
         end
       elsif source.respond_to?(:read)
         digests = (options[:digests] || [:md5, :sha1]).
@@ -256,7 +256,7 @@ module URI
       proxy = URI.parse(proxy) if String === proxy
       excludes = ENV['NO_PROXY'].to_s.split(/\s*,\s*/).compact
       excludes = excludes.map { |exclude| exclude =~ /:\d+$/ ? exclude : "#{exclude}:*" }
-      return proxy unless excludes.any? { |exclude| File.fnmatch(exclude, "#{host}:#{port}") }
+      return proxy unless excludes.any? { |exclude| ::File.fnmatch(exclude, "#{host}:#{port}") }
     end
 
     def write_internal(options, &block) #:nodoc:
