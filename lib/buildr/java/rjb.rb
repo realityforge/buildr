@@ -114,7 +114,7 @@ module Java
     def tools_jar #:nodoc:
       @tools_jar ||= begin
         home = ENV['JAVA_HOME'] or fail 'Are we forgetting something? JAVA_HOME not set.'
-        ['lib/tools.jar', '../lib/tools.jar'].map { |path| File.expand_path(path, home) }.
+        %w[lib/tools.jar ../lib/tools.jar].map { |path| File.expand_path(path, home) }.
           find { |path| File.exist?(path) }
       end
     end
