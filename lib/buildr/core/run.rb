@@ -19,7 +19,7 @@ module Buildr #:nodoc:
     class JavaRunner < Base
       include Buildr::JRebel
 
-      specify :name => :java, :languages => [:java, :scala, :groovy]
+      specify :name => :java, :languages => [:java, :groovy]
 
       def run(task)
         fail "Missing :main option" unless task.options[:main]

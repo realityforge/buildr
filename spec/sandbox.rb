@@ -19,14 +19,6 @@
 # repository and cache these across test cases.
 Buildr.application.instance_eval { @rakefile = File.expand_path('buildfile') }
 repositories.remote << 'https://repo1.maven.org/maven2'
-repositories.remote << 'https://oss.sonatype.org/content/groups/scala-tools'
-
-
-# Force Scala version for specs; don't want to rely on SCALA_HOME
-module Buildr::Scala
-  SCALA_VERSION_FOR_SPECS = ENV["SCALA_VERSION"] || "2.11.8"
-end
-Buildr.settings.build['scala.version'] = Buildr::Scala::SCALA_VERSION_FOR_SPECS
 
 require 'rspec/retry'
 RSpec.configure do |config|
@@ -35,7 +27,6 @@ end
 
 # Add a 'require' here only for optional extensions, not for extensions that should be loaded by default.
 require 'buildr/groovy'
-require 'buildr/scala'
 require 'buildr/bnd'
 require 'buildr/jaxb_xjc'
 require 'buildr/kotlin'
