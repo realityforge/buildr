@@ -249,7 +249,6 @@ module Buildr
                          :style => project.checkstyle.style_file
               end
             end
-
           end
         end
       end
