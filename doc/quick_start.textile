@@ -26,7 +26,7 @@ $ buildr compile
 
 Information about the classpath and dependencies is described "later on":#dependencies.
 
-p(tip). By default, Buildr projects assume the Java language and the @src/main/java/@ source directory.  You can also have projects in the Scala or Groovy language (both languages support joint compilation with Java).  To use Scala, place your @.scala@ files in the @src/main/scala/@ directory and include the following invocation at the head of your buildfile: @require 'buildr/scala'@  Similarly, Groovy expects sources in the @src/main/groovy/@ directory and necessitates @require 'buildr/groovy'@ (see "languages":languages.html for more information).
+p(tip). By default, Buildr projects assume the Java language and the @src/main/java/@ source directory.  You can also have projects in the Scala or Groovy language (both languages support joint compilation with Java).  Groovy expects sources in the @src/main/groovy/@ directory and necessitates @require 'buildr/groovy'@ (see "languages":languages.html for more information).
 
 The @compile@ task will also detect _any_ files which exist under the @src/main/resources/@ directory.  These resources are copied verbatim to the @target/resources/@ directory as part of the compilation task.  Buildr also performs some basic change detection to minimize compilation.  If your source files haven't changed since the last compile, then they will not be recompiled.
 
@@ -156,7 +156,7 @@ define 'killer-app' do
 end
 {% endhighlight %}
 
-Note that only one test framework per-project may be used.  This may seem like an obvious restriction given that both frameworks introduced so far have used the same directory, but other frameworks such as Specs and EasyB do not follow the same convention.  In cases of ambiguity (for example, when tests are present in both @src/test/java/@ _and_ @src/spec/scala/@), only one test framework will be chosen, but this choice is not well-defined.  When in doubt, explicitly specify the test framework with the @test.using@ property.  This overrides Buildr's auto-detection and ensures sane behavior.
+Note that only one test framework per-project may be used.  This may seem like an obvious restriction given that both frameworks introduced so far have used the same directory, but other frameworks such as Specs and EasyB do not follow the same convention.  In cases of ambiguity, only one test framework will be chosen, but this choice is not well-defined.  When in doubt, explicitly specify the test framework with the @test.using@ property.  This overrides Buildr's auto-detection and ensures sane behavior.
 
 Other test frameworks are documented "here":testing.html and "here":languages.html.
 

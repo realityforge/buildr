@@ -234,7 +234,6 @@ F:\hudson\tools\Ruby193-p194
 F:\hudson\tools\Ruby192-p290
 F:\hudson\tools\Ruby187-p370
 F:\hudson\tools\jruby-1.6.7
-F:\hudson\tools\scala-2.9.0.1
 {% endhighlight %}
 
 WARNING: Several attempts were made to use GEM_HOME to install the dependent gems for each test in a separate location but we were unable to figure out the mechanisms via which sub-shells would inherit the paths and the ability to run tools such as rspec.

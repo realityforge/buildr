@@ -5,7 +5,7 @@ title: More Stuff
 
 h2(#shell).  Interactive Shells (REPLs)
 
-Many languages (including Scala and Groovy) provide an interactive shell tool which allows developers to run arbitrary expressions and see the results immediately:
+Many languages (including Groovy) provide an interactive shell tool which allows developers to run arbitrary expressions and see the results immediately:
 
 <pre>$ scala
 Welcome to Scala version 2.7.4.final (Java HotSpot(TM) 64-Bit Server VM, Java 1.6.0_03-p3).
