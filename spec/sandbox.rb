@@ -34,7 +34,6 @@ RSpec.configure do |config|
 end
 
 # Add a 'require' here only for optional extensions, not for extensions that should be loaded by default.
-require 'buildr/clojure'
 require 'buildr/groovy'
 require 'buildr/scala'
 require 'buildr/bnd'
