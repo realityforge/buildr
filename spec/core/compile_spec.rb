@@ -108,21 +108,7 @@ describe Buildr::CompileTask do
   it 'should only support existing compilers' do
     lambda { define('foo') { compile.using(:unknown) } }.should raise_error(ArgumentError, /unknown compiler/i)
   end
-
-  it 'should allow overriding the guessed compiler' do
-    write "src/main/java/com/example/Hello.java", ""
-    old_compiler = nil
-    new_compiler = nil
-    define('foo') {
-      old_compiler = compile.compiler
-      compile.using(:scalac)
-      new_compiler = compile.compiler
-    }
-    old_compiler.should == :javac
-    new_compiler.should == :scalac
-  end
 end
-
 
 describe Buildr::CompileTask, '#compiler' do
   it 'should be nil if no compiler identifier' do

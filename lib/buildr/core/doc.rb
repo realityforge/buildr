@@ -147,7 +147,6 @@ module Buildr #:nodoc:
       #
       # For example:
       #   doc.using :windowtitle=>'My application'
-      #   doc.using :vscaladoc
       def using(*args)
         args.pop.each { |key, value| @options[key.to_sym] = value } if Hash === args.last
 

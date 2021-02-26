@@ -32,8 +32,7 @@ Gem::Specification.new do |spec|
   spec.summary        = 'Build like you code'
   spec.licenses        = %w(Apache-2.0)
   spec.description    = <<-TEXT
-Apache Buildr is a build system for Java-based applications, including support
-for Scala, Groovy and a growing number of JVM languages and tools.  We wanted
+Apache Buildr is a build system for Java-based applications.  We wanted
 something that's simple and intuitive to use, so we only need to tell it what
 to do, and it takes care of the rest.  But also something we can easily extend
 for those one-off tasks, with a language that's a joy to use.

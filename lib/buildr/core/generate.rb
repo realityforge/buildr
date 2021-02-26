@@ -86,7 +86,6 @@ define "#{name}" do
           source = source.sub(/\/$/, '') # remove trailing /
           script += <<-EOF
   layout[:source, :main, :java] = "#{source}"
-  layout[:source, :main, :scala] = "#{source}"
 EOF
         end
         if output
@@ -94,7 +93,6 @@ EOF
           script += <<-EOF
   layout[:target, :main] = "#{output}"
   layout[:target, :main, :java] = "#{output}"
-  layout[:target, :main, :scala] = "#{output}"
 EOF
         end
         return script

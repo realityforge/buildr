@@ -36,37 +36,13 @@ artifacts(
   Buildr::Groovy.dependencies,
   Buildr::JaxbXjc.dependencies,
   Buildr::Bnd.dependencies,
-  Buildr::Scala::Scalac.dependencies,
-  Buildr::Shell::BeanShell.artifact,
-  Buildr::Clojure.dependencies
+  Buildr::Shell::BeanShell.artifact
 ).each do |path|
   file(path).invoke
 end
 
 ENV['HOME'] = File.expand_path(File.join(File.dirname(__FILE__), '..', 'tmp', 'home'))
 mkpath ENV['HOME']
-
-# Make Scala.version resilient to sandbox reset
-module Buildr::Scala
-
-  remove_const(:DEFAULT_VERSION)
-
-  DEFAULT_VERSION = SCALA_VERSION_FOR_SPECS
-
-  class << self
-    def version
-      SCALA_VERSION_FOR_SPECS
-    end
-  end
-
-  class Scalac
-    class << self
-      def use_installed?
-        false
-      end
-    end
-  end
-end
 
 # We need to run all tests inside a _sandbox, tacking a snapshot of Buildr before the test,
 # and restoring everything to its previous state after the test. Damn state changes.

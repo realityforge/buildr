@@ -17,10 +17,7 @@ $LOADED_FEATURES << 'jruby' unless RUBY_PLATFORM =~ /java/ # Pretend to have JRu
 require 'buildr/jetty'
 require 'buildr/jetty6'
 require 'buildr/nailgun'
-require 'buildr/scala'
 repositories.remote << 'https://repo1.maven.org/maven2'
-
-repositories.remote << 'https://oss.sonatype.org/content/groups/scala-tools'
 
 define 'buildr' do
   compile.using :source=>'1.7', :target=>'1.7', :debug=>false
