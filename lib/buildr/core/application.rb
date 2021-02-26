@@ -388,7 +388,6 @@ module Buildr
     def ask_generate_buildfile
       header = "To use Buildr you need a buildfile. Do you want me to create one?"
       options = {}
-      options["From eclipse .project files"] = [Dir.pwd, true] if Generate.has_eclipse_project?
       options["From Maven2 POM file"] = ['pom.xml', false] if File.exist?('pom.xml')
       options["From directory structure"] = [Dir.pwd, false]
       options["Cancel"]= nil
