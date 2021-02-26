@@ -145,7 +145,6 @@ task 'stage' => %w(clobber prepare) do
 
       sh *cmd, :verbose=>true
     end
-    cp 'etc/KEYS', '_staged/dist'
     puts '[X] Created and signed release packages in _staged/dist'
   end.call
 
@@ -165,7 +164,6 @@ h3. #{spec.name} #{spec.version} (#{STAGE_DATE})
 |_. Package |_. MD5 Checksum |_. PGP |
 #{rows.join("\n")}
 
-p>. ("Release signing keys":#{official}/KEYS)
     TEXTILE
     file_name = 'doc/download.textile'
     print "Adding download links to #{file_name} ... "
