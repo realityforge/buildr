@@ -42,12 +42,12 @@ for those one-off tasks, with a language that's a joy to use.
   spec.platform       = $platform
 
   spec.files          = Dir['{addon,bin,doc,etc,lib,rakelib,spec}/**/*', '*.{gemspec,buildfile}'] +
-                        %w(LICENSE NOTICE CHANGELOG README.rdoc Rakefile _buildr _jbuildr)
+                        %w(LICENSE NOTICE CHANGELOG.md README.rdoc Rakefile _buildr _jbuildr)
   spec.require_paths  = 'lib', 'addon'
   spec.bindir         = 'bin'                               # Use these for applications.
   spec.executable     = 'buildr'
 
-  spec.extra_rdoc_files = 'README.rdoc', 'CHANGELOG', 'LICENSE', 'NOTICE'
+  spec.extra_rdoc_files = 'README.rdoc', 'CHANGELOG.md', 'LICENSE', 'NOTICE'
   spec.rdoc_options     = '--title', 'Buildr', '--main', 'README.rdoc',
                           '--webcvs', 'https://github.com/apache/buildr'
   spec.post_install_message = 'To get started run buildr --help'

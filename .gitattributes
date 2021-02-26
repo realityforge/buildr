@@ -9,6 +9,7 @@
 *.png binary
 *.rake text
 *.rb text
+*.md text
 *.rdoc text
 *.sh text
 *.sh text eol=lf
@@ -20,7 +21,6 @@
 .gitattributes text
 .gitignore text
 Buildfile text
-CHANGELOG text
 Gemfile text
 LICENSE text
 Rakefile text

@@ -45,16 +45,16 @@ task 'prepare' do
     puts '[X] There are no local changes, everything is in source control'
   end.call
 
-  # Make sure we have a valid CHANGELOG entry for this release.
+  # Make sure we have a valid CHANGELOG.md entry for this release.
   lambda do
-    puts 'Checking that CHANGELOG indicates most recent version and today''s date ... '
+    puts 'Checking that CHANGELOG.md indicates most recent version and today''s date ... '
     expecting = "#{spec.version} (#{STAGE_DATE})"
-    header = File.readlines('CHANGELOG').first.chomp
-    fail "Expecting CHANGELOG to start with #{expecting}, but found #{header} instead" unless expecting == header
-    puts '[x] CHANGELOG indicates most recent version and today''s date'
+    header = File.readlines('CHANGELOG.md').first.chomp
+    fail "Expecting CHANGELOG.md to start with #{expecting}, but found #{header} instead" unless expecting == header
+    puts '[x] CHANGELOG.md indicates most recent version and today''s date'
   end.call
 
-  # Make sure we have a valid CHANGELOG entry for this release.
+  # Make sure we have a valid CHANGELOG.md entry for this release.
   lambda do
     puts 'Checking that doc/index.textile indicates most recent version and today''s date ... '
     expecting = "Highlights from Buildr #{spec.version} (#{STAGE_DATE})"
@@ -105,7 +105,7 @@ task 'stage' => %w(clobber prepare) do
   lambda do
     puts 'Looking for changes between this release and previous one ...'
     pattern = /(^(\d+\.\d+(?:\.\d+)?)\s+\(\d{4}-\d{2}-\d{2}\)\s*((:?^[^\n]+\n)*))/
-    changes = File.read('CHANGELOG').scan(pattern).inject({}) { |hash, set| hash[set[1]] = set[2] ; hash }
+    changes = File.read('CHANGELOG.md').scan(pattern).inject({}) { |hash, set| hash[set[1]] = set[2] ; hash }
     current = changes[spec.version.to_s]
     fail "No changeset found for version #{spec.version}" unless current
     File.open '_staged/CHANGES', 'w' do |file|
@@ -205,7 +205,7 @@ h3. #{spec.name} #{spec.version} (#{STAGE_DATE})
     # Need to know who you are on Apache, local user may be different (see .ssh/config).
     base_url = "https://dist.apache.org/repos/dist/dev/buildr/#{spec.version}#{RC_VERSION}"
     # Need changes for this release only.
-    changelog = File.read('CHANGELOG').scan(/(^(\d+\.\d+(?:\.\d+)?)\s+\(\d{4}-\d{2}-\d{2}\)\s*((:?^[^\n]+\n)*))/)
+    changelog = File.read('CHANGELOG.md').scan(/(^(\d+\.\d+(?:\.\d+)?)\s+\(\d{4}-\d{2}-\d{2}\)\s*((:?^[^\n]+\n)*))/)
     changes = changelog[0][2]
     previous_version = changelog[1][1]
 

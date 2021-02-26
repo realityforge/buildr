@@ -76,10 +76,10 @@ desc 'Build a copy of the Web site in the ./_site'
 task 'site' => ['_site', :rdoc, 'buildr.pdf'] do
   cp_r 'rdoc', '_site'
   fail 'No RDocs in site directory' unless File.exist?('_site/rdoc/Buildr.html')
-  cp 'CHANGELOG', '_site'
+  cp 'CHANGELOG.md', '_site'
   open('_site/.htaccess', 'w') do |htaccess|
     htaccess << %Q{
-<FilesMatch "CHANGELOG">
+<FilesMatch "CHANGELOG.md">
 ForceType 'text/plain; charset=UTF-8'
 </FilesMatch>
 }

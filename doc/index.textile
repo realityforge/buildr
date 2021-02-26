@@ -75,7 +75,7 @@ Highlights from Buildr 1.5.7 (2019-02-16)
 * Change: Use https protocol to access Gem metadata. Submitted by Olle Jonsson.
 * Change: Change RSpec shared_context usage to avoid warnings. Submitted by Olle Jonsson.
 
-This is a partial list -- see the "CHANGELOG":CHANGELOG for full details.
+This is a partial list -- see the "CHANGELOG.md":CHANGELOG for full details.
 
 h2(#notices).  Credits & Notices
 

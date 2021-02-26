@@ -79,15 +79,15 @@ task 'release' do
     end
   end.call
 
-  # Update CHANGELOG to next release number.
+  # Update CHANGELOG.md to next release number.
   lambda do
     next_version = spec.version.to_s.split('.').map { |v| v.to_i }.
       zip([0, 0, 1]).map { |a| a.inject(0) { |t,i| t + i } }.join('.')
-    modified = "#{next_version} (Pending)\n\n" + File.read('CHANGELOG')
-    File.open 'CHANGELOG', 'w' do |file|
+    modified = "#{next_version} (Pending)\n\n" + File.read('CHANGELOG.md')
+    File.open 'CHANGELOG.md', 'w' do |file|
       file.write modified
     end
-    puts '[X] Updated CHANGELOG and added entry for next release'
+    puts '[X] Updated CHANGELOG.md and added entry for next release'
   end.call
 
   # Update source files to next release number.
