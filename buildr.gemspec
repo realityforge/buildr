@@ -72,16 +72,6 @@ for those one-off tasks, with a language that's a joy to use.
   spec.add_dependency 'bundler'
   spec.add_dependency 'win32console'          '1.3.2' if $platform.to_s == 'x86-mswin32'
 
-  # Unable to get this consistently working under jruby on windows
-  unless $platform.to_s == 'java'
-    spec.add_development_dependency 'jekyll', '3.1.3'
-    spec.add_development_dependency 'RedCloth', '4.2.9'
-    spec.add_development_dependency 'jekylltask', '1.1.0'
-    spec.add_development_dependency 'pygments.rb', '0.6.3'
-    spec.add_development_dependency 'rdoc', '4.2.2'
-    spec.add_development_dependency 'jekyll-textile-converter', '0.1.0'
-  end
-
   spec.add_development_dependency 'hoe',                  '3.15.1'
   spec.add_development_dependency 'rspec-expectations',   '2.14.3'
   spec.add_development_dependency 'rspec-mocks',          '2.14.3'
@@ -90,11 +80,6 @@ for those one-off tasks, with a language that's a joy to use.
   spec.add_development_dependency 'rspec-retry',          '0.2.1'
   spec.add_development_dependency 'test-unit',            '3.2.1'
   spec.add_development_dependency 'ci_reporter',          '1.9.0'
-  # Ideally we would depend on psych when the platform has >= 1.9.2 support and jruby platform version > 1.6.6
-  #spec.add_development_dependency 'psych' if RUBY_VERSION >= '1.9.2'
-  spec.add_development_dependency 'pygmentize', '0.0.3'
-  spec.add_development_dependency 'saikuro_treemap', '0.2.0'
-  spec.add_development_dependency 'atoulme-Saikuro', '1.2.1'
   # Used to manage whitespace of files within repository
   spec.add_development_dependency 'zapwhite', '2.14.0'
 end

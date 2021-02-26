@@ -17,35 +17,6 @@ RC_VERSION = ENV['RC_VERSION'] || '' unless defined?(RC_VERSION)
 
 desc 'Release the next version of buildr from existing staged repository'
 task 'release' do
-  # First, we need to get all the staged files from Apache to _release.
-  mkpath '_release'
-  lambda do
-    url = "https://dist.apache.org/repos/dist/dev/buildr/#{spec.version}#{RC_VERSION}"
-    puts "Populating _release directory from #{url} ..."
-    sh "svn co #{url} _release/#{spec.version}"
-    puts '[X] Staged files are now in _release'
-  end.call
-
-  # Upload binary and source packages and new Web site
-  lambda do
-    target = "dist/#{spec.version}"
-    puts "Copying packages to #{target}"
-    FileUtils.rm_rf(target)
-    existing_dirs = `ls dist`.split
-    FileUtils.mkdir_p(target)
-    sh 'rsync', '--progress', '--recursive', '--delete', "_release/#{spec.version}/dist/", target
-    sh 'chmod', '-f', '-R', 'g+w', target
-    puts "[X] Copying packages to #{target}"
-
-    puts "[X] Removing existing packages #{existing_dirs.join(', ')}"
-    existing_dirs.each do |dir|
-      sh 'svn', 'rm', '--force', "dist/#{dir}"
-    end
-    puts "Publishing #{spec.name}"
-    task('publish-dist-svn').invoke
-    puts "[X] Publishing #{spec.name}"
-  end.call
-
   # Push gems to RubyGems.org
   lambda do
     files = FileList["_release/#{spec.version}/dist/*.{gem}"]
