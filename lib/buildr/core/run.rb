@@ -17,7 +17,6 @@ module Buildr #:nodoc:
   module Run #:nodoc:
 
     class JavaRunner < Base
-      include Buildr::JRebel
 
       specify :name => :java, :languages => [:java]
 
@@ -25,9 +24,9 @@ module Buildr #:nodoc:
         fail "Missing :main option" unless task.options[:main]
         cp = project.compile.dependencies + [project.path_to(:target, :classes), project.path_to(:target, :resources)] + task.classpath
         Java::Commands.java(task.options[:main], {
-          :properties => jrebel_props(project).merge(task.options[:properties] || {}),
+          :properties => task.options[:properties] || {},
           :classpath => cp,
-          :java_args => jrebel_args + (task.options[:java_args] || [])
+          :java_args => task.options[:java_args] || []
         })
       end
     end # JavaRunnner

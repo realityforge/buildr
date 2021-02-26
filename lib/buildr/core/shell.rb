@@ -17,7 +17,6 @@ module Buildr #:nodoc:
   module Shell #:nodoc:
 
     class BeanShell < Base
-      include Buildr::JRebel
 
       VERSION = '2.0b4'
 
@@ -38,9 +37,9 @@ module Buildr #:nodoc:
                [project.path_to(:target, :classes), Buildr.artifact(BeanShell.artifact)] +
                task.classpath )
         Java::Commands.java 'bsh.Console', {
-          :properties => jrebel_props(project).merge(task.properties),
+          :properties => task.properties,
           :classpath => cp,
-          :java_args => jrebel_args + task.java_args
+          :java_args => task.java_args
         }
       end
 
@@ -48,7 +47,6 @@ module Buildr #:nodoc:
 
 
     class JIRB < Base
-      include JRebel
 
       JRUBY_VERSION = '1.6.2'
 
@@ -63,7 +61,6 @@ module Buildr #:nodoc:
             'jruby.home' => jruby_home,
             'jruby.lib' => "#{jruby_home}#{File::SEPARATOR}lib"
           }
-          props.merge! jrebel_props(project)
           props.merge! task.properties
 
           unless Util.win_os?
@@ -91,7 +88,7 @@ module Buildr #:nodoc:
 
           args = [
             "-Xbootclasspath/a:#{Dir.glob("#{jruby_home}#{File::SEPARATOR}lib#{File::SEPARATOR}jruby*.jar").join File::PATH_SEPARATOR}"
-          ] + jrebel_args + task.java_args
+          ] + task.java_args
 
           Java::Commands.java 'org.jruby.Main', "#{jruby_home}#{File::SEPARATOR}bin#{File::SEPARATOR}jirb", {
             :properties => props,
@@ -101,8 +98,8 @@ module Buildr #:nodoc:
         else
           cp = project.compile.dependencies + [ jruby_artifact, project.path_to(:target, :classes) ] +
                task.classpath
-          props = jrebel_props(project).merge(task.properties)
-          args = jrebel_args + task.java_args
+          props = task.properties.dup
+          args = task.java_args
 
           Java::Commands.java 'org.jruby.Main', '--command', 'irb', {
             :properties => props,
