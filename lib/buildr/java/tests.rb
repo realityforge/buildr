@@ -21,7 +21,7 @@ module Buildr #:nodoc:
     class << self
 
       def applies_to?(project) #:nodoc:
-        project.test.compile.language == :java || project.test.compile.language == :groovy
+        project.test.compile.language == :java
       end
 
       def dependencies
