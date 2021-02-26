@@ -26,7 +26,7 @@ define 'buildr' do
     compile.using(:javac).from(FileList['lib/buildr/java/**/*.java']).into('lib/buildr/java')
   end
 
-  desc 'Buildr extra packages (Antlr, Cobertura, Hibernate, Javacc, JDepend, Jetty, OpenJPA, XmlBeans)'
+  desc 'Buildr extra packages'
   define 'extra', :version=>'1.0' do
     compile.using(:javac).from(FileList['addon/buildr/**/*.java']).into('addon/buildr').with(Buildr::Jetty::REQUIRES, Buildr::Jetty6::REQUIRES, Buildr::Nailgun::ARTIFACT_SPEC)
     # Legals included in source code and show in RDoc.
