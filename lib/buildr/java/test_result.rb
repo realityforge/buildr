@@ -13,7 +13,6 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-# It is necessary to require these files here as the bdd plugin directly includes this file
 require 'yaml'
 
 module Buildr #:nodoc:
