@@ -50,11 +50,6 @@ module Buildr
 
     test "helloWorld", "package"
 
-    test "helloWorldEcj", "package", %Q(
-p result
-#assert(::Buildr::Java.classpath.include?(artifact("org.eclipse.jdt.core.compiler:ecj:jar:3.5.1").to_s))
-    )
-
     test "compile_with_parent", "compile"
 
     test "junit3", "test"
