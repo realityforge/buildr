@@ -36,7 +36,6 @@ artifacts(
   Buildr::Groovy.dependencies,
   Buildr::JaxbXjc.dependencies,
   Buildr::Bnd.dependencies,
-  Buildr::Shell::BeanShell.artifact
 ).each do |path|
   file(path).invoke
 end
