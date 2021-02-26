@@ -3,23 +3,10 @@ jdk:
   - openjdk8
 rvm:
   - 2.3.1
-  - jruby-1.7.27
-  - jruby-9.0.5.0
 git:
   depth: 10
-scala:
-  - 2.11.8
 env:
   global:
     - JRUBY_OPTS="-J-Xmx700M"
     - JAVA_OPTS="-Xmx700m"
-install:
-  - source ci-setup.sh
 script: bundle exec rake ci
-notifications:
-  email:
-    recipients:
-      - commits@buildr.apache.org
-    on_success: always
-    on_failure: always
-  irc: "irc.freenode.org#buildr"
