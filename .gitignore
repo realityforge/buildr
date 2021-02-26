@@ -14,7 +14,6 @@
 /tmp
 *.swp
 /*.log
-/_all-in-one
 /nbproject
 /.rakeTasks
 /*.iml
