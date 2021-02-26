@@ -28,7 +28,6 @@ end
 # Add a 'require' here only for optional extensions, not for extensions that should be loaded by default.
 require 'buildr/bnd'
 require 'buildr/jaxb_xjc'
-require 'buildr/kotlin'
 
 Java.load # Anything added to the classpath.
 artifacts(

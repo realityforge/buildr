@@ -18,7 +18,6 @@ require 'buildr/jetty'
 require 'buildr/jetty6'
 require 'buildr/nailgun'
 require 'buildr/scala'
-require 'buildr/kotlin'
 repositories.remote << 'https://repo1.maven.org/maven2'
 
 repositories.remote << 'https://oss.sonatype.org/content/groups/scala-tools'
@@ -33,11 +32,6 @@ define 'buildr' do
   define 'scala' do
     compile.using(:javac).from(FileList['lib/buildr/scala/**/*.java']).into('lib/buildr/scala')
   end
-
-  define 'kotlin' do
-    compile.using(:javac).from(FileList['lib/buildr/kotlin/**/*.java']).into('lib/buildr/kotlin').with(Buildr::Kotlin::Kotlinc.dependencies)
-  end
-
   desc 'Buildr extra packages (Antlr, Cobertura, Hibernate, Javacc, JDepend, Jetty, OpenJPA, XmlBeans)'
   define 'extra', :version=>'1.0' do
     compile.using(:javac).from(FileList['addon/buildr/**/*.java']).into('addon/buildr').with(Buildr::Jetty::REQUIRES, Buildr::Jetty6::REQUIRES, Buildr::Nailgun::ARTIFACT_SPEC)
