@@ -54,15 +54,6 @@ task 'prepare' do
     puts '[x] CHANGELOG.md indicates most recent version and today''s date'
   end.call
 
-  # Make sure we have a valid CHANGELOG.md entry for this release.
-  lambda do
-    puts 'Checking that doc/index.textile indicates most recent version and today''s date ... '
-    expecting = "Highlights from Buildr #{spec.version} (#{STAGE_DATE})"
-    content = IO.read('doc/index.textile')
-    fail "Expecting doc/index.textile to contain #{expecting}" unless content.include?(expecting)
-    puts '[x] doc/index.textile indicates most recent version and today''s date'
-  end.call
-
   # Need GPG to sign the packages.
   lambda do
     raise "ENV['GPG_USER'] not specified" unless ENV['GPG_USER']
