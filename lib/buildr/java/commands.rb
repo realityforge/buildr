@@ -66,7 +66,7 @@ module Java
               File.directory?(c) && !c.end_with?('/') ? "#{c}/" : c.to_s
             end
             manifest = Buildr::Packaging::Java::Manifest.new([{'Class-Path' => paths.map{|p| URI.encode(p)}.join(" ")}])
-            tjar = Tempfile.new(['javacmd', '.jar'])
+            tjar = Tempfile.new(%w[javacmd .jar])
             Zip::OutputStream.open(tjar.path) do |zos|
               zos.put_next_entry('META-INF/MANIFEST.MF')
               zos.write manifest.to_s

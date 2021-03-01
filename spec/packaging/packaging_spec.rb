@@ -549,7 +549,7 @@ describe Rake::Task, ' package' do
       define('bar') { package }
     end
     task('package').invoke
-    FileList['**/target/*.zip'].map.sort.should == ['bar/target/foo-bar-1.0.zip', 'target/foo-1.0.zip']
+    FileList['**/target/*.zip'].map.sort.should == %w[bar/target/foo-bar-1.0.zip target/foo-1.0.zip]
   end
 end
 

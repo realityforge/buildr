@@ -93,7 +93,7 @@ module Buildr
         fail "Internal error: attempting to access local setting before buildfile located" unless @application.rakefile
         path = File.expand_path(File.dirname(@application.rakefile))
       end
-      file_name = ['yaml', 'yml'].map { |ext| File.join(path, "#{name}.#{ext}") }.find { |fn| File.exist?(fn) }
+      file_name = %w[yaml yml].map { |ext| File.join(path, "#{name}.#{ext}") }.find { |fn| File.exist?(fn) }
       return {} unless file_name
       yaml = YAML.load(File.read(file_name)) || {}
       fail "Expecting #{file_name} to be a map (name: value)!" unless Hash === yaml
@@ -106,7 +106,7 @@ module Buildr
 
   class Application < Rake::Application #:nodoc:
 
-    DEFAULT_BUILDFILES = ['buildfile', 'Buildfile', 'buildfile.rb', 'Buildfile.rb']
+    DEFAULT_BUILDFILES = %w[buildfile Buildfile buildfile.rb Buildfile.rb]
 
     attr_reader :rakefiles, :requires
     private :rakefiles, :requires

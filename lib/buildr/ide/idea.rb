@@ -383,7 +383,7 @@ module Buildr #:nodoc:
 
         source_roots = [buildr_project.iml.main_source_directories, buildr_project.compile.sources, buildr_project.resources.sources].flatten.compact
         default_deployment_descriptors = []
-        ['orm.xml', 'persistence.xml'].
+        %w[orm.xml persistence.xml].
           each do |descriptor|
           source_roots.each do |path|
             d = "#{path}/META-INF/#{descriptor}"

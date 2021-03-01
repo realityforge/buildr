@@ -228,7 +228,7 @@ describe 'javac compiler options' do
   end
 
   it 'should use -lint argument with value of option as array' do
-    compile_task.using(:lint=>['path', 'serial'])
+    compile_task.using(:lint=>%w[path serial])
     javac_args.should include('-Xlint:path,serial')
   end
 
@@ -242,7 +242,7 @@ describe 'javac compiler options' do
   end
 
   it 'should pass other argument if other option is array' do
-    compile_task.using(:other=>['-Xstdout', 'msgs'])
+    compile_task.using(:other=>%w[-Xstdout msgs])
     javac_args.should include('-Xstdout', 'msgs')
   end
 

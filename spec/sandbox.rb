@@ -112,7 +112,7 @@ module Sandbox
     ENV['BUILDR_ENV'] = 'development'
 
     @_sandbox[:env_keys] = ENV.keys
-    ['DEBUG', 'TEST', 'HTTP_PROXY', 'HTTPS_PROXY', 'USER'].each { |k| ENV.delete(k) ; ENV.delete(k.downcase) }
+    %w[DEBUG TEST HTTP_PROXY HTTPS_PROXY USER].each { |k| ENV.delete(k) ; ENV.delete(k.downcase) }
 
     # By default, remote repository is user's own local M2 repository
     # since we don't want to remotely download artifacts into the sandbox over and over

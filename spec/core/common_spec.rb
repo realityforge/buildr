@@ -234,7 +234,7 @@ describe Buildr.method(:filter) do
   end
 
   it 'should use the source directories' do
-    dirs = ['first', 'second']
+    dirs = %w[first second]
     filter('first', 'second').sources.should include(*dirs.map { |dir| file(File.expand_path(dir)) })
   end
 
@@ -263,7 +263,7 @@ describe Buildr::Filter do
   end
 
   it 'should respond to :from and add source directories' do
-    dirs = ['first', 'second']
+    dirs = %w[first second]
     @filter.from(*dirs)
     @filter.sources.should include(*dirs.map { |dir| file(File.expand_path(dir)) })
   end
@@ -312,22 +312,22 @@ describe Buildr::Filter do
 
   it 'should respond to :include and use these inclusion patterns' do
     @filter.from('src').into('target').include('file2', 'file3').run
-    Dir['target/*'].sort.should eql(['target/file2', 'target/file3'])
+    Dir['target/*'].sort.should eql(%w[target/file2 target/file3])
   end
 
   it 'should respond to :include with regular expressions and use these inclusion patterns' do
     @filter.from('src').into('target').include(/file[2|3]/).run
-    Dir['target/*'].sort.should eql(['target/file2', 'target/file3'])
+    Dir['target/*'].sort.should eql(%w[target/file2 target/file3])
   end
 
   it 'should respond to :include with a Proc and use these inclusion patterns' do
     @filter.from('src').into('target').include(lambda {|file| file[-1, 1].to_i%2 == 0}).run
-    Dir['target/*'].sort.should eql(['target/file2', 'target/file4'])
+    Dir['target/*'].sort.should eql(%w[target/file2 target/file4])
   end
 
   it 'should respond to :include with a FileTask and use these inclusion patterns' do
     @filter.from('src').into('target').include(file('target/file2'), file('target/file4')).run
-    Dir['target/*'].sort.should eql(['target/file2', 'target/file4'])
+    Dir['target/*'].sort.should eql(%w[target/file2 target/file4])
   end
 
   it 'should respond to :exclude and return self' do
@@ -336,29 +336,29 @@ describe Buildr::Filter do
 
   it 'should respond to :exclude and use these exclusion patterns' do
     @filter.from('src').into('target').exclude('file2', 'file3').run
-    Dir['target/*'].sort.should eql(['target/file1', 'target/file4'])
+    Dir['target/*'].sort.should eql(%w[target/file1 target/file4])
   end
 
   it 'should respond to :exclude with regular expressions and use these exclusion patterns' do
     @filter.from('src').into('target').exclude(/file[2|3]/).run
-    Dir['target/*'].sort.should eql(['target/file1', 'target/file4'])
+    Dir['target/*'].sort.should eql(%w[target/file1 target/file4])
   end
 
   it 'should respond to :exclude with a Proc and use these exclusion patterns' do
     @filter.from('src').into('target').exclude(lambda {|file| file[-1, 1].to_i%2 == 0}).run
-    Dir['target/*'].sort.should eql(['target/file1', 'target/file3'])
+    Dir['target/*'].sort.should eql(%w[target/file1 target/file3])
   end
 
   it 'should respond to :exclude with a FileTask and use these exclusion patterns' do
     @filter.from('src').into('target').exclude(file('target/file1'), file('target/file3')).run
-    Dir['target/*'].sort.should eql(['target/file2', 'target/file4'])
+    Dir['target/*'].sort.should eql(%w[target/file2 target/file4])
   end
 
   it 'should respond to :exclude with a FileTask, use these exclusion patterns and depend on those tasks' do
     file1 = false
     file2 = false
     @filter.from('src').into('target').exclude(file('target/file1').enhance { file1 = true }, file('target/file3').enhance {file2 = true }).run
-    Dir['target/*'].sort.should eql(['target/file2', 'target/file4'])
+    Dir['target/*'].sort.should eql(%w[target/file2 target/file4])
     @filter.target.invoke
     file1.should be_true
     file2.should be_true
@@ -409,7 +409,7 @@ describe Buildr::Filter do
   end
 
   it 'should not apply filters to binary files' do
-    ["jpg", "jpeg", "gif", "png"].each { |ext| write "images/file.#{ext}", 'something' }
+    %w[jpg jpeg gif png].each { |ext| write "images/file.#{ext}", 'something' }
     filter = @filter.from('images').into('target').using('key1'=>'value1', 'key2'=>'value2')
     filter.instance_variable_get("@mapper").should_not_receive(:maven_transform)
     filter.run
@@ -653,7 +653,7 @@ describe Buildr::Options, 'proxy.exclude' do
   end
 
   it 'should support multiple host names' do
-    options.proxy.exclude = ['optimus', 'prime']
+    options.proxy.exclude = %w[optimus prime]
     Net::HTTP.should_receive(:new).with('optimus', 80).and_return(@http)
     URI('http://optimus').read :proxy=>options.proxy
     Net::HTTP.should_receive(:new).with('prime', 80).and_return(@http)

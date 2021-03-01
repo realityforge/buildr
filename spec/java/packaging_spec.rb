@@ -385,7 +385,7 @@ RSpec.shared_examples 'package with meta_inf' do
   end
 
   it 'should include files specified by :meta_inf option' do
-    files = ['README', 'DISCLAIMER'].each { |file| write file }
+    files = %w[README DISCLAIMER].each { |file| write file }
     package_with_meta_inf files
     inspect_meta_inf { |files| files.should eql(files) }
   end
@@ -397,7 +397,7 @@ RSpec.shared_examples 'package with meta_inf' do
   end
 
   it 'should include file tasks specified by :meta_inf option' do
-    files = ['README', 'DISCLAIMER'].each { |file| file(file) { |task| write task.to_s } }
+    files = %w[README DISCLAIMER].each { |file| file(file) { |task| write task.to_s } }
     package_with_meta_inf files.map { |f| file(f) }
     inspect_meta_inf { |files| files.should eql(files) }
   end
@@ -600,7 +600,7 @@ describe Packaging, 'war' do
 
   it 'should accept artifacts from :libs option' do
     make_jars
-    define('foo', :version=>'1.0') { package(:war).with(:libs=>['group:id:jar:1.0', 'group:id:jar:2.0']) }
+    define('foo', :version=>'1.0') { package(:war).with(:libs=>%w[group:id:jar:1.0 group:id:jar:2.0]) }
     inspect_war { |files| files.should include('META-INF/MANIFEST.MF', 'WEB-INF/lib/id-1.0.jar', 'WEB-INF/lib/id-2.0.jar') }
   end
 

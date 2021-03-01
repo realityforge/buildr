@@ -145,7 +145,7 @@ describe Project, ' block' do
   end
 
   it 'should execute in namespace of project' do
-    define('foo') { define('bar') { Buildr.application.current_scope.should eql(['foo', 'bar']) } }
+    define('foo') { define('bar') { Buildr.application.current_scope.should eql(%w[foo bar]) } }
   end
 end
 
@@ -355,7 +355,7 @@ describe Rake::Task, ' recursive' do
 
   it 'should invoke in depth-first order' do
     task('foo:doda').invoke
-    @order.should eql([ 'foo:bar:baz', 'foo:bar', 'foo' ])
+    @order.should eql(%w[foo:bar:baz foo:bar foo])
   end
 
   it 'should not invoke task in parent project' do
@@ -419,7 +419,7 @@ describe 'Sub-project' do
       define('bar') { ordered << self.name }
       define('baz') { ordered << self.name }
     end
-    ordered.should eql(['foo', 'foo:bar', 'foo:baz'])
+    ordered.should eql(%w[foo foo:bar foo:baz])
   end
 
   it 'should execute in order of dependency' do
@@ -429,7 +429,7 @@ describe 'Sub-project' do
       define('bar') { project('foo:baz') ; ordered << self.name }
       define('baz') { ordered << self.name }
     end
-    ordered.should eql(['foo', 'foo:baz', 'foo:bar'])
+    ordered.should eql(%w[foo foo:baz foo:bar])
   end
 
   it 'should warn of circular dependency' do
@@ -649,7 +649,7 @@ describe Project, '#task' do
   end
 
   it 'should accept multiple dependencies' do
-    define('foo') { task('bar'=>['baz1', 'baz2']) }
+    define('foo') { task('bar'=>%w[baz1 baz2]) }
     project('foo').task('bar').prerequisites.should include('baz1')
     project('foo').task('bar').prerequisites.should include('baz2')
   end
@@ -659,7 +659,7 @@ describe Project, '#task' do
       task 'baz'
       task 'bar'=>'baz'
     end
-    lambda { project('foo').task('bar').invoke }.should run_tasks(['foo:baz', 'foo:bar'])
+    lambda { project('foo').task('bar').invoke }.should run_tasks(%w[foo:baz foo:bar])
   end
 
   it 'should create a file task' do
@@ -683,7 +683,7 @@ describe Project, '#task' do
   end
 
   it 'should accept multiple dependencies' do
-    define('foo') { file('bar'=>['baz1', 'baz2']) }
+    define('foo') { file('bar'=>%w[baz1 baz2]) }
     project('foo').file('bar').prerequisites.should include('baz1')
     project('foo').file('bar').prerequisites.should include('baz2')
   end

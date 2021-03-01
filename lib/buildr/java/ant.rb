@@ -32,7 +32,7 @@ module Buildr #:nodoc:
 
       # Ant classpath dependencies.
       def dependencies
-        @dependencies ||= ["org.apache.ant:ant:jar:#{version}", "org.apache.ant:ant-launcher:jar:#{version}"]
+        @dependencies ||= %W[org.apache.ant:ant:jar:#{version} org.apache.ant:ant-launcher:jar:#{version}]
       end
     end
 

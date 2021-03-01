@@ -76,7 +76,7 @@ describe Buildr::ArtifactNamespace do
     it 'should return the namespace for the given name' do
       artifact_ns(:foo).name.should == 'foo'
       artifact_ns('foo:bar').name.should == 'foo:bar'
-      artifact_ns(['foo', 'bar', 'baz']).name.should == 'foo:bar:baz'
+      artifact_ns(%w[foo bar baz]).name.should == 'foo:bar:baz'
       abc_module do
         artifact_ns(A::B::C).name.should == 'A::B::C'
       end
@@ -210,8 +210,7 @@ describe Buildr::ArtifactNamespace do
 
     it 'should take a hash :name -> specs_array' do
       define 'one' do
-        artifact_ns.need :things => ['foo:bar:jar:1.0',
-                                     'foo:baz:jar:2.0',]
+        artifact_ns.need :things => %w[foo:bar:jar:1.0 foo:baz:jar:2.0]
         artifact_ns['foo:bar:jar'].should_not be_selected
         artifact_ns['foo:baz:jar'].should_not be_selected
         artifact_ns[:bar, :baz].should == [nil, nil]
@@ -294,7 +293,7 @@ describe Buildr::ArtifactNamespace do
     end
 
     it 'should be able to register a group' do
-      specs = ['its:me:here:1', 'its:you:there:2']
+      specs = %w[its:me:here:1 its:you:there:2]
       artifact_ns.use :them => specs
       artifact_ns[:them].map(&:to_spec).should == specs
       artifact_ns['its:me:here'].should_not be_nil

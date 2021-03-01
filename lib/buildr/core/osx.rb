@@ -26,7 +26,7 @@ if $stdout.isatty && verbose
       # Register with Growl, that way you can turn notifications on/off from system preferences.
       OSX::NSDistributedNotificationCenter.defaultCenter.
         postNotificationName_object_userInfo_deliverImmediately(:GrowlApplicationRegistrationNotification, nil,
-          { :ApplicationName=>'Buildr', :AllNotifications=>['Completed', 'Failed'],
+          { :ApplicationName=>'Buildr', :AllNotifications=>%w[Completed Failed],
             :ApplicationIcon=>icon.TIFFRepresentation }, true)
 
       OSX::NSDistributedNotificationCenter.defaultCenter.

@@ -215,7 +215,7 @@ describe Buildr::Application do
 
     it 'should parse multiple version requirements' do
       write 'build.yaml', 'gems: buildr-foo >=2.0 !=2.1'
-      should_attempt_to_load_dependency(Gem::Dependency.new('buildr-foo', ['>=2.0', '!=2.1']))
+      should_attempt_to_load_dependency(Gem::Dependency.new('buildr-foo', %w[>=2.0 !=2.1]))
     end
 
     def should_attempt_to_load_dependency(dep)
@@ -284,7 +284,7 @@ describe Buildr::Application do
     end
 
     it 'should load files from all the directories specified in the rakelib option' do
-      Buildr.application.options.rakelib = ['ext', 'more', 'tasks']
+      Buildr.application.options.rakelib = %w[ext more tasks]
       write_task 'ext/foo.rake'
       write_task 'tasks/bar.rake'
       write_task 'tasks/zeb.rake'

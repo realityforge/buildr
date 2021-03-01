@@ -527,7 +527,7 @@ describe URI::SFTP, '#write' do
   end
 
   it 'should check that path exists on server' do
-    paths = ['/root', '/root/path']
+    paths = %w[/root /root/path]
     @sftp_session.should_receive(:opendir!).with(anything()).twice { |path| paths.shift.should == path }
     @uri.write @content
   end
@@ -547,7 +547,7 @@ describe URI::SFTP, '#write' do
   end
 
   it 'should create missing directories recursively' do
-    paths = ['/root', '/root/path']
+    paths = %w[/root /root/path]
     @sftp_session.should_receive(:mkdir!).with(anything(), {}).twice { |path, options| paths.shift.should == path }
     @uri.write @content
   end

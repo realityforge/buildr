@@ -38,7 +38,7 @@ module CompilerHelper
   end
 
   def sources
-    @sources ||= ['Test1.java', 'Test2.java'].map { |f| File.join('src/main/java/thepackage', f) }.
+    @sources ||= %w[Test1.java Test2.java].map { |f| File.join('src/main/java/thepackage', f) }.
       each { |src| write src, "package thepackage; class #{src.pathmap('%n')} {}" }
   end
 
@@ -313,7 +313,7 @@ describe Buildr::CompileTask, '#invoke' do
 
   it 'should run all dependencies as prerequisites' do
     file(File.expand_path('no-such.jar')) { |task| task('prereq').invoke }
-    lambda { compile_task.from(sources).with('no-such.jar').into('classes').invoke }.should run_tasks(['prereq', 'foo:compile'])
+    lambda { compile_task.from(sources).with('no-such.jar').into('classes').invoke }.should run_tasks(%w[prereq foo:compile])
   end
 
   it 'should force compilation if no target' do
@@ -514,7 +514,7 @@ describe Project, '#resources' do
   end
 
   it 'should accept prerequisites' do
-    tasks = ['task1', 'task2'].each { |name| task(name) }
+    tasks = %w[task1 task2].each { |name| task(name) }
     define('foo') { resources 'task1', 'task2' }
     lambda { project('foo').resources.invoke }.should run_tasks('task1', 'task2')
   end
@@ -524,7 +524,7 @@ describe Project, '#resources' do
     write 'extra/spicy'
     define('foo') { resources.from 'extra' }
     project('foo').resources.invoke
-    FileList['target/resources/*'].sort.should  == ['target/resources/original', 'target/resources/spicy']
+    FileList['target/resources/*'].sort.should  == %w[target/resources/original target/resources/spicy]
   end
 
   it 'should pass include pattern to filter' do
@@ -538,7 +538,7 @@ describe Project, '#resources' do
     3.times { |i| write "src/main/resources/test#{i + 1}" }
     define('foo') { resources.exclude('test2') }
     project('foo').resources.invoke
-    FileList['target/resources/*'].sort.should  == ['target/resources/test1', 'target/resources/test3']
+    FileList['target/resources/*'].sort.should  == %w[target/resources/test1 target/resources/test3]
   end
 
   it 'should accept block and enhance task' do

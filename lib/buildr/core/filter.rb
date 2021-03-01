@@ -309,7 +309,7 @@ module Buildr #:nodoc:
         self
       end
 
-      BINARY_FILES = [ '*.png', '*.gif', '*.jpg', '*.jpeg' ]
+      BINARY_FILES = %w[*.png *.gif *.jpg *.jpeg]
 
       def is_binary?(content, path)
         !!path && BINARY_FILES.any? { |glob| File.fnmatch(glob, path) }

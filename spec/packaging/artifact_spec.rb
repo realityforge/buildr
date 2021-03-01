@@ -340,8 +340,8 @@ describe Repositories, 'remote' do
   end
 
   it 'should lookup in array order' do
-    repositories.remote = [ 'http://buildr.apache.org/repository/noexist', 'http://example.org' ]
-    order = ['com', 'org']
+    repositories.remote = %w[http://buildr.apache.org/repository/noexist http://example.org]
+    order = %w[com org]
     URI.stub(:download) do |uri, target, options|
       order.shift if order.first && uri.to_s[order.first]
       fail URI::NotFoundError unless order.empty?
@@ -803,12 +803,12 @@ end
 
 describe Buildr, '#artifacts' do
   it 'should return a list of artifacts from all its arguments' do
-    specs = [ 'saxon:saxon:jar:8.4', 'saxon:saxon-dom:jar:8.4', 'saxon:saxon-xpath:jar:8.4' ]
+    specs = %w[saxon:saxon:jar:8.4 saxon:saxon-dom:jar:8.4 saxon:saxon-xpath:jar:8.4]
     artifacts(*specs).should eql(specs.map { |spec| artifact(spec) })
   end
 
   it 'should accept nested arrays' do
-    specs = [ 'saxon:saxon:jar:8.4', 'saxon:saxon-dom:jar:8.4', 'saxon:saxon-xpath:jar:8.4' ]
+    specs = %w[saxon:saxon:jar:8.4 saxon:saxon-dom:jar:8.4 saxon:saxon-xpath:jar:8.4]
     artifacts([[specs[0]]], [[specs[1]], specs[2]]).should eql(specs.map { |spec| artifact(spec) })
   end
 
@@ -1274,12 +1274,12 @@ XML
   end
 
   it 'should return a list of artifacts from all its arguments' do
-    specs = [ 'saxon:saxon:jar:8.4', 'saxon:saxon-dom:jar:8.4', 'saxon:saxon-xpath:jar:8.4' ]
+    specs = %w[saxon:saxon:jar:8.4 saxon:saxon-dom:jar:8.4 saxon:saxon-xpath:jar:8.4]
     transitive(*specs).should eql(specs.map { |spec| artifact(spec) })
   end
 
   it 'should accept nested arrays' do
-    specs = [ 'saxon:saxon:jar:8.4', 'saxon:saxon-dom:jar:8.4', 'saxon:saxon-xpath:jar:8.4' ]
+    specs = %w[saxon:saxon:jar:8.4 saxon:saxon-dom:jar:8.4 saxon:saxon-xpath:jar:8.4]
     transitive([[specs[0]]], [[specs[1]], specs[2]]).should eql(specs.map { |spec| artifact(spec) })
   end
 

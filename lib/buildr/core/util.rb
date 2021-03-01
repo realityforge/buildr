@@ -153,7 +153,7 @@ end
 
 unless defined? BasicObject # 1.9
   class BasicObject #:nodoc:
-    (instance_methods - ['__send__', '__id__', '==', 'send', 'send!', 'respond_to?', 'equal?', 'object_id']).
+    (instance_methods - %w[__send__ __id__ == send send! respond_to? equal? object_id]).
       each do |method|
         undef_method method
       end

@@ -63,7 +63,7 @@ XML
 
   it 'should respect exclusions when computing transitive dependencies' do
     pom = POM.load(artifact(@app).pom)
-    specs = [ 'org.example:library:jar:1.1', 'org.example:foo:jar:2.0' ]
+    specs = %w[org.example:library:jar:1.1 org.example:foo:jar:2.0]
     pom.dependencies.should eql(specs)
   end
 end

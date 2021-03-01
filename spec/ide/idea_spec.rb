@@ -544,8 +544,7 @@ describe Buildr::IntellijIdea do
 
         @foo = define "foo" do
           iml.add_jpa_facet(:provider_enabled => 'Hibernate',
-                            :deployment_descriptors => ["src/main/resources2/META-INF/persistence.xml",
-                                                        "src/main/resources2/META-INF/orm.xml"])
+                            :deployment_descriptors => %w[src/main/resources2/META-INF/persistence.xml src/main/resources2/META-INF/orm.xml])
         end
         invoke_generate_task
       end
@@ -655,7 +654,7 @@ describe Buildr::IntellijIdea do
     describe "using add_ejb_facet specifying parameters" do
       before do
         @foo = define "foo" do
-          iml.add_ejb_facet(:ejb_roots => ["generated/main/java","generated/main/resources"],
+          iml.add_ejb_facet(:ejb_roots => %w[generated/main/java generated/main/resources],
           :deployment_descriptors => ["generated/main/resources/WEB-INF/ejb-jar.xml"])
         end
         invoke_generate_task
@@ -962,9 +961,9 @@ describe Buildr::IntellijIdea do
           end
           ipr.add_exploded_war_artifact(project,
                                         :name => 'gar',
-                                        :war_module_names => ['x','y'],
-                                        :gwt_module_names => ['p','q'],
-                                        :artifacts => ['baz','biz'],
+                                        :war_module_names => %w[x y],
+                                        :gwt_module_names => %w[p q],
+                                        :artifacts => %w[baz biz],
                                         :dependencies => ['net.sourceforge.jtds:jtds:jar:1.2.7.XX', project('bar')])
         end
         invoke_generate_task
@@ -1356,7 +1355,7 @@ describe Buildr::IntellijIdea do
       it "generate an IPR with the references to correct module files" do
         doc = xml_document(@foo._("foo.ipr"))
         doc.should have_nodes("#{xpath_to_module}", 5)
-        ["foo.iml", "fe/bar.iml", "fi/baz.iml", "fi/foe/foe.iml", "fe/fum/fum.iml"].each do |module_ref|
+        %w[foo.iml fe/bar.iml fi/baz.iml fi/foe/foe.iml fe/fum/fum.iml].each do |module_ref|
           doc.should have_nodes("#{xpath_to_module}[@fileurl='file://$PROJECT_DIR$/#{module_ref}' && @filepath='$PROJECT_DIR$/#{module_ref}']", 1)
         end
       end
