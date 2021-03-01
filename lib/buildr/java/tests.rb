@@ -263,7 +263,6 @@ module Buildr #:nodoc:
       end
 
       def dependencies
-        return ["org.testng:testng:jar:jdk15:#{version}"] if version < '6.0'
         %W(org.testng:testng:jar:#{version} com.beust:jcommander:jar:1.27)
       end
     end
@@ -277,7 +276,6 @@ module Buildr #:nodoc:
     def run(tests, dependencies) #:nodoc:
       cmd_args = []
       cmd_args << '-suitename' << task.project.id
-      cmd_args << '-sourcedir' << task.compile.sources.join(';') if TestNG.version < '6.0'
       cmd_args << '-log' << '2'
       cmd_args << '-d' << task.report_to.to_s
       exclude_args = options[:excludegroups] || []
@@ -289,7 +287,7 @@ module Buildr #:nodoc:
         cmd_args << '-groups' << groups_args.join(',')
       end
       # run all tests in the same suite
-      cmd_args << '-testclass' << (TestNG.version < '6.0' ? test : tests.join(','))
+      cmd_args << '-testclass' << tests.join(',')
 
       cmd_args += options[:args] if options[:args]
 
