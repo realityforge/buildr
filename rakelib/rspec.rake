@@ -37,7 +37,7 @@ RSpec::Core::RakeTask.new :spec => ['_reports', :compile] do |task|
   files = FileList['spec/**/*_spec.rb']
   task.rspec_path = 'bundle exec rspec'
   task.rspec_files = files
-  task.rspec_opts = %w{--order random:123 --format html --out _reports/specs.html --backtrace}
+  task.rspec_opts = %w{--order defined --format html --out _reports/specs.html --backtrace}
 end
 file('_reports/specs.html') { task(:spec).invoke }
 
