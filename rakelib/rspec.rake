@@ -16,12 +16,6 @@
 require 'rspec/core/rake_task'
 directory '_reports'
 
-def default_spec_opts
-  default = %w{--order random:123 --format documentation --out _reports/specs.txt --backtrace}
-  default << '--colour' if $stdout.isatty && !(RbConfig::CONFIG['host_os'] =~ /mswin|win32|dos/i)
-  default
-end
-
 # RSpec doesn't support file exclusion, so hack our own.
 class RSpec::Core::RakeTask
   attr_accessor :rspec_files
