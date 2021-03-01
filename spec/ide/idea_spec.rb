@@ -694,56 +694,6 @@ describe Buildr::IntellijIdea do
       end
     end
 
-    describe "using add_jruby_facet" do
-      before do
-
-        @foo = define "foo" do
-          iml.add_jruby_facet
-        end
-        invoke_generate_task
-      end
-
-      it "generates a jruby facet with appropriate sdk" do
-        doc = xml_document(@foo._("foo.iml"))
-        jruby_facet_xpath = ensure_facet_xpath(doc, 'JRUBY', 'JRuby')
-        doc.should have_xpath("#{jruby_facet_xpath}/configuration/JRUBY_FACET_CONFIG_ID[@NAME='JRUBY_SDK_NAME', VALUE='jruby-1.6.7.2']")
-      end
-
-      it "generates a jruby facet with appropriate paths" do
-        doc = xml_document(@foo._("foo.iml"))
-        jruby_facet_xpath = ensure_facet_xpath(doc, 'JRUBY', 'JRuby')
-        prefix = "#{jruby_facet_xpath}/configuration"
-        doc.should have_xpath("#{prefix}/LOAD_PATH[@number='0']")
-        doc.should have_xpath("#{prefix}/I18N_FOLDERS[@number='0']")
-      end
-    end
-
-    describe "using add_jruby_facet with .ruby-version specified" do
-      before do
-
-        write ".ruby-version", "jruby-1.7.2"
-
-        @foo = define "foo" do
-          iml.add_jruby_facet
-        end
-        invoke_generate_task
-      end
-
-      it "generates a jruby facet with appropriate sdk" do
-        doc = xml_document(@foo._("foo.iml"))
-        jruby_facet_xpath = ensure_facet_xpath(doc, 'JRUBY', 'JRuby')
-        doc.should have_xpath("#{jruby_facet_xpath}/configuration/JRUBY_FACET_CONFIG_ID[@NAME='JRUBY_SDK_NAME', VALUE='rbenv: jruby-1.7.2']")
-      end
-
-      it "generates a jruby facet with appropriate paths" do
-        doc = xml_document(@foo._("foo.iml"))
-        jruby_facet_xpath = ensure_facet_xpath(doc, 'JRUBY', 'JRuby')
-        prefix = "#{jruby_facet_xpath}/configuration"
-        doc.should have_xpath("#{prefix}/LOAD_PATH[@number='0']")
-        doc.should have_xpath("#{prefix}/I18N_FOLDERS[@number='0']")
-      end
-    end
-
     describe "with add_data_source" do
       before do
         artifact("org.postgresql:postgresql:jar:9.not-a-version") { |task| write task.name }
