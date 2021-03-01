@@ -23,22 +23,24 @@ module Buildr
       # The specs for requirements
       def dependencies
         %w(
+          com.github.spotbugs:spotbugs:jar:4.2.1
+          com.github.spotbugs:spotbugs-annotations:jar:4.2.1
           com.google.code.findbugs:jsr305:jar:3.0.2
-          com.github.spotbugs:spotbugs-ant:jar:3.1.5
-          com.github.spotbugs:spotbugs:jar:3.1.5
-          com.github.spotbugs:spotbugs-annotations:jar:3.1.5
-          com.google.code.findbugs:jFormatString:jar:3.0.0
-          commons-lang:commons-lang:jar:2.6
-          org.dom4j:dom4j:jar:2.1.0
-          jaxen:jaxen:jar:1.1.6
           net.jcip:jcip-annotations:jar:1.0
-          org.apache.bcel:bcel:jar:6.2
-
-          org.ow2.asm:asm:jar:7.1
-          org.ow2.asm:asm-analysis:jar:7.1
-          org.ow2.asm:asm-commons:jar:7.1
-          org.ow2.asm:asm-tree:jar:7.1
-          org.ow2.asm:asm-util:jar:7.1
+          org.apache.bcel:bcel:jar:6.5.0
+          org.apache.commons:commons-lang3:jar:3.11
+          org.apache.commons:commons-text:jar:1.9
+          org.dom4j:dom4j:jar:2.1.3
+          org.json:json:jar:20201115
+          org.ow2.asm:asm:jar:9.0
+          org.ow2.asm:asm-analysis:jar:9.0
+          org.ow2.asm:asm-tree:jar:9.0
+          org.ow2.asm:asm-commons:jar:9.0
+          org.ow2.asm:asm-util:jar:9.0
+          org.slf4j:slf4j-api:jar:1.7.30
+          org.slf4j:slf4j-jdk14:jar:1.7.30
+          jaxen:jaxen:jar:1.2.0
+          net.sf.saxon:Saxon-HE:jar:10.3
         )
       end
 
