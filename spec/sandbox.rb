@@ -27,7 +27,7 @@ end
 
 Java.load # Anything added to the classpath.
 artifacts(
-  TestFramework.frameworks.map(&:dependencies).flatten, JUnit.ant_taskdef,
+  TestFramework.frameworks.map(&:dependencies).flatten
 ).each do |path|
   file(path).invoke
 end

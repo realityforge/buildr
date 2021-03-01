@@ -1374,14 +1374,14 @@ describe Buildr::IntellijIdea do
           define 'foo' do
             resources.from _(:source, :main, :resources)
             compile.with 'group:id:jar:1.0'
-            test.using(:junit)
+            test.using(:testng)
             package(:jar)
           end
 
           define 'bar' do
             # internally transitive dependencies on foo, both runtime and test
             compile.with project('root:foo'), project('root:foo').compile.dependencies
-            test.using(:junit).with [project('root:foo').test.compile.target,
+            test.using(:testng).with [project('root:foo').test.compile.target,
                                      project('root:foo').test.resources.target,
                                      project('root:foo').test.compile.dependencies].compact
             package(:jar)

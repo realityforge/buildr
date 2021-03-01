@@ -59,13 +59,12 @@ module Buildr #:nodoc:
 
     end
 
-    # Base class for all test frameworks, with common functionality.  Extend and over-ride as you see fit
-    # (see JUnit as an example).
+    # Base class for all test frameworks, with common functionality.  Extend and over-ride as you see fit.
     class Base
 
       class << self
 
-        # The framework's identifier (e.g. :junit).  Inferred from the class name.
+        # The framework's identifier (e.g. :testng).  Inferred from the class name.
         def to_sym
           @symbol ||= name.split('::').last.downcase.to_sym
         end

@@ -108,7 +108,7 @@ module Buildr #:nodoc:
   # The project itself will define several life cycle tasks for you. For example,
   # it automatically creates a compile task that will compile all the source files
   # found in src/main/java into target/classes, a test task that will compile source
-  # files from src/test/java and run all the JUnit tests found there, and a build
+  # files from src/test/java and run all the tests found there, and a build
   # task to compile and then run the tests.
   #
   # You use the project definition to enhance these tasks, for example, telling the

@@ -106,9 +106,7 @@ module Buildr #:nodoc:
           attrs.each { |name, value| instance_variable_set("@#{name}", value) }
         end
 
-        # Returns additional dependencies required by this language.  For example, since the
-        # test framework picks on these, you can use the JUnit framework with Scala.
-        # Defaults to obtaining a list of artifact specifications from the REQUIRES constant.
+        # Returns additional dependencies required by this language.
         def dependencies
           []
         end
@@ -144,8 +142,7 @@ module Buildr #:nodoc:
         raise 'Not implemented'
       end
 
-      # Returns additional dependencies required by this language.  For example, since the
-      # test framework picks on these, you can use the JUnit framework with Scala.
+      # Returns additional dependencies required by this language.
       def dependencies
         self.class.dependencies
       end
