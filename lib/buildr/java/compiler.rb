@@ -47,21 +47,11 @@ module Buildr #:nodoc:
 
       def compile(sources, target, dependencies) #:nodoc:
         check_options options, OPTIONS
-        cmd_args = []
-        # tools.jar contains the Java compiler.
-        dependencies << Java.tools_jar if Java.tools_jar
-        cmd_args << '-classpath' << dependencies.join(File::PATH_SEPARATOR) unless dependencies.empty?
-        source_paths = sources.select { |source| File.directory?(source) }
-        cmd_args << '-sourcepath' << source_paths.join(File::PATH_SEPARATOR) unless source_paths.empty?
-        cmd_args << '-d' << File.expand_path(target)
-        cmd_args += javac_args
-        cmd_args += files_from_sources(sources)
-        unless Buildr.application.options.dryrun
-          trace((['javac'] + cmd_args).join(' '))
-          Java.load
-          Java.com.sun.tools.javac.Main.compile(cmd_args.to_java(Java.java.lang.String)) == 0 or
-            fail 'Failed to compile, see errors above'
-        end
+        Java::Commands.javac(files_from_sources(sources),
+                             :classpath => dependencies,
+                             :sourcepath => sources.select { |source| File.directory?(source) },
+                             :output => target,
+                             :javac_args => self.javac_args)
       end
 
       # Filter out source files that are known to not produce any corresponding .class output file. If we leave
@@ -76,7 +66,7 @@ module Buildr #:nodoc:
       def javac_args #:nodoc:
         args = []
         args << '-nowarn' unless options[:warnings]
-        args << '-verbose' if trace? :javac
+        args << '-verbose' if trace?(:javac)
         args << '-g' if options[:debug]
         args << '-deprecation' if options[:deprecation]
         args << '-source' << options[:source].to_s if options[:source]

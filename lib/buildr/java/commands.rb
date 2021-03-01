@@ -112,7 +112,7 @@ module Java
       # * :sourcepath -- Additional source paths to use.
       # * :javac_args -- Any additional arguments to pass (e.g. -extdirs, -encoding)
       # * :name -- Shows this name, otherwise shows the working directory.
-      def javac(*args)
+      def javac(*args, &block)
         options = Hash === args.last ? args.pop : {}
         rake_check_options options, :classpath, :sourcepath, :output, :javac_args, :name
 
@@ -121,19 +121,23 @@ module Java
         name = options[:name] || Dir.pwd
 
         cmd_args = []
+        cmd_args << path_to_bin('javac')
         cp = classpath_from(options)
         cmd_args << '-classpath' << cp.join(File::PATH_SEPARATOR) unless cp.empty?
         cmd_args << '-sourcepath' << [options[:sourcepath]].flatten.join(File::PATH_SEPARATOR) if options[:sourcepath]
         cmd_args << '-d' << File.expand_path(options[:output].to_s) if options[:output]
         cmd_args += options[:javac_args].flatten if options[:javac_args]
-        cmd_args += files
+        Tempfile.open('javac') do |tmp|
+          tmp.write files.join(' ')
+          cmd_args << "@#{tmp.path}"
+        end
         unless Buildr.application.options.dryrun
           mkdir_p options[:output] if options[:output]
           info "Compiling #{files.size} source files in #{name}"
-          trace (['javac'] + cmd_args).join(' ')
-          Java.load
-          ::Java::com.sun.tools.javac.Main.compile(cmd_args.to_java(::Java::java.lang.String)) == 0 or
-            fail 'Failed to compile, see errors above'
+          block = lambda { |ok, res| fail 'Failed to compile, see errors above' unless ok } unless block
+          sh(*cmd_args) do |ok, ps|
+            block.call ok, ps
+          end
         end
       end
 
