@@ -54,20 +54,6 @@ task 'prepare' do
     puts '[x] CHANGELOG.md indicates most recent version and today''s date'
   end.call
 
-  # Need GPG to sign the packages.
-  lambda do
-    raise "ENV['GPG_USER'] not specified" unless ENV['GPG_USER']
-
-    gpg_arg = ENV['GPG_USER']
-    gpg_arg or fail 'Please run with GPG_USER=<argument for gpg --local-user>'
-    gpg_ok = `gpg2 --list-keys #{gpg_arg}` rescue nil
-    unless $?.success?
-      gpg_ok = `gpg --list-keys #{gpg_arg}`
-      gpg_cmd = 'gpg'
-    end
-    fail "No GPG user #{gpg_arg}" if gpg_ok.empty?
-  end.call
-
   task('license').invoke
   task('addon_extensions:check').invoke
 
