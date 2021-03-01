@@ -1039,14 +1039,14 @@ module Buildr #:nodoc:
       end
 
       def add_glassfish_configuration(project, options = {})
-        artifact_name = options[:name] || project.iml.id
         version = options[:version] || '4.1.0'
         server_name = options[:server_name] || "GlassFish #{version}"
         configuration_name = options[:configuration_name] || server_name
         domain_name = options[:domain] || project.iml.id
         domain_port = options[:port] || '9009'
         packaged = options[:packaged] || {}
-        exploded = options[:exploded] || []
+        exploded = options[:exploded] || {}
+        artifacts = options[:artifacts] || {}
 
         add_to_composite_component(self.configurations) do |xml|
           xml.configuration(:name => configuration_name, :type => 'GlassfishConfiguration', :factoryName => 'Local', :default => false, :APPLICATION_SERVER_NAME => server_name) do |xml|
@@ -1064,9 +1064,20 @@ module Buildr #:nodoc:
                   end
                 end
               end
-              exploded.each do |deployable_name|
-                deployment.artifact(:name => deployable_name) do |artifact|
-                  artifact.settings
+              exploded.each do |deployable_name, context_root|
+                deployment.artifact(:name => deployable_name) do |file|
+                  file.settings do |settings|
+                    settings.option(:name => 'contextRoot', :value => "/#{context_root}")
+                    settings.option(:name => 'defaultContextRoot', :value => 'false')
+                  end
+                end
+              end
+              artifacts.each do |deployable_name, context_root|
+                deployment.artifact(:name => deployable_name) do |file|
+                  file.settings do |settings|
+                    settings.option(:name => 'contextRoot', :value => "/#{context_root}")
+                    settings.option(:name => 'defaultContextRoot', :value => 'false')
+                  end
                 end
               end
             end
@@ -1100,7 +1111,12 @@ module Buildr #:nodoc:
 
             xml.method do |method|
               method.option(:name => 'BuildArtifacts', :enabled => 'true') do |option|
-                option.artifact(:name => artifact_name)
+                exploded.keys.each do |deployable_name|
+                  option.artifact(:name => deployable_name)
+                end
+                artifacts.keys.each do |deployable_name|
+                  option.artifact(:name => deployable_name)
+                end
               end
             end
           end
@@ -1114,13 +1130,14 @@ module Buildr #:nodoc:
         configuration_name = options[:configuration_name] || "Remote #{server_name}"
         domain_port = options[:port] || '9009'
         packaged = options[:packaged] || {}
-        exploded = options[:exploded] || []
+        exploded = options[:exploded] || {}
+        artifacts = options[:artifacts] || {}
 
         add_to_composite_component(self.configurations) do |xml|
           xml.configuration(:name => configuration_name, :type => 'GlassfishConfiguration', :factoryName => 'Remote', :default => false, :APPLICATION_SERVER_NAME => server_name) do |xml|
             xml.option(:name => 'LOCAL', :value => 'false')
             xml.option(:name => 'OPEN_IN_BROWSER', :value => 'false')
-            xml.option(:name => 'UPDATING_POLICY', :value => 'hot-swap-classes')
+            xml.option(:name => 'UPDATING_POLICY', :value => 'redeploy-artifacts')
 
             xml.deployment do |deployment|
               packaged.each do |name, deployable|
@@ -1133,9 +1150,20 @@ module Buildr #:nodoc:
                   end
                 end
               end
-              exploded.each do |deployable_name|
-                deployment.artifact(:name => deployable_name) do |artifact|
-                  artifact.settings
+              exploded.each do |deployable_name, context_root|
+                deployment.artifact(:name => deployable_name) do |file|
+                  file.settings do |settings|
+                    settings.option(:name => 'contextRoot', :value => "/#{context_root}")
+                    settings.option(:name => 'defaultContextRoot', :value => 'false')
+                  end
+                end
+              end
+              artifacts.each do |deployable_name, context_root|
+                deployment.artifact(:name => deployable_name) do |file|
+                  file.settings do |settings|
+                    settings.option(:name => 'contextRoot', :value => "/#{context_root}")
+                    settings.option(:name => 'defaultContextRoot', :value => 'false')
+                  end
                 end
               end
             end
@@ -1169,7 +1197,12 @@ module Buildr #:nodoc:
 
             xml.method do |method|
               method.option(:name => 'BuildArtifacts', :enabled => 'true') do |option|
-                option.artifact(:name => artifact_name)
+                exploded.keys.each do |deployable_name|
+                  option.artifact(:name => deployable_name)
+                end
+                artifacts.keys.each do |deployable_name|
+                  option.artifact(:name => deployable_name)
+                end
               end
             end
           end
