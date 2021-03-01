@@ -82,7 +82,6 @@ module Buildr #:nodoc:
         raise
       end
     end
-
   end
 
   # JUnit test framework, the default test framework for Java tests.
