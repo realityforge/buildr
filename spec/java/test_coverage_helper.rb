@@ -167,7 +167,7 @@ RSpec.shared_examples 'test coverage tool' do
         define('foo')
         task("foo:#{toolname}:html").invoke
         html_report_contents = Dir[File.join(test_coverage_config.report_dir, '**/*.html')].map{|path|File.open(path).read}.join
-        html_report_contents.force_encoding('ascii-8bit') if RUBY_VERSION >= '1.9'
+        html_report_contents.force_encoding('ascii-8bit')
         html_report_contents.should =~ /TOKEN/
       end
     end
