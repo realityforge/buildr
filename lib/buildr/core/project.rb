@@ -331,12 +331,6 @@ module Buildr #:nodoc:
         end
       end
 
-      # *Deprecated* Check the Extension module to see how extensions are handled.
-      def on_define(&block)
-        Buildr.application.deprecated 'This method is deprecated, see Extension'
-        (@on_define ||= []) << block if block
-      end
-
       def scope_name(scope, task_name) #:nodoc:
         task_name
       end
