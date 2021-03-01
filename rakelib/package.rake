@@ -15,10 +15,7 @@
 
 require 'rubygems/package_task'
 
-Gem::PackageTask.new(spec) do |pkg|
-  pkg.need_tar = true
-  pkg.need_zip = true
-end
+Gem::PackageTask.new(spec)
 
 desc 'Compile Java libraries used by Buildr'
 task 'compile' do
