@@ -111,7 +111,6 @@ describe URI, '#upload' do
     mkpath 'dir' ; write 'dir/test', 'in directory'
     mkpath 'dir/nested' ; write 'dir/nested/test', 'in nested directory'
     @uri.upload 'dir'
-    file(@target).should contain('test', 'nested/test')
     file(@target + '/test').should contain('in directory')
     file(@target + '/nested/test').should contain('in nested directory')
   end
