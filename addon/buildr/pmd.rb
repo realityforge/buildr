@@ -23,7 +23,20 @@ module Buildr
 
       # The specs for requirements
       def dependencies
-        %w(net.sourceforge.pmd:pmd:jar:5.1.3 jaxen:jaxen:jar:1.1.1 commons-io:commons-io:jar:2.2 com.beust:jcommander:jar:1.27 asm:asm:jar:3.2)
+        %w(
+          net.sourceforge.pmd:pmd-core:jar:6.11.0
+          net.sourceforge.pmd:pmd-java:jar:6.11.0
+          net.sourceforge.pmd:pmd-java8:jar:6.11.0
+          jaxen:jaxen:jar:1.1.6
+          commons-io:commons-io:jar:2.6
+          com.beust:jcommander:jar:1.72
+          org.ow2.asm:asm:jar:7.1
+          com.google.code.gson:gson:jar:2.8.5
+          net.java.dev.javacc:javacc:jar:5.0
+          net.sourceforge.saxon:saxon:jar:9.1.0.8
+          org.apache.commons:commons-lang3:jar:3.8.1
+          org.antlr:antlr4-runtime:jar:4.7
+        )
       end
 
       def pmd(rule_set_files, format, output_file_prefix, source_paths, options = {})
@@ -45,11 +58,11 @@ module Buildr
         mkdir_p File.dirname(output_file_prefix)
 
         Buildr.ant('pmd-report') do |ant|
-          ant.taskdef :name=> 'pmd', :classpath => cp.join(';'), :classname => 'net.sourceforge.pmd.ant.PMDTask'
-          ant.pmd :shortFilenames => true, :rulesetfiles => rule_sets.join(',') do
+          ant.taskdef :name => 'pmd', :classpath => cp.join(';'), :classname => 'net.sourceforge.pmd.ant.PMDTask'
+          ant.pmd :shortFilenames => true, :rulesetfiles => rule_sets.join(','), :noCache => true do
             ant.formatter :type => format, :toFile => "#{output_file_prefix}.#{format}"
             source_paths.each do |src|
-              ant.fileset :dir=> src, :includes=>'**/*.java' if File.directory?(src)
+              ant.fileset :dir => src, :includes => '**/*.java' if File.directory?(src)
             end
           end
         end
