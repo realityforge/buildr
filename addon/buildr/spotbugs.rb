@@ -49,52 +49,43 @@ module Buildr
       end
 
       def spotbugs(output_file, source_paths, analyze_paths, options = {})
-        dependencies = (options[:dependencies] || []) + self.dependencies
-        cp = Buildr.artifacts(dependencies).each { |a| a.invoke if a.respond_to?(:invoke) }.map(&:to_s).join(File::PATH_SEPARATOR)
+        plugins = self.fb_contrib_dependencies
+        Buildr.artifacts(self.dependencies).each { |a| a.invoke if a.respond_to?(:invoke) }
 
-        plugins = (options[:plugins] || self.fb_contrib_dependencies)
-        pluginList = Buildr.artifacts(plugins).each { |a| a.invoke if a.respond_to?(:invoke) }.map(&:to_s).join(File::PATH_SEPARATOR)
+        args = []
+        args << '-textui'
+        packages_to_analyze = options[:packages_to_analyze] || []
+        if packages_to_analyze.size > 0
+          args << '-onlyAnalyze' << (packages_to_analyze.collect{|p| "#{p}.-"}.join(',') + ':')
+        end
+        args << '-effort:max'
+        args << '-medium'
+        args << ('html' == options[:output] ? '-html' : '-xml:withMessages')
+        args << '-output' << output_file
+        args << '-sourcepath' << source_paths.map(&:to_s).join(File::PATH_SEPARATOR)
+        args << '-pluginList' << Buildr.artifacts(plugins).map(&:to_s).join(File::PATH_SEPARATOR)
 
-        args = {
-            :output => options[:output] || 'xml',
-            :outputFile => output_file,
-            :effort => 'max',
-            :pluginList => pluginList,
-            :classpath => cp,
-            :reportLevel => options[:report_level] || 'low',
-            :timeout => '90000000',
-            :debug => 'false'
-        }
-        args[:failOnError] = true if options[:fail_on_error]
-        args[:excludeFilter] = options[:exclude_filter] if options[:exclude_filter]
-        args[:jvmargs] = options[:java_args] if options[:java_args]
+        extra_dependencies = (options[:extra_dependencies] || []) + plugins
+        if 0 != extra_dependencies.size
+          args << '-auxclasspath' << Buildr.artifacts(extra_dependencies).each { |a| a.invoke if a.respond_to?(:invoke) }.map(&:to_s).join(File::PATH_SEPARATOR)
+        end
+        if options[:exclude_filter]
+          args << '-exclude' << options[:exclude_filter]
+        end
+
+        analyze_paths.each do |dep|
+          a = dep.is_a?(String) ? file(dep) : dep
+          a.invoke
+          args << a.to_s
+        end
 
         mkdir_p File.dirname(output_file)
 
-        Buildr.ant('spotbugs') do |ant|
-          ant.taskdef :name => 'spotbugs',
-                      :classname => 'edu.umd.cs.findbugs.anttask.FindBugsTask',
-                      :classpath => cp
-          ant.spotbugs args do
-            source_paths.each do |source_path|
-              ant.sourcePath :path => source_path.to_s
-            end
-            Buildr.artifacts(analyze_paths).each(&:invoke).each do |analyze_path|
-              ant.auxAnalyzePath :path => analyze_path.to_s
-            end
-            if options[:properties]
-              options[:properties].each_pair do |k, v|
-                ant.systemProperty :name => k, :value => v
-              end
-            end
-            if options[:extra_dependencies]
-              ant.auxClasspath do |aux|
-                Buildr.artifacts(options[:extra_dependencies]).each { |a| a.invoke if a.respond_to?(:invoke) }.each do |dep|
-                  aux.pathelement :location => dep.to_s
-                end
-              end
-            end
-          end
+        begin
+          Java::Commands.java 'edu.umd.cs.findbugs.LaunchAppropriateUI', *(args + [{:classpath => Buildr.artifacts(dependencies), :properties => options[:properties], :java_args => options[:java_args]}])
+        rescue Exception => e
+          puts e
+          raise e if options[:fail_on_error]
         end
       end
     end
@@ -111,12 +102,6 @@ module Buildr
 
       def config_directory
         @config_directory || project._(:source, :main, :etc, :spotbugs)
-      end
-
-      attr_writer :report_level
-
-      def report_level
-        @report_level || 'medium'
       end
 
       attr_writer :report_dir
@@ -156,7 +141,11 @@ module Buildr
       attr_writer :java_args
 
       def java_args
-        @java_args || '-server -Xss1m -Xmx800m -Duser.language=en -Duser.region=EN '
+        @java_args || '-server -Xss1m -Xmx1.4G -Duser.language=en -Duser.region=EN'
+      end
+
+      def packages_to_analyze
+        @packages_to_analyze ||= [self.project.java_package_name]
       end
 
       def source_paths
@@ -210,7 +199,6 @@ module Buildr
         deps.flatten.compact
       end
 
-
       protected
 
       def initialize(project)
@@ -233,14 +221,14 @@ module Buildr
           project.task('spotbugs:xml') do
             puts 'Spotbugs: Analyzing source code...'
             options =
-                {
-                    :properties => project.spotbugs.properties,
-                    :fail_on_error => project.spotbugs.fail_on_error?,
-                    :extra_dependencies => project.spotbugs.complete_extra_dependencies
-                }
+              {
+                :packages_to_analyze => project.spotbugs.packages_to_analyze,
+                :properties => project.spotbugs.properties,
+                :fail_on_error => project.spotbugs.fail_on_error?,
+                :extra_dependencies => project.spotbugs.complete_extra_dependencies
+              }
             options[:exclude_filter] = project.spotbugs.filter_file if File.exist?(project.spotbugs.filter_file)
             options[:output] = 'xml:withMessages'
-            options[:report_level] = project.spotbugs.report_level
 
             Buildr::Spotbugs.spotbugs(project.spotbugs.xml_output_file,
                                       project.spotbugs.complete_source_paths,
@@ -252,14 +240,14 @@ module Buildr
           project.task('spotbugs:html') do
             puts 'Spotbugs: Analyzing source code...'
             options =
-                {
-                    :properties => project.spotbugs.properties,
-                    :fail_on_error => project.spotbugs.fail_on_error?,
-                    :extra_dependencies => project.spotbugs.complete_extra_dependencies
-                }
+              {
+                :packages_to_analyze => project.spotbugs.packages_to_analyze,
+                :properties => project.spotbugs.properties,
+                :fail_on_error => project.spotbugs.fail_on_error?,
+                :extra_dependencies => project.spotbugs.complete_extra_dependencies
+              }
             options[:exclude_filter] = project.spotbugs.filter_file if File.exist?(project.spotbugs.filter_file)
             options[:output] = 'html'
-            options[:report_level] = project.spotbugs.report_level
 
             Buildr::Spotbugs.spotbugs(project.spotbugs.html_output_file,
                                       project.spotbugs.complete_source_paths,
