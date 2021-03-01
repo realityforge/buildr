@@ -72,7 +72,6 @@ require 'buildr/java/commands'
 require 'buildr/java/doc'
 require 'buildr/java/custom_pom'
 require 'buildr/ide/idea'
-require 'buildr/ide/eclipse'
 
 # Methods defined in Buildr are both instance methods (e.g. when included in Project)
 # and class methods when invoked like Buildr.artifacts().
