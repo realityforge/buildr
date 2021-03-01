@@ -13,8 +13,7 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-# To work-around a bug with gemcutter: http://stackoverflow.com/questions/4932881/gemcutter-rake-build-now-throws-undefined-method-write-for-syckemitter
-require 'psych' if RUBY_VERSION >= '1.9.2'
+require 'psych'
 
 # We need JAVA_HOME for most things (setup, spec, etc).
 unless ENV['JAVA_HOME']
