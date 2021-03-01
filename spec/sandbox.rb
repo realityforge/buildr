@@ -25,17 +25,9 @@ RSpec.configure do |config|
   config.verbose_retry = true # show retry status in spec process
 end
 
-# Add a 'require' here only for optional extensions, not for extensions that should be loaded by default.
-require 'buildr/bnd'
-require 'buildr/jaxb_xjc'
-
 Java.load # Anything added to the classpath.
 artifacts(
-  TestFramework.frameworks.map(&:dependencies).flatten,
-  JUnit.ant_taskdef,
-  Buildr::Groovy.dependencies,
-  Buildr::JaxbXjc.dependencies,
-  Buildr::Bnd.dependencies,
+  TestFramework.frameworks.map(&:dependencies).flatten, JUnit.ant_taskdef,
 ).each do |path|
   file(path).invoke
 end
