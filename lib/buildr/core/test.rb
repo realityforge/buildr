@@ -561,52 +561,6 @@ module Buildr #:nodoc:
     end
   end
 
-
-  # The integration tests task. Buildr has one such task (see Buildr#integration) that runs
-  # all tests marked with :integration=>true, and has a setup/teardown tasks separate from
-  # the unit tests.
-  class IntegrationTestsTask < Rake::Task
-
-    def initialize(*args) #:nodoc:
-      super
-      @setup = task("#{name}:setup")
-      @teardown = task("#{name}:teardown")
-      enhance do
-        info 'Running integration tests...'
-        TestTask.run_local_tests true
-      end
-    end
-
-    def execute(args) #:nodoc:
-      setup.invoke
-      begin
-        super
-      ensure
-        teardown.invoke
-      end
-    end
-
-    # :call-seq:
-    #   setup(*prereqs) => task
-    #   setup(*prereqs) { |task| .. } => task
-    #
-    # Returns the setup task. The setup task is executed before running the integration tests.
-    def setup(*prereqs, &block)
-      @setup.enhance prereqs, &block
-    end
-
-    # :call-seq:
-    #   teardown(*prereqs) => task
-    #   teardown(*prereqs) { |task| .. } => task
-    #
-    # Returns the teardown task. The teardown task is executed after running the integration tests.
-    def teardown(*prereqs, &block)
-      @teardown.enhance prereqs, &block
-    end
-
-  end
-
-
   # Methods added to Project to support compilation and running of tests.
   module Test
 
@@ -643,17 +597,6 @@ module Buildr #:nodoc:
           TestTask.exclude excludes
         end
         task('test').invoke
-      end
-
-      IntegrationTestsTask.define_task('integration')
-
-      # Similar to test:[pattern] but for integration tests.
-      rule /^integration:.*$/ do |task|
-        unless task.name.split(':')[1] =~ /^(setup|teardown)$/
-          # The map works around a JRuby bug whereby the string looks fine, but fails in fnmatch.
-          TestTask.only_run task.name[/integration:(.*)/, 1].split(',').map { |t| "#{t}" }
-          task('integration').invoke
-        end
       end
 
     end
