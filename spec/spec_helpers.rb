@@ -46,6 +46,49 @@ unless defined?(SpecHelpers)
 
   require File.expand_path('sandbox', File.dirname(__FILE__))
 
+  module Matchers #:nodoc:
+
+    class << self
+
+      # Define matchers that operate by calling a method on the tested object.
+      # For example:
+      #   foo.should contain(bar)
+      # calls:
+      #   foo.contain(bar)
+      def match_using(*names)
+        names.each do |name|
+          matcher = Class.new do
+            # Initialize with expected arguments (i.e. contain(bar) initializes with bar).
+            define_method(:initialize) { |*args| @expects = args }
+            # Matches against actual value (i.e. foo.should exist called with foo).
+            define_method(:matches?) do |actual|
+              @actual = actual
+              return actual.send("#{name}?", *@expects) if actual.respond_to?(:"#{name}?", true)
+              return actual.send(name, *@expects) if actual.respond_to?(name.to_sym, true)
+              raise "You can't check #{actual.inspect}, it doesn't respond to #{name}."
+            end
+            # Some matchers have arguments, others don't, treat appropriately.
+            define_method :failure_message do
+              args = " " + @expects.map{ |arg| "'#{arg}'" }.join(", ") unless @expects.empty?
+              "Expected #{@actual} to #{name}#{args}"
+            end
+            define_method :negative_failure_message do
+              args = " " + @expects.map{ |arg| "'#{arg}'" }.join(", ") unless @expects.empty?
+              "Expected #{@actual} to not #{name}#{args}"
+            end
+          end
+          # Define method to create matcher.
+          define_method(name) { |*args| matcher.new(*args) }
+        end
+      end
+
+    end
+
+    # Define delegate matchers for exist and contain methods.
+    match_using :exist, :contain
+
+  end
+
   class ::Rake::FileTask
     def exist?
       File.exist?(self.to_s)
@@ -59,7 +102,7 @@ unless defined?(SpecHelpers)
 
   module SpecHelpers
 
-    include Checks::Matchers
+    include Matchers
 
     [:info, :warn, :error, :puts].each do |severity|
       ::Object.class_eval do
