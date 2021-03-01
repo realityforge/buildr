@@ -288,7 +288,7 @@ describe Project, '#package' do
 
   it 'should create different tasks for specs with matching type' do
     define 'foo', :version=>'1.0' do
-      javadoc("foo").into( "foo" )
+      doc("foo").into( "foo" )
       package(:javadoc)
       package(:zip)
     end
