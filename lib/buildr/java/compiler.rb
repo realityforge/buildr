@@ -88,48 +88,8 @@ module Buildr #:nodoc:
         end
         args + Array(options[:other])
       end
-
     end
-
   end
-
-
-  # Methods added to Project to support the Java Annotation Processor.
-  module Apt
-
-    # :call-seq:
-    #   apt(*sources) => task
-    #
-    # Returns a task that will use Java#apt to generate source files in target/generated/apt,
-    # from all the source directories passed as arguments. Uses the compile.sources list if
-    # on arguments supplied.
-    #
-    # For example:
-    #
-    def apt(*sources)
-      sources = compile.sources if sources.empty?
-      file(path_to(:target, 'generated/apt')=>sources) do |task|
-        cmd_args = [ trace?(:apt) ? '-verbose' : '-nowarn' ]
-        cmd_args << '-nocompile' << '-s' << task.name
-        cmd_args << '-source' << compile.options.source if compile.options.source
-        classpath = Buildr.artifacts(compile.dependencies).map(&:to_s).each { |t| task(t).invoke }
-        cmd_args << '-classpath' << classpath.join(File::PATH_SEPARATOR) unless classpath.empty?
-        cmd_args += (sources.map(&:to_s) - [task.name]).
-          map { |file| File.directory?(file) ? FileList["#{file}/**/*.java"] : file }.flatten
-        unless Buildr.application.options.dryrun
-          info 'Running apt'
-          trace (['apt'] + cmd_args).join(' ')
-          Java.com.sun.tools.apt.Main.process(cmd_args.to_java(Java.java.lang.String)) == 0 or
-            fail 'Failed to process annotations, see errors above'
-        end
-      end
-    end
-
-  end
-
 end
 
 Buildr::Compiler << Buildr::Compiler::Javac
-class Buildr::Project #:nodoc:
-  include Buildr::Apt
-end

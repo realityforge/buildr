@@ -533,8 +533,6 @@ module Buildr #:nodoc:
     # For example:
     #   # Include Log4J and the api sub-project artifacts.
     #   compile.with 'log4j:log4j:jar:1.2', project('api')
-    #   # Include Apt-generated source files.
-    #   compile.from apt
     #   # For JavaC, force target compatibility.
     #   compile.options.source = '1.6'
     #   # Run the OpenJPA bytecode enhancer after compilation.

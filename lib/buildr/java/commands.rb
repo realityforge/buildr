@@ -101,43 +101,6 @@ module Java
       end
 
       # :call-seq:
-      #   apt(*files, options)
-      #
-      # Runs Apt with the specified arguments.
-      #
-      # The last argument may be a Hash with additional options:
-      # * :compile -- If true, compile source files to class files.
-      # * :source -- Specifies source compatibility with a given JVM release.
-      # * :output -- Directory where to place the generated source files, or the
-      #   generated class files when compiling.
-      # * :classpath -- One or more file names, tasks or artifact specifications.
-      #   These are all expanded into artifacts, and all tasks are invoked.
-      def apt(*args)
-        options = Hash === args.last ? args.pop : {}
-        rake_check_options options, :compile, :source, :output, :classpath
-
-        files = args.flatten.map(&:to_s).
-          collect { |arg| File.directory?(arg) ? FileList["#{arg}/**/*.java"] : arg }.flatten
-        cmd_args = [ trace?(:apt) ? '-verbose' : '-nowarn' ]
-        if options[:compile]
-          cmd_args << '-d' << options[:output].to_s
-        else
-          cmd_args << '-nocompile' << '-s' << options[:output].to_s
-        end
-        cmd_args << '-source' << options[:source] if options[:source]
-        cp = classpath_from(options)
-        cmd_args << '-classpath' << cp.join(File::PATH_SEPARATOR) unless cp.empty?
-        cmd_args += files
-        unless Buildr.application.options.dryrun
-          info 'Running apt'
-          trace (['apt'] + cmd_args).join(' ')
-          Java.load
-          ::Java::com.sun.tools.apt.Main.process(cmd_args.to_java(::Java::java.lang.String)) == 0 or
-            fail 'Failed to process annotations, see errors above'
-        end
-      end
-
-      # :call-seq:
       #   javac(*files, options)
       #
       # Runs Javac with the specified arguments.
