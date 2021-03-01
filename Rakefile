@@ -51,7 +51,7 @@ directory '_reports'
 desc 'Run all specs'
 RSpec::Core::RakeTask.new :spec => ['_reports', :compile] do |task|
   task.rspec_path = 'bundle exec rspec'
-  task.rspec_opts = %w{--order defined --format html --out _reports/specs.html --backtrace}
+  task.rspec_opts = %w{--format html --out _reports/specs.html --backtrace}
 end
 
 desc 'Run all specs with CI reporter'
