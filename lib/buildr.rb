@@ -50,7 +50,6 @@ require 'buildr/core/test'
 require 'buildr/java/commands'
 require 'buildr/core/transports'
 require 'buildr/java/pom'
-require 'buildr/core/cc'
 require 'buildr/core/doc'
 require 'buildr/core/osx' if RUBY_PLATFORM =~ /darwin/
 require 'buildr/core/linux' if RUBY_PLATFORM =~ /linux/
