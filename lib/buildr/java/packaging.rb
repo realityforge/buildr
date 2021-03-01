@@ -401,9 +401,7 @@ module Buildr #:nodoc:
           zip.include :from=>doc.target
         end
       end
-
     end
-
   end
 end
 
