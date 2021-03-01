@@ -204,8 +204,7 @@ RSpec.shared_examples 'package with manifest' do
     package.invoke
     Zip::File.open(package.to_s) do |zip|
       permissions = format("%o", zip.find_entry('META-INF/MANIFEST.MF').unix_perms)
-      expected_mode = Buildr::Util.win_os? ? /666$/ : /644$/
-      permissions.should match expected_mode
+      permissions.should match /644$/
     end
   end
 
@@ -550,7 +549,7 @@ describe Packaging, 'war' do
     inspect_war { |files| files.should include('test.html') }
   end
 
-  it 'should accept files from :classes option', :retry => (Buildr::Util.win_os? ? 4 : 1) do
+  it 'should accept files from :classes option' do
     write 'classes/test'
     define('foo', :version=>'1.0') { package(:war).with(:classes=>'classes') }
     inspect_war { |files| files.should include('WEB-INF/classes/test') }

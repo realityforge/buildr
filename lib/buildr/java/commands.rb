@@ -55,23 +55,15 @@ module Java
 
         cmd_args = []
         if options[:dir]
-          pwd = options[:dir]
-          if Buildr::Util.win_os?
-            # Ruby uses forward slashes regardless of platform,
-            # unfortunately cd c:/some/path fails on Windows
-            cmd_args << "cd /d \"#{pwd.gsub(%r{/}, '\\')}\" && "
-          else
-            cmd_args << "cd '#{pwd}' && "
-          end
+          cmd_args << "cd '#{options[:dir]}' && "
         end
         cmd_args << path_to_bin('java')
         cp = classpath_from(options)
 
         unless cp.empty?
-          if options[:pathing_jar] == true || (options[:pathing_jar].nil? && Util.win_os? && cp.join(':').size > 2048)
+          if options[:pathing_jar] == true
             paths = cp.map do |c|
-              path = File.directory?(c) && !c.end_with?('/') ? "#{c}/" : c.to_s
-              Buildr::Util.win_os? ? "/#{path}" : path
+              File.directory?(c) && !c.end_with?('/') ? "#{c}/" : c.to_s
             end
             manifest = Buildr::Packaging::Java::Manifest.new([{'Class-Path' => paths.map{|p| URI.encode(p)}.join(" ")}])
             tjar = Tempfile.new(['javacmd', '.jar'])
@@ -93,28 +85,9 @@ module Java
 
         tmp = nil
         begin
-            # Windows can't handle cmd lines greater than 2048/8192 chars.
-            # If our cmd line is longer, we create a batch file and execute it instead.
-          if Util.win_os? &&  cmd_args.map(&:inspect).join(' ').size > 2048
-            # remove '-classpath' and the classpath itself from the cmd line.
-            cp_i = cmd_args.index{|x| x.to_s =~ /^-classpath/}
-            2.times do
-              cmd_args.delete_at cp_i unless cp_i.nil?
-            end
-            # create tmp batch file.
-            tmp = Tempfile.new(['starter', '.bat'])
-            tmp.write "@echo off\n"
-            tmp.write "SET CLASSPATH=#{cp.join(File::PATH_SEPARATOR).gsub(%r{/}, '\\')}\n"
-            tmp.write cmd_args.map(&:inspect).join(' ')
-            tmp.close
-            # set new cmd line.
-            cmd_args = [tmp.path]
-          end
-
           unless Buildr.application.options.dryrun
             info "Running #{name}" if name && options[:verbose]
             block = lambda { |ok, res| fail "Failed to execute #{name}, see errors above" unless ok } unless block
-            cmd_args = cmd_args.map(&:inspect).join(' ') if Util.win_os?
             sh(*cmd_args) do |ok, ps|
               block.call ok, ps
             end
@@ -261,9 +234,9 @@ module Java
       # Returns the path to the specified Java command (with no argument to java itself).
       def path_to_bin(name = nil)
         home = ENV['JAVA_HOME'] or fail 'Are we forgetting something? JAVA_HOME not set.'
-        bin = Util.normalize_path(File.join(home, 'bin'))
+        bin = File.expand_path(File.join(home, 'bin'))
         fail 'JAVA_HOME environment variable does not point to a valid JRE/JDK installation.' unless File.exist? bin
-        Util.normalize_path(File.join(bin, name.to_s))
+        File.expand_path(File.join(bin, name.to_s))
       end
 
       # :call-seq:

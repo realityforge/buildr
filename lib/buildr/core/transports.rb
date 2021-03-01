@@ -537,11 +537,9 @@ module URI
     end
 
     # Returns the file system path based that corresponds to the URL path.
-    # On windows this method strips the leading slash off of the path.
     # On all platforms this method unescapes the URL path.
     def real_path #:nodoc:
-      real_path = Buildr::Util.win_os? && path =~ /^\/[a-zA-Z]:\// ? path[1..-1] : path
-      URI.unescape(real_path)
+      URI.unescape(path)
     end
 
   protected

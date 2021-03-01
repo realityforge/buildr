@@ -526,38 +526,35 @@ describe "ZipTask" do
   end
 
   # chmod is not reliable on Windows
-  unless Buildr::Util.win_os?
-    it 'should preserve file permissions' do
-      # with JRuby it's important to use absolute paths with File.chmod()
-      # http://jira.codehaus.org/browse/JRUBY-3300
-      hello = File.expand_path('src/main/bin/hello')
-      write hello, 'echo hi'
-      File.chmod(0777,  hello)
-      fail("Failed to set permission on #{hello}") unless (File.stat(hello).mode & 0777) == 0777
+  it 'should preserve file permissions' do
+    # with JRuby it's important to use absolute paths with File.chmod()
+    # http://jira.codehaus.org/browse/JRUBY-3300
+    hello = File.expand_path('src/main/bin/hello')
+    write hello, 'echo hi'
+    File.chmod(0777,  hello)
+    fail("Failed to set permission on #{hello}") unless (File.stat(hello).mode & 0777) == 0777
 
-      zip('foo.zip').include('src/main/bin/*').invoke
-      unzip('target' => 'foo.zip').extract
-      (File.stat('target/hello').mode & 0777).should == 0777
-    end
-
-    it 'should preserve file permissions when merging zip files' do
-      # with JRuby it's important to use absolute paths with File.chmod()
-      # http://jira.codehaus.org/browse/JRUBY-3300
-      hello = File.expand_path('src/main/bin/hello')
-      write hello, 'echo hi'
-      File.chmod(0777,  hello)
-      fail("Failed to set permission on #{hello}") unless (File.stat(hello).mode & 0777) == 0777
-
-      foo = zip('foo.zip')
-      foo.include('src/main/bin/*').invoke
-      bar = zip('bar.zip')
-      bar.merge(foo)
-      bar.invoke
-      unzip('target' => 'bar.zip').extract
-      (File.stat('target/hello').mode & 0777).should == 0777
-    end
+    zip('foo.zip').include('src/main/bin/*').invoke
+    unzip('target' => 'foo.zip').extract
+    (File.stat('target/hello').mode & 0777).should == 0777
   end
 
+  it 'should preserve file permissions when merging zip files' do
+    # with JRuby it's important to use absolute paths with File.chmod()
+    # http://jira.codehaus.org/browse/JRUBY-3300
+    hello = File.expand_path('src/main/bin/hello')
+    write hello, 'echo hi'
+    File.chmod(0777,  hello)
+    fail("Failed to set permission on #{hello}") unless (File.stat(hello).mode & 0777) == 0777
+
+    foo = zip('foo.zip')
+    foo.include('src/main/bin/*').invoke
+    bar = zip('bar.zip')
+    bar.merge(foo)
+    bar.invoke
+    unzip('target' => 'bar.zip').extract
+    (File.stat('target/hello').mode & 0777).should == 0777
+  end
 end
 
 describe Unzip do

@@ -672,7 +672,7 @@ end
 # this issue.
 module FileUtils
   def fu_list(arg) #:nodoc:
-    [arg].flatten.map { |path| Buildr::Util.normalize_path(path) }
+    [arg].flatten.map { |path| File.expand_path(path) }
   end
 
   private_module_function :fu_list

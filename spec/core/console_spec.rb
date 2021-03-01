@@ -21,7 +21,7 @@ describe Buildr::Console do
 
     it 'should return a value' do
       Buildr::Console.console_dimensions.should_not be_nil if $stdout.isatty # have to ask again as stdout may be redirected.
-    end if $stdout.isatty && !ENV["TRAVIS"] && !Buildr::Util.win_os?
+    end if $stdout.isatty && !ENV["TRAVIS"]
   end
 
   describe 'color' do
@@ -42,7 +42,7 @@ describe Buildr::Console do
       it 'should emit blue code when asked' do
         Buildr::Console.color('message', :blue).should eql("\e[34mmessage\e[0m")
       end
-    end if $stdout.isatty && !Buildr::Util.win_os?
+    end if $stdout.isatty
 
     describe ' use_color is false' do
       before do

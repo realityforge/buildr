@@ -23,7 +23,6 @@ module Buildr #nodoc
       end
 
       def use_color=(use_color)
-        return if use_color && !setup_support
         @use_color = use_color
       end
 
@@ -38,12 +37,8 @@ module Buildr #nodoc
 
       # Return the [rows, columns] of a console or nil if unknown
       def console_dimensions
-        return nil unless setup_support
-
         begin
-          if Buildr::Util.win_os?
-              Win32::Console.new(Win32::Console::STD_OUTPUT_HANDLE).MaxWindow
-          elsif $stdout.isatty
+          if $stdout.isatty
             if /solaris/ =~ RUBY_PLATFORM and
               `stty` =~ /\brows = (\d+).*\bcolumns = (\d+)/
               [$2, $1].map { |c| x.to_i }
@@ -95,24 +90,12 @@ module Buildr #nodoc
       private
 
       def set_no_echo_mode
-        return unless setup_support
-        if Buildr::Util.win_os?
-          c = Win32::Console.new(Win32::Console::STD_OUTPUT_HANDLE)
-          c.Echo(false) rescue Exception
-        else
-          @state = `stty -g 2>/dev/null`
-          `stty -echo -icanon 2>/dev/null`
-        end
+        @state = `stty -g 2>/dev/null`
+        `stty -echo -icanon 2>/dev/null`
       end
 
       def reset_mode
-        return unless setup_support
-        if Buildr::Util.win_os?
-          c = Win32::Console.new(Win32::Console::STD_OUTPUT_HANDLE)
-          c.Echo(true) rescue Exception
-        else
-          `stty #{@state} 2>/dev/null`
-        end
+        `stty #{@state} 2>/dev/null`
         @state = nil
       end
 
@@ -134,29 +117,6 @@ module Buildr #nodoc
         end
         return nil
       end
-
-      def setup_support
-        return @initialized unless @initialized.nil?
-        @initialized = false
-        begin
-          if Buildr::Util.win_os?
-            require 'Win32/Console/ANSI'
-          end
-        rescue
-          # Unfortunately we have multiple incompatible jline libraries
-          # in the classpath. This is probably because we are using jruby
-          # 1.7.5 with a library like scala and both use incompatible jline
-          # implementations
-          return false
-        rescue NameError
-          return false
-        rescue LoadError
-          return false
-        end
-        @initialized = true
-        return true
-      end
-
     end
   end
 end

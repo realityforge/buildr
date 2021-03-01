@@ -18,19 +18,6 @@ module Buildr #:nodoc:
   module Util
     extend self
 
-    # In order to determine if we are running on a windows OS,
-    # prefer this function instead of using Gem.win_platform?.
-    #
-    # Gem.win_platform? only checks these RUBY_PLATFORM global,
-    # that in some cases like when running on JRuby is not
-    # sufficient for our purpose:
-    #
-    # For JRuby, the value for RUBY_PLATFORM will always be 'java'
-    # That's why this function checks on Config::CONFIG['host_os']
-    def win_os?
-      !!(RbConfig::CONFIG['host_os'] =~ /windows|bccwin|cygwin|djgpp|mingw|mswin|mswin32|wince/i)
-    end
-
     # Runs Ruby with these command line arguments.  The last argument may be a hash,
     # supporting the following keys:
     #   :command  -- Runs the specified script (e.g., :command=>'gem')
@@ -39,8 +26,8 @@ module Buildr #:nodoc:
     def ruby(*args)
       options = Hash === args.last ? args.pop : {}
       cmd = []
-      ruby_bin = normalize_path(RbConfig::CONFIG['ruby_install_name'], RbConfig::CONFIG['bindir'])
-      if options.delete(:sudo) && !(win_os? || Process.uid == File.stat(ruby_bin).uid)
+      ruby_bin = File.expand_path(RbConfig::CONFIG['ruby_install_name'], RbConfig::CONFIG['bindir'])
+      if options.delete(:sudo) && !(Process.uid == File.stat(ruby_bin).uid)
         cmd << 'sudo' << '-u' << "##{File.stat(ruby_bin).uid}"
       end
       cmd << ruby_bin
@@ -49,17 +36,6 @@ module Buildr #:nodoc:
       cmd.push options
       sh *cmd do |ok, status|
         ok or fail "Command ruby failed with status (#{status ? status.exitstatus : 'unknown'}): [#{cmd.join(" ")}]"
-      end
-    end
-
-    # Just like File.expand_path, but for windows systems it
-    # capitalizes the drive name and ensures backslashes are used
-    def normalize_path(path, *dirs)
-      path = File.expand_path(path, *dirs)
-      if win_os?
-        path.gsub!('/', '\\').gsub!(/^[a-zA-Z]+:/) { |s| s.upcase }
-      else
-        path
       end
     end
 
@@ -301,24 +277,8 @@ end
       rake_check_options options, :noop, :verbose
       rake_output_message cmd.join(" ") if options[:verbose]
       unless options[:noop]
-        if Buildr::Util.win_os?
-          # Ruby uses forward slashes regardless of platform,
-          # unfortunately cd c:/some/path fails on Windows
-          pwd = Dir.pwd.gsub(%r{/}, '\\')
-          cd = "cd /d \"#{pwd}\" && "
-        else
-          cd = "cd '#{Dir.pwd}' && "
-        end
-
         args = if cmd.size > 1 then cmd[1..cmd.size] else [] end
-
-        res = if Buildr::Util.win_os? && cmd.size == 1
-          system("#{cd} call #{cmd.first}")
-        else
-          arg_str = args.map { |a| "'#{a}'" }
-          system(cd + cmd.first + ' ' + arg_str.join(' '))
-        end
-
+        res = system("cd '#{Dir.pwd}' && " + cmd.first + ' ' + args.map { |a| "'#{a}'" }.join(' '))
         block.call(res, $?)
       end
     end
