@@ -16,20 +16,9 @@
 require 'rspec/core/rake_task'
 directory '_reports'
 
-# RSpec doesn't support file exclusion, so hack our own.
-class RSpec::Core::RakeTask
-  attr_accessor :rspec_files
-  private
-  def files_to_run
-    @rspec_files
-  end
-end
-
 desc 'Run all specs'
 RSpec::Core::RakeTask.new :spec => ['_reports', :compile] do |task|
-  files = FileList['spec/**/*_spec.rb']
   task.rspec_path = 'bundle exec rspec'
-  task.rspec_files = files
   task.rspec_opts = %w{--order defined --format html --out _reports/specs.html --backtrace}
 end
 file('_reports/specs.html') { task(:spec).invoke }
