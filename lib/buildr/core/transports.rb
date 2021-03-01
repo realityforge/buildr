@@ -450,7 +450,7 @@ module URI
           # To create a path, we need to create all its parent. We use realpath to determine if
           # the path already exists, otherwise mkdir fails.
           trace "Creating path #{path}"
-          File.dirname(path).split('/').reject(&:empty?).inject('/') do |base, part|
+          ::File.dirname(path).split('/').reject(&:empty?).inject('/') do |base, part|
             combined = base + part
             sftp.close(sftp.opendir!(combined)) rescue sftp.mkdir! combined, {}
             "#{combined}/"
@@ -492,8 +492,8 @@ module URI
 
     def upload(source, options = nil)
       super
-      if File === source then
-        File.chmod(source.stat.mode, real_path)
+      if ::File === source then
+        ::File.chmod(source.stat.mode, real_path)
       end
     end
 
@@ -550,7 +550,7 @@ module URI
 
     def write_internal(options, &block) #:nodoc:
       raise ArgumentError, 'Either you\'re attempting to write a file to another host (which we don\'t support), or you used two slashes by mistake, where you should have file:///<path>.' if host
-      temp = Tempfile.new(File.basename(path))
+      temp = Tempfile.new(::File.basename(path))
       temp.binmode
       with_progress_bar options[:progress] && options[:size], path.split('/').last, options[:size] || 0 do |progress|
         while chunk = yield(RW_CHUNK_SIZE)
@@ -559,7 +559,7 @@ module URI
         end
       end
       temp.close
-      mkpath File.dirname(real_path)
+      mkpath ::File.dirname(real_path)
       mv temp.path, real_path
       real_path
     end
