@@ -688,13 +688,3 @@ describe Packaging, 'zip' do
     end
   end
 end
-
-describe Packaging, ' tar' do
-  before { @packaging = :tar }
-  it_should_behave_like 'packaging'
-end
-
-describe Packaging, ' tgz' do
-  before { @packaging = :tgz }
-  it_should_behave_like 'packaging'
-end

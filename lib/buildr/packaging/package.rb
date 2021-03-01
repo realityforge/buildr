@@ -220,11 +220,6 @@ module Buildr #:nodoc:
       ZipTask.define_task(file_name)
     end
 
-    def package_as_tar(file_name) #:nodoc:
-      TarTask.define_task(file_name)
-    end
-    alias :package_as_tgz :package_as_tar
-
     def package_as_sources_spec(spec) #:nodoc:
       spec.merge(:type=>:jar, :classifier=>'sources')
     end
@@ -234,7 +229,6 @@ module Buildr #:nodoc:
         zip.include :from=>[compile.sources, resources.target].compact
       end
     end
-
   end
 end
 
