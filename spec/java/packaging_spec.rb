@@ -1223,41 +1223,6 @@ describe Packaging, 'javadoc' do
   end
 end
 
-describe Packaging, 'test_jar' do
-  it_should_behave_like 'packaging'
-  before { @packaging, @package_type = :test_jar, :jar }
-
-  it 'should create package of type :jar and classifier \'tests\'' do
-    define 'foo', :version=>'1.0' do
-      package(:test_jar).type.should eql(:jar)
-      package(:test_jar).classifier.should eql('tests')
-      package(:test_jar).name.should match(/foo-1.0-tests.jar$/)
-    end
-  end
-
-  it 'should contain test source and resource files' do
-    write 'src/test/java/Test.java', 'public class Test {}'
-    write 'src/test/resources/test.properties', 'foo=bar'
-    define('foo', :version=>'1.0') { package(:test_jar) }
-    project('foo').task('package').invoke
-    project('foo').packages.first.should contain('Test.class')
-    project('foo').packages.first.should contain('test.properties')
-  end
-
-  it 'should create test jar if resources exists (but not sources)' do
-    write 'src/test/resources/test.properties', 'foo=bar'
-    define('foo', :version=>'1.0') { package(:test_jar) }
-    project('foo').package(:test_jar).invoke
-    project('foo').packages.first.should contain('test.properties')
-  end
-
-  it 'should be a ZipTask' do
-    define 'foo', :version=>'1.0' do
-      package(:test_jar).should be_kind_of(ZipTask)
-    end
-  end
-end
-
 RSpec.shared_examples 'package_with_' do
 
   def prepare(options = {})
