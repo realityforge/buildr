@@ -142,7 +142,7 @@ module Java
       end
 
       # :call-seq:
-      #   javadoc(*files, options)
+      #   javadoc(*files, options, &block)
       #
       # Runs Javadocs with the specified files and options.
       #
@@ -157,11 +157,15 @@ module Java
       # * false -- Prefixed, for example, :index=>false becomes -noindex
       # * string -- Option with value, for example, :windowtitle=>'My project' becomes -windowtitle "My project"
       # * array -- Option with set of values separated by spaces.
-      def javadoc(*args)
+      def javadoc(*args, &block)
         options = Hash === args.last ? args.pop : {}
         fail 'No output defined for javadoc' if options[:output].nil?
         options[:output] = File.expand_path(options[:output].to_s)
-        cmd_args = [ '-d', options[:output], trace?(:javadoc) ? '-verbose' : '-quiet' ]
+        cmd_args = []
+        cmd_args << path_to_bin('javadoc')
+        cmd_args << '-d' << options[:output]
+        cmd_args << (trace?(:javadoc) ? '-verbose' : '-quiet')
+
         options.reject { |key, value| [:output, :name, :sourcepath, :classpath].include?(key) }.
           each { |key, value| value.invoke if value.respond_to?(:invoke) }.
           each do |key, value|
@@ -186,10 +190,11 @@ module Java
         name = options[:name] || Dir.pwd
         unless Buildr.application.options.dryrun
           info "Generating Javadoc for #{name}"
-          trace (['javadoc'] + cmd_args).join(' ')
-          Java.load
-          ::Java::com.sun.tools.javadoc.Main.execute(cmd_args.to_java(::Java::java.lang.String)) == 0 or
-            fail 'Failed to generate Javadocs, see errors above'
+          trace(cmd_args.join(' '))
+          block = lambda { |ok, res| fail 'Failed to generate Javadocs, see errors above' unless ok } unless block
+          sh(*cmd_args) do |ok, ps|
+            block.call ok, ps
+          end
         end
       end
 
