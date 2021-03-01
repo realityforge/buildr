@@ -173,7 +173,7 @@ module Buildr
       end
 
       def extra_dependencies
-        @extra_dependencies ||= [self.project.compile.dependencies, self.project.test.compile.dependencies].flatten
+        @extra_dependencies ||= []
       end
 
       # An array of additional java_args
@@ -199,17 +199,6 @@ module Buildr
         end
 
         paths.flatten.compact
-      end
-
-      def complete_extra_dependencies
-        deps = self.extra_dependencies.dup
-
-        self.additional_project_names.each do |project_name|
-          p = self.project.project(project_name)
-          deps << [p.compile.dependencies, p.test.compile.dependencies].flatten.compact
-        end
-
-        deps.flatten.compact
       end
 
       protected
@@ -244,7 +233,7 @@ module Buildr
                                           :properties => project.checkstyle.properties,
                                           :java_args => project.checkstyle.java_args,
                                           :fail_on_error => project.checkstyle.fail_on_error?,
-                                          :dependencies => project.checkstyle.complete_extra_dependencies)
+                                          :dependencies => project.checkstyle.extra_dependencies.dup.flatten.compact)
           end
 
           if project.checkstyle.html_enabled?
