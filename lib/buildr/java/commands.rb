@@ -211,9 +211,6 @@ module Java
         Buildr.artifacts(options[:classpath] || []).map(&:to_s).
           map { |t| task(t).invoke; File.expand_path(t) }
       end
-
     end
-
   end
-
 end
