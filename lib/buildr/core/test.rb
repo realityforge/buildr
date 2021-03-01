@@ -81,7 +81,6 @@ module Buildr #:nodoc:
         def dependencies
           @dependencies ||= []
         end
-
       end
 
       # Construct a new test framework with the specified options.  Note that options may
@@ -118,9 +117,7 @@ module Buildr #:nodoc:
       def run(tests, dependencies)
         raise 'Not implemented'
       end
-
     end
-
   end
 
 
