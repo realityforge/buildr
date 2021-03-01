@@ -28,7 +28,7 @@ module Buildr #:nodoc:
     # For JRuby, the value for RUBY_PLATFORM will always be 'java'
     # That's why this function checks on Config::CONFIG['host_os']
     def win_os?
-      !!(RbConfig::CONFIG['host_os'] =~ /windows|cygwin|bccwin|cygwin|djgpp|mingw|mswin|mswin32|wince/i)
+      !!(RbConfig::CONFIG['host_os'] =~ /windows|bccwin|cygwin|djgpp|mingw|mswin|mswin32|wince/i)
     end
 
     # Runs Ruby with these command line arguments.  The last argument may be a hash,
