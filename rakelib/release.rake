@@ -57,9 +57,14 @@ task 'perform_release' do
       raise 'Uncommitted changes in git repository. Please commit them prior to release.' if 0 != status_output.size
     end
 
+    stage('AddonExtensionsCheck', 'Ensure that files in addon directory do not have the .rake suffix.') do
+      bad_files = FileList['addon/**/*.rake']
+      raise "#{bad_files.join(', ')} named with .rake extension but should be .rb, fix them before making a release!" unless bad_files.empty?
+    end
+
     stage('Build', 'Build the project to ensure that the tests pass') do
       sh "bundle exec rake clobber"
-      sh "bundle exec rake addon_extensions:check package"
+      sh "bundle exec rake package"
     end
 
     stage('TagProject', 'Tag the project') do
