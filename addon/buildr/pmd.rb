@@ -52,7 +52,6 @@ module Buildr
               ant.fileset :dir=> src, :includes=>'**/*.java' if File.directory?(src)
             end
           end
-
         end
       end
     end
