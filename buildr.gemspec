@@ -65,7 +65,6 @@ for those one-off tasks, with a language that's a joy to use.
   spec.add_dependency 'atoulme-Antwrap',      '0.7.5'
   spec.add_dependency 'diff-lcs',             '1.2.5'
   spec.add_dependency 'xml-simple',           '1.1.5'
-  spec.add_dependency 'minitar',              '0.5.4'
   spec.add_dependency 'bundler'
 
   spec.add_development_dependency 'hoe',                  '3.15.1'
