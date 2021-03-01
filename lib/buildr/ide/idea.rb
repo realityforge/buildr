@@ -378,21 +378,6 @@ module Buildr #:nodoc:
         end
       end
 
-      def add_jruby_facet(options = {})
-        name = options[:name] || 'JRuby'
-
-        ruby_version_file = buildr_project._('.ruby-version')
-        default_jruby_version = File.exist?(ruby_version_file) ? "rbenv: #{IO.read(ruby_version_file).strip}" : 'jruby-1.6.7.2'
-        jruby_version = options[:jruby_version] || default_jruby_version
-        add_facet(name, 'JRUBY') do |f|
-          f.configuration do |c|
-            c.JRUBY_FACET_CONFIG_ID :NAME => 'JRUBY_SDK_NAME', :VALUE => jruby_version
-            c.LOAD_PATH :number => '0'
-            c.I18N_FOLDERS :number => '0'
-          end
-        end
-      end
-
       def add_jpa_facet(options = {})
         name = options[:name] || 'JPA'
 
@@ -1048,7 +1033,7 @@ module Buildr #:nodoc:
         path = ::Buildr::Util.relative_path(File.expand_path(script), project.base_dir)
         name = options[:name] || File.basename(script)
         dir = options[:dir] || "$MODULE_DIR$/#{path}"
-        sdk = options[:sdk] || 'rbenv: ' + (IO.read(File.dirname(__FILE__) + '/../.ruby-version').trim rescue "jruby-#{RUBY_VERSION}")
+        sdk = options[:sdk]
 
         add_to_composite_component(self.configurations) do |xml|
           xml.configuration(:name => name, :type => 'RubyRunConfigurationType', :factoryName => 'Ruby', :default => !!options[:default]) do |xml|

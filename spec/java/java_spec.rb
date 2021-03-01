@@ -16,38 +16,27 @@
 
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'spec_helpers'))
 
-
-unless RUBY_PLATFORM =~ /java/
-  describe ENV, 'JAVA_HOME on OS X' do
-    before do
-      @old_home, ENV['JAVA_HOME'] = ENV['JAVA_HOME'], nil
-      @old_env_java = Object.module_eval { remove_const :ENV_JAVA }
-      RbConfig::CONFIG.should_receive(:[]).at_least(:once).with('host_os').and_return('darwin0.9')
-    end
-
-    it 'should point to default JVM' do
-      load File.expand_path('../lib/buildr/java/rjb.rb')
-      ENV['JAVA_HOME'].should == '/System/Library/Frameworks/JavaVM.framework/Home'
-    end
-
-    it 'should use value of environment variable if specified' do
-      ENV['JAVA_HOME'] = '/System/Library/Frameworks/JavaVM.specified'
-      load File.expand_path('../lib/buildr/java/rjb.rb')
-      ENV['JAVA_HOME'].should == '/System/Library/Frameworks/JavaVM.specified'
-    end
-
-    after do
-      ENV['JAVA_HOME'] = @old_home
-      ENV_JAVA.replace @old_env_java
-    end
+describe ENV, 'JAVA_HOME on OS X' do
+  before do
+    @old_home, ENV['JAVA_HOME'] = ENV['JAVA_HOME'], nil
+    @old_env_java = Object.module_eval { remove_const :ENV_JAVA }
+    RbConfig::CONFIG.should_receive(:[]).at_least(:once).with('host_os').and_return('darwin0.9')
   end
-else
-  describe 'JRuby environment' do
-    it 'should enforce a minimum version of jruby' do
-      check =File.read(File.expand_path('../lib/buildr/java/jruby.rb')).match(/JRUBY_MIN_VERSION.*\n.*JRUBY_MIN_VERSION\n/).to_s
-      check.sub!('JRUBY_VERSION', "'0.0.0'")
-      lambda {  eval(check) }.should raise_error(/JRuby must be at least at version /)
-    end
+
+  it 'should point to default JVM' do
+    load File.expand_path('../lib/buildr/java/rjb.rb')
+    ENV['JAVA_HOME'].should == '/System/Library/Frameworks/JavaVM.framework/Home'
+  end
+
+  it 'should use value of environment variable if specified' do
+    ENV['JAVA_HOME'] = '/System/Library/Frameworks/JavaVM.specified'
+    load File.expand_path('../lib/buildr/java/rjb.rb')
+    ENV['JAVA_HOME'].should == '/System/Library/Frameworks/JavaVM.specified'
+  end
+
+  after do
+    ENV['JAVA_HOME'] = @old_home
+    ENV_JAVA.replace @old_env_java
   end
 end
 

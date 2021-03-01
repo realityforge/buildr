@@ -42,15 +42,7 @@ module Buildr #nodoc
 
         begin
           if Buildr::Util.win_os?
-            if Buildr::Util.java_platform?
-              if JRUBY_VERSION =~ /^1.7/
-                [@java_terminal.get_width, @java_terminal.get_height]
-              else
-                [@java_terminal.getTerminalWidth, @java_terminal.getTerminalHeight]
-              end
-            else
               Win32::Console.new(Win32::Console::STD_OUTPUT_HANDLE).MaxWindow
-            end
           elsif $stdout.isatty
             if /solaris/ =~ RUBY_PLATFORM and
               `stty` =~ /\brows = (\d+).*\bcolumns = (\d+)/
@@ -105,15 +97,8 @@ module Buildr #nodoc
       def set_no_echo_mode
         return unless setup_support
         if Buildr::Util.win_os?
-          if Buildr::Util.java_platform?
-            if @java_console
-              @state = @java_console.getEchoCharacter
-              @java_console.setEchoCharacter 0
-            end
-          else
-            c = Win32::Console.new(Win32::Console::STD_OUTPUT_HANDLE)
-            c.Echo(false) rescue Exception
-          end
+          c = Win32::Console.new(Win32::Console::STD_OUTPUT_HANDLE)
+          c.Echo(false) rescue Exception
         else
           @state = `stty -g 2>/dev/null`
           `stty -echo -icanon 2>/dev/null`
@@ -123,14 +108,8 @@ module Buildr #nodoc
       def reset_mode
         return unless setup_support
         if Buildr::Util.win_os?
-          if Buildr::Util.java_platform?
-            if @java_console
-              @java_console.setEchoCharacter @state
-            end
-          else
-            c = Win32::Console.new(Win32::Console::STD_OUTPUT_HANDLE)
-            c.Echo(true) rescue Exception
-          end
+          c = Win32::Console.new(Win32::Console::STD_OUTPUT_HANDLE)
+          c.Echo(true) rescue Exception
         else
           `stty #{@state} 2>/dev/null`
         end
@@ -161,38 +140,7 @@ module Buildr #nodoc
         @initialized = false
         begin
           if Buildr::Util.win_os?
-            if Buildr::Util.java_platform?
-              require 'java'
-              require 'readline'
-              begin
-                # Attempt jline1
-                java_import 'java.io.OutputStreamWriter'
-                java_import 'java.nio.channels.Channels'
-                java_import 'jline.ConsoleReader'
-                java_import 'jline.Terminal'
-
-                @java_input = Java::JavaNioChannels::Channels.newInputStream($stdin.to_channel)
-                @java_output = Java::JavaIo.OutputStreamWriter.new(Java::JavaNioChannels::Channels.newOutputStream($stdout.to_channel))
-                @java_terminal = Java::Jline::Terminal.getTerminal
-                @java_console = Java::Jline::ConsoleReader.new(@java_input, @java_output)
-                @java_console.setUseHistory(false)
-                @java_console.set_bell_enabled(true)
-                @java_console.setUsePagination(false)
-
-              rescue Exception
-                # attempt jline 2
-                java_import 'jline.console.ConsoleReader'
-
-                @java_console = ConsoleReader.new($stdin.to_inputstream, $stdout.to_outputstream)
-                @java_console.set_history_enabled(false)
-                @java_console.set_bell_enabled(true)
-                @java_console.set_pagination_enabled(false)
-                @java_terminal = @java_console.getTerminal
-              end
-              return false
-            else
-              require 'Win32/Console/ANSI'
-            end
+            require 'Win32/Console/ANSI'
           end
         rescue
           # Unfortunately we have multiple incompatible jline libraries

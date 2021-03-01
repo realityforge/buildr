@@ -14,23 +14,20 @@
 # the License.
 
 # To work-around a bug with gemcutter: http://stackoverflow.com/questions/4932881/gemcutter-rake-build-now-throws-undefined-method-write-for-syckemitter
-require 'psych' if RUBY_VERSION >= '1.9.2' && !RUBY_PLATFORM[/java/]
+require 'psych' if RUBY_VERSION >= '1.9.2'
 
 # We need JAVA_HOME for most things (setup, spec, etc).
 unless ENV['JAVA_HOME']
-  if RUBY_PLATFORM[/java/]
-    ENV['JAVA_HOME'] = Java.java.lang.System.getProperty('java.home')
-  elsif RUBY_PLATFORM[/darwin/]
+  if RUBY_PLATFORM[/darwin/]
     ENV['JAVA_HOME'] = '/System/Library/Frameworks/JavaVM.framework/Home'
   else
     fail "Please set JAVA_HOME first (set JAVA_HOME=... or env JAVA_HOME=... rake ...)"
   end
 end
 
-
 # Load the Gem specification for the current platform (Ruby or JRuby).
-def spec(platform = RUBY_PLATFORM[/java/] || 'ruby')
-  @specs ||= %w(ruby java x86-mswin32).inject({}) { |hash, spec_platform|
+def spec(platform = 'ruby')
+  @specs ||= %w(ruby x86-mswin32).inject({}) { |hash, spec_platform|
     ENV['BUILDR_PLATFORM'] = spec_platform
     hash.update(spec_platform=> Gem::Specification.load('buildr.gemspec'))
     Gem::Specification._clear_load_cache

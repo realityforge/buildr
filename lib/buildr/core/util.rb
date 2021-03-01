@@ -18,10 +18,6 @@ module Buildr #:nodoc:
   module Util
     extend self
 
-    def java_platform?
-      !!(RUBY_PLATFORM =~ /java/)
-    end
-
     # In order to determine if we are running on a windows OS,
     # prefer this function instead of using Gem.win_platform?.
     #
@@ -284,123 +280,6 @@ class Hash
 
 end
 
-if Buildr::Util.java_platform?
-  require 'ffi'
-
-  # Workaround for BUILDR-535: when requiring 'ffi', JRuby defines an :error
-  # method with arity 0.
-  class Module
-    remove_method :error if method_defined?(:error)
-  end
-
-  module Buildr
-    class ProcessStatus
-      attr_reader :pid, :termsig, :stopsig, :exitstatus
-
-      def initialize(pid, success, exitstatus)
-        @pid = pid
-        @success = success
-        @exitstatus = exitstatus
-
-        @termsig = nil
-        @stopsig = nil
-      end
-
-      def &(num)
-        pid & num
-      end
-
-      def ==(other)
-        pid == other.pid
-      end
-
-      def >>(num)
-        pid >> num
-      end
-
-      def coredump?
-        false
-      end
-
-      def exited?
-        true
-      end
-
-      def stopped?
-        false
-      end
-
-      def success?
-        @success
-      end
-
-      def to_i
-        pid
-      end
-
-      def to_int
-        pid
-      end
-
-      def to_s
-        pid.to_s
-      end
-    end
-  end
-
-  module FileUtils
-    extend FFI::Library
-
-    ffi_lib FFI::Platform::LIBC
-
-    alias_method :__jruby_system__, :system
-    attach_function :system, [:string], :int
-    alias_method :__native_system__, :system
-    alias_method :system, :__jruby_system__
-
-    # code "borrowed" directly from Rake
-    def sh(*cmd, &block)
-      options = (Hash === cmd.last) ? cmd.pop : {}
-      unless block_given?
-        show_command = cmd.join(" ")
-        show_command = show_command[0,42] + "..."
-
-        block = lambda { |ok, status|
-          ok or fail "Command failed with status (#{status.exitstatus}): [#{show_command}]"
-        }
-      end
-      if RakeFileUtils.verbose_flag == Rake::FileUtilsExt::DEFAULT
-        options[:verbose] = false
-      else
-        options[:verbose] ||= RakeFileUtils.verbose_flag
-      end
-      options[:noop]    ||= RakeFileUtils.nowrite_flag
-      rake_check_options options, :noop, :verbose
-      rake_output_message cmd.join(" ") if options[:verbose]
-      unless options[:noop]
-        if Buildr::Util.win_os?
-          # Ruby uses forward slashes regardless of platform,
-          # unfortunately cd c:/some/path fails on Windows
-          pwd = Dir.pwd.gsub(%r{/}, '\\')
-          cd = "cd /d \"#{pwd}\" && "
-        else
-          cd = "cd '#{Dir.pwd}' && "
-        end
-        args = if cmd.size > 1 then cmd[1..cmd.size] else [] end
-
-        res = if Buildr::Util.win_os? && cmd.size == 1
-          __native_system__("#{cd} call #{cmd.first}")
-        else
-          arg_str = args.map { |a| "'#{a}'" }
-          __native_system__(cd + cmd.first + ' ' + arg_str.join(' '))
-        end
-        status = Buildr::ProcessStatus.new(0, res == 0, res)    # KLUDGE
-        block.call(res == 0, status)
-      end
-    end
-
-  end
-else
   module FileUtils
     # code "borrowed" directly from Rake
     def sh(*cmd, &block)
@@ -444,4 +323,3 @@ else
       end
     end
   end
-end

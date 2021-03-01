@@ -14,8 +14,6 @@
 # the License.
 
 require 'net/http'
-# PATCH:  On Windows, Net::SSH 2.0.2 attempts to load the Pageant DLLs which break on JRuby.
-$LOADED_FEATURES << 'net/ssh/authentication/pageant.rb' if RUBY_PLATFORM =~ /java/
 Net.autoload :SSH, 'net/ssh'
 Net.autoload :SFTP, 'net/sftp'
 autoload :CGI, 'cgi'
