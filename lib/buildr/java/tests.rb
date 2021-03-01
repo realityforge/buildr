@@ -85,33 +85,6 @@ module Buildr #:nodoc:
 
   end
 
-
-  # JMock is available when using JUnit and TestNG, JBehave.
-  module JMock
-
-    VERSION = '2.5.1'
-
-    class << self
-      def version
-        Buildr.settings.build['jmock'] || VERSION
-      end
-
-      def dependencies(versions = {:hamcrest => '1.1'})
-        two_or_later = version[0,1].to_i >= 2
-        group = two_or_later ? 'org.jmock' : 'jmock'
-
-        @dependencies ||= ["#{group}:jmock:jar:#{version}"]
-        if two_or_later
-          @dependencies << "org.jmock:jmock-junit#{Buildr::JUnit.version.to_s[0,1]}:jar:#{version}"
-          @dependencies << "org.hamcrest:hamcrest-core:jar:#{versions[:hamcrest]}"
-          @dependencies << "org.hamcrest:hamcrest-library:jar:#{versions[:hamcrest]}"
-        end
-        @dependencies
-      end
-    end
-  end
-
-
   # JUnit test framework, the default test framework for Java tests.
   #
   # Support the following options:
@@ -191,8 +164,7 @@ module Buildr #:nodoc:
       end
 
       def dependencies
-        four11_or_newer = version >= '4.11'
-        @dependencies ||= ["junit:junit:jar:#{version}"]+ (four11_or_newer ? JMock.dependencies({:hamcrest => '1.3'}) : JMock.dependencies)
+        @dependencies ||= ["junit:junit:jar:#{version}"]
       end
 
       def ant_taskdef #:nodoc:
@@ -291,8 +263,8 @@ module Buildr #:nodoc:
       end
 
       def dependencies
-        return ["org.testng:testng:jar:jdk15:#{version}"] + JMock.dependencies if version < '6.0'
-        %W(org.testng:testng:jar:#{version} com.beust:jcommander:jar:1.27) + JMock.dependencies
+        return ["org.testng:testng:jar:jdk15:#{version}"] if version < '6.0'
+        %W(org.testng:testng:jar:#{version} com.beust:jcommander:jar:1.27)
       end
     end
 

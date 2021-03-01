@@ -47,14 +47,6 @@ describe Buildr::JUnit do
     project('foo').test.compile.dependencies.should include(artifact("junit:junit:jar:1.2.3"))
   end
 
-  it 'should include JMock dependencies' do
-    define('foo') { test.using(:junit) }
-    two_or_later = JMock.version[0,1].to_i >= 2
-    group = two_or_later ? "org.jmock" : "jmock"
-    project('foo').test.compile.dependencies.should include(artifact("#{group}:jmock:jar:#{JMock.version}"))
-    project('foo').test.dependencies.should include(artifact("#{group}:jmock:jar:#{JMock.version}"))
-  end
-
   it 'should not include Hamcrest dependencies for JUnit < 4.11' do
     begin
       Buildr.settings.build['junit'] = '4.10'
@@ -70,15 +62,6 @@ describe Buildr::JUnit do
     define('foo') { test.using :junit }
     project('foo').test.compile.dependencies.should include(artifact("org.hamcrest:hamcrest-core:jar:1.3"))
     project('foo').test.dependencies.should include(artifact("org.hamcrest:hamcrest-core:jar:1.3"))
-  end
-
-
-  it 'should pick JUnit version from junit build settings' do
-    Buildr::JUnit.instance_eval { @dependencies = nil } # JUnit caches JMock dependencies
-    Buildr::JMock.instance_eval { @dependencies = nil }
-    write 'build.yaml', 'jmock: 1.2.3'
-    define('foo') { test.using(:junit) }
-    project('foo').test.compile.dependencies.should include(artifact("jmock:jmock:jar:1.2.3"))
   end
 
   it 'should include public classes extending junit.framework.TestCase' do
@@ -313,7 +296,6 @@ describe Buildr::JUnit do
   after do
     # Yes, this is ugly.  Better solution?
     Buildr::JUnit.instance_eval { @dependencies = nil }
-    Buildr::JMock.instance_eval { @dependencies = nil }
   end
 end
 
@@ -406,14 +388,6 @@ describe Buildr::TestNG do
     project('foo').test.compile.dependencies.should include(artifact("com.beust:jcommander:jar:1.27"))
     project('foo').test.dependencies.should include(artifact("org.testng:testng:jar:#{TestNG.version}"))
     project('foo').test.dependencies.should include(artifact("com.beust:jcommander:jar:1.27"))
-  end
-
-  it 'should include jmock dependencies' do
-    define('foo') { test.using :testng }
-    two_or_later = JMock.version[0,1].to_i >= 2
-    group = two_or_later ? "org.jmock" : "jmock"
-    project('foo').test.compile.dependencies.should include(artifact("#{group}:jmock:jar:#{JMock.version}"))
-    project('foo').test.dependencies.should include(artifact("#{group}:jmock:jar:#{JMock.version}"))
   end
 
   it 'should parse test classes in paths containing escaped sequences' do
