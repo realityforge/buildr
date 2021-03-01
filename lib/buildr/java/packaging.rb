@@ -343,7 +343,7 @@ module Buildr #:nodoc:
       # for example:
       #   package_with_javadoc :only=>['foo:bar', 'foo:baz']
       #
-      # (Same as calling package :javadoc on each project/sub-project that has source directories.)
+      # (Same as calling package :doc on each project/sub-project that has source directories.)
       def package_with_javadoc(options = nil)
         options ||= {}
         enhance do
