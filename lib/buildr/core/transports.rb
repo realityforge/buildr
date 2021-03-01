@@ -525,9 +525,9 @@ module URI
 
       path = real_path
       # TODO: complain about clunky URLs
-      raise NotFoundError, "Looking for #{self} and can't find it." unless File.exists?(path)
-      raise NotFoundError, "Looking for the file #{self}, and it happens to be a directory." if File.directory?(path)
-      File.open path, 'rb' do |input|
+      raise NotFoundError, "Looking for #{self} and can't find it." unless ::File.exists?(path)
+      raise NotFoundError, "Looking for the file #{self}, and it happens to be a directory." if ::File.directory?(path)
+      ::File.open path, 'rb' do |input|
         with_progress_bar options[:progress], path.split('/').last, input.stat.size do |progress|
           block ? block.call(input.read) : input.read
         end
