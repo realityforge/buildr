@@ -269,53 +269,6 @@ module Buildr #:nodoc:
         def classes=(value) #:nodoc:
           @classes = [value].flatten.map { |dir| file(dir.to_s) }
         end
-
-      end
-
-
-      # Extends the JarTask to create an AAR file (Axis2 service archive).
-      #
-      # Supports all the same options as JarTask, with the addition of :wsdls, :services_xml and :libs.
-      #
-      # * :wsdls -- WSDL files to include (under META-INF).  By default packaging will include all WSDL
-      #   files found under src/main/axis2.
-      # * :services_xml -- Location of services.xml file (included under META-INF).  By default packaging
-      #   takes this from src/main/axis2/services.xml.  Use a different path if you genereate the services.xml
-      #   file as part of the build.
-      # * :libs -- Array of files, tasks, artifact specifications, etc that will be added to the /lib directory.
-      #
-      # For example:
-      #   package(:aar).with(:libs=>'log4j:log4j:jar:1.1')
-      #
-      #   filter.from('src/main/axis2').into('target').include('services.xml', '*.wsdl').using('http_port'=>'8080')
-      #   package(:aar).wsdls.clear
-      #   package(:aar).with(:services_xml=>_('target/services.xml'), :wsdls=>_('target/*.wsdl'))
-      class AarTask < JarTask
-        # Artifacts to include under /lib.
-        attr_accessor :libs
-        # WSDLs to include under META-INF (defaults to all WSDLs under src/main/axis2).
-        attr_accessor :wsdls
-        # Location of services.xml file (defaults to src/main/axis2/services.xml).
-        attr_accessor :services_xml
-
-        def initialize(*args) #:nodoc:
-          super
-          @libs = []
-          @wsdls = []
-          prepare do
-            path('META-INF').include @wsdls
-            path('META-INF').include @services_xml, :as=>'services.xml' if @services_xml
-            path('lib').include Buildr.artifacts(@libs) unless @libs.nil? || @libs.empty?
-          end
-        end
-
-        def libs=(value) #:nodoc:
-          @libs = Buildr.artifacts(value)
-        end
-
-        def wsdls=(value) #:nodoc:
-          @wsdls |= Array(value)
-        end
       end
 
       include Extension
