@@ -46,6 +46,17 @@ unless defined?(SpecHelpers)
 
   require File.expand_path('sandbox', File.dirname(__FILE__))
 
+  class ::Rake::FileTask
+    def exist?
+      File.exist?(self.to_s)
+    end
+
+    def contain(content)
+      IO.read(self.to_s).include?(content)
+      #      File.exist?(self.to_s)
+    end
+  end
+
   module SpecHelpers
 
     include Checks::Matchers
