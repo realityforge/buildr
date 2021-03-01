@@ -155,7 +155,7 @@ module Java
       # * array -- Option with set of values separated by spaces.
       def javadoc(*args)
         options = Hash === args.last ? args.pop : {}
-        fail "No output defined for javadoc" if options[:output].nil?
+        fail 'No output defined for javadoc' if options[:output].nil?
         options[:output] = File.expand_path(options[:output].to_s)
         cmd_args = [ '-d', options[:output], trace?(:javadoc) ? '-verbose' : '-quiet' ]
         options.reject { |key, value| [:output, :name, :sourcepath, :classpath].include?(key) }.
