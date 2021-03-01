@@ -2,7 +2,7 @@ language: ruby
 jdk:
   - openjdk8
 rvm:
-  - 2.3.1
+  - 2.7.2
 git:
   depth: 10
 env:
