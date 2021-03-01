@@ -15,7 +15,7 @@
 
 require 'rubygems/package_task'
 
-Gem::PackageTask.new(spec)
+gem_task = Gem::PackageTask.new(spec)
 
 desc 'Compile Java libraries used by Buildr'
 task 'compile' do
@@ -24,13 +24,7 @@ task 'compile' do
   args << '--trace' if Rake.application.options.trace
   sh *args
 end
-file Gem::PackageTask.new(spec).package_dir => 'compile'
-file Gem::PackageTask.new(spec).package_dir_path => 'compile'
-
-# We also need the other packages (JRuby if building on Ruby, and vice versa)
-# Must call new with block, even if block does nothing, otherwise bad things happen.
-@specs.values.each do |s|
-  Gem::PackageTask.new(s) { |task| }
-end
+file gem_task.package_dir => 'compile'
+file gem_task.package_dir_path => 'compile'
 
 task('clobber') { rm_rf 'target' }
