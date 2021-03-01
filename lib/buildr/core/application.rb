@@ -666,18 +666,6 @@ module Rake #:nodoc
   end
 end
 
-# Under windows, paths passed to mkpath, mkdir_p and mkdirs need to be normalized.
-# Otherwise ruby may decide to treat the drive component as a directory (i.e.
-# create a directory named "C:"). This patch hooks in at a low level to work around
-# this issue.
-module FileUtils
-  def fu_list(arg) #:nodoc:
-    [arg].flatten.map { |path| File.expand_path(path) }
-  end
-
-  private_module_function :fu_list
-end
-
 module FileUtils
   def fu_output_message(msg)   #:nodoc:
     if Rake::FileUtilsExt::DEFAULT == RakeFileUtils.verbose_flag
