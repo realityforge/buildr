@@ -375,23 +375,6 @@ module Buildr #:nodoc:
         end
       end
 
-      def package_as_aar(file_name) #:nodoc:
-        Java::AarTask.define_task(file_name).tap do |aar|
-          aar.with :manifest=>manifest, :meta_inf=>meta_inf
-          aar.with :wsdls=>path_to(:source, :main, :axis2, '*.wsdl')
-          aar.with :services_xml=>path_to(:source, :main, :axis2, 'services.xml')
-          aar.with [compile.target, resources.target].compact
-          aar.with :libs=>compile.dependencies
-        end
-      end
-
-      def package_as_ear(file_name) #:nodoc:
-        Java::EarTask.define_task(file_name).tap do |ear|
-          ear.send :associate, self
-          ear.with :display_name=>id, :manifest=>manifest, :meta_inf=>meta_inf
-        end
-      end
-
       def package_as_javadoc_spec(spec) #:nodoc:
         spec.merge(:type=>:jar, :classifier=>'javadoc')
       end
