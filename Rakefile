@@ -14,6 +14,8 @@
 # the License.
 
 require 'psych'
+require 'rubygems/package_task'
+require 'rspec/core/rake_task'
 
 # We need JAVA_HOME for most things (setup, spec, etc).
 unless ENV['JAVA_HOME']
@@ -24,17 +26,33 @@ unless ENV['JAVA_HOME']
   end
 end
 
-# Load the Gem specification for the current platform (Ruby or JRuby).
-def spec(platform = 'ruby')
-  @specs ||= %w(ruby).inject({}) { |hash, spec_platform|
-    ENV['BUILDR_PLATFORM'] = spec_platform
-    hash.update(spec_platform=> Gem::Specification.load('buildr.gemspec'))
-    Gem::Specification._clear_load_cache
-    ENV['BUILDR_PLATFORM'] = nil
-    hash
-  }
-  @specs[platform]
+desc 'Clean up all temporary directories used for running tests, creating documentation, packaging, etc.'
+task :clobber do
+  rm_rf 'target'
+  rm_f 'failed'
+  rm_rf '_reports'
+  rm_rf 'tmp'
 end
 
-desc 'Clean up all temporary directories used for running tests, creating documentation, packaging, etc.'
-task :clobber
+desc 'Compile Java libraries used by Buildr'
+task 'compile' do
+  puts 'Compiling Java libraries ...'
+  args = RbConfig::CONFIG['ruby_install_name'], File.expand_path('_buildr'), '--buildfile', 'buildr.buildfile', 'compile'
+  args << '--trace' if Rake.application.options.trace
+  sh *args
+end
+
+gem_task = Gem::PackageTask.new(Gem::Specification.load('buildr.gemspec'))
+file gem_task.package_dir => 'compile'
+file gem_task.package_dir_path => 'compile'
+
+directory '_reports'
+
+desc 'Run all specs'
+RSpec::Core::RakeTask.new :spec => ['_reports', :compile] do |task|
+  task.rspec_path = 'bundle exec rspec'
+  task.rspec_opts = %w{--order defined --format html --out _reports/specs.html --backtrace}
+end
+
+desc 'Run all specs with CI reporter'
+task 'ci' => %w(clobber spec)
