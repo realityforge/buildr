@@ -19,12 +19,17 @@ module Buildr
   module Checkstyle
 
     class << self
-      def checkstyle(configuration_file, format, output_file, source_paths, options = {})
-        version = '8.40'
-        artifact = Buildr.artifact("com.puppycrawl.tools:checkstyle-all:jar:#{version}")
-        Buildr.download(artifact => "https://github.com/checkstyle/checkstyle/releases/download/checkstyle-#{version}/checkstyle-#{version}-all.jar")
 
-        dependencies = [artifact] + (options[:dependencies] || [])
+      # The specs for requirements
+      def dependencies
+        version = '8.40'
+        spec = "com.puppycrawl.tools:checkstyle-all:jar:#{version}"
+        Buildr.download(Buildr.artifact(spec) => "https://github.com/checkstyle/checkstyle/releases/download/checkstyle-#{version}/checkstyle-#{version}-all.jar")
+        [spec]
+      end
+
+      def checkstyle(configuration_file, format, output_file, source_paths, options = {})
+        dependencies = self.dependencies + (options[:dependencies] || [])
         cp = Buildr.artifacts(dependencies).each { |a| a.invoke if a.respond_to?(:invoke) }.map(&:to_s)
 
         args = []
