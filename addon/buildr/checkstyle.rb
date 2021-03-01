@@ -176,6 +176,13 @@ module Buildr
         @extra_dependencies ||= [self.project.compile.dependencies, self.project.test.compile.dependencies].flatten
       end
 
+      # An array of additional java_args
+      attr_writer :java_args
+
+      def java_args
+        @java_args ||= []
+      end
+
       # An array of additional projects to scan for main and test sources
       attr_writer :additional_project_names
 
@@ -233,6 +240,7 @@ module Buildr
                                           project.checkstyle.xml_output_file,
                                           project.checkstyle.complete_source_paths,
                                           :properties => project.checkstyle.properties,
+                                          :java_args => project.checkstyle.java_args,
                                           :fail_on_error => project.checkstyle.fail_on_error?,
                                           :dependencies => project.checkstyle.complete_extra_dependencies)
           end
