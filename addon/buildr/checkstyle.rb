@@ -230,11 +230,9 @@ module Buildr
             project.task('checkstyle:html' => xml_task) do
               puts 'Checkstyle: Generating report'
               mkdir_p File.dirname(project.checkstyle.html_output_file)
-              Buildr.ant 'checkstyle' do |ant|
-                ant.xslt :in => project.checkstyle.xml_output_file,
-                         :out => project.checkstyle.html_output_file,
-                         :style => project.checkstyle.style_file
-              end
+              args = ['-IN', project.checkstyle.xml_output_file, '-XSL', project.checkstyle.style_file, '-OUT', project.checkstyle.html_output_file]
+              classpath = Buildr.artifacts(%w(xalan:xalan:jar:2.7.2 xalan:serializer:jar:2.7.2 xml-apis:xml-apis:jar:1.3.04))
+              Java::Commands.java 'org.apache.xalan.xslt.Process', *(args + [{ :classpath => classpath }])
             end
           end
         end
