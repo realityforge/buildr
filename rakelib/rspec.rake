@@ -27,7 +27,6 @@ end
 
 desc 'Run all specs'
 RSpec::Core::RakeTask.new :spec => ['_reports', :compile] do |task|
-  ENV['USE_FSC'] = 'no'
   files = FileList['spec/**/*_spec.rb']
   task.rspec_path = 'bundle exec rspec'
   task.rspec_files = files
