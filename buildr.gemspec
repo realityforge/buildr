@@ -79,7 +79,6 @@ for those one-off tasks, with a language that's a joy to use.
   spec.add_development_dependency 'rspec',                '2.14.1'
   spec.add_development_dependency 'rspec-retry',          '0.2.1'
   spec.add_development_dependency 'test-unit',            '3.2.1'
-  spec.add_development_dependency 'ci_reporter',          '1.9.0'
   # Used to manage whitespace of files within repository
   spec.add_development_dependency 'zapwhite', '2.19.0'
 end
