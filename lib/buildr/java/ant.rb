@@ -36,9 +36,7 @@ module Buildr #:nodoc:
         # to put it but the root classpath.
         @dependencies ||= ["org.apache.ant:ant:jar:#{version}", "org.apache.ant:ant-launcher:jar:#{version}"]
       end
-
     end
-
 
     Java.classpath << lambda { Ant.dependencies }
 
