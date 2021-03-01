@@ -1158,10 +1158,10 @@ module Buildr #:nodoc:
             xml.predefined_log_file(:id => 'GlassFish', :enabled => 'true')
 
             add_glassfish_runner_settings(xml, 'Debug', {
-                                               :DEBUG_PORT => domain_port.to_s,
-                                               :TRANSPORT => '0',
-                                               :LOCAL => 'false',
-                                             })
+              :DEBUG_PORT => domain_port.to_s,
+              :TRANSPORT => '0',
+              :LOCAL => 'false',
+            })
             add_glassfish_configuration_wrapper(xml, 'Debug')
 
             add_glassfish_runner_settings(xml, 'Run')
