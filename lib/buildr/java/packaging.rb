@@ -278,7 +278,7 @@ module Buildr #:nodoc:
           project.manifest = project.parent.manifest.dup
         else
           project.manifest = {
-            'Build-By'=>ENV['USER'], 'Build-Jdk'=>ENV_JAVA['java.version'],
+            'Build-By'=>ENV['USER'],
             'Implementation-Title'=>project.comment || project.name,
             'Implementation-Version'=>project.version }
         end

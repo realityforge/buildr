@@ -13,6 +13,11 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
+if RbConfig::CONFIG['host_os'] =~ /darwin/i
+  # On OS X we attempt to guess where JAVA_HOME is, if not set
+  ENV['JAVA_HOME'] ||= '/System/Library/Frameworks/JavaVM.framework/Home'
+end
+
 # Base module for all things Java.
 module Java
 

@@ -82,7 +82,6 @@ RSpec.shared_examples 'package with manifest' do
         'Created-By'              =>'Buildr',
         'Implementation-Title'    =>@project.name,
         'Implementation-Version'  =>'1.2',
-        'Build-Jdk'               =>ENV_JAVA['java.version'],
         'Build-By'                =>'MysteriousJoe'
       }
     end
