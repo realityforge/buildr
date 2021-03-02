@@ -23,6 +23,7 @@ unless Gem::Version.new("0").respond_to?(:version=)
 
       # re-prime @segments
       @segments = nil
+      @canonical_segments = nil
       segments
     end
   end
