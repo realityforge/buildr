@@ -414,7 +414,7 @@ module Buildr #:nodoc:
       #                                     ->  ( >2 & <4)
       #
       # VersionRequirement supports RubyGem's comparison operators
-      # in adition to parens, logical and, logical or and negation.
+      # in addition to parens, logical and, logical or and negation.
       # See the docs for VersionRequirement for more info on operators.
       def initialize(spec)
         self.class.send :include, ActsAsArtifact unless ActsAsArtifact === self
