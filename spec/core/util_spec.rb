@@ -159,7 +159,7 @@ describe 'Buildr::Util.tools_jar' do
 
   describe 'when JAVA_HOME points to a JRE inside a JDK' do
     before do
-      Java.instance_eval { @tools_jar = nil }
+      Buildr::Util.instance_eval { @tools_jar = nil }
       write 'jdk/lib/tools.jar'
       ENV['JAVA_HOME'] = File.expand_path('jdk/jre')
     end
@@ -171,7 +171,7 @@ describe 'Buildr::Util.tools_jar' do
 
   describe 'when there is no tools.jar' do
     before do
-      Java.instance_eval { @tools_jar = nil }
+      Buildr::Util.instance_eval { @tools_jar = nil }
       ENV['JAVA_HOME'] = File.expand_path('jdk')
     end
 
