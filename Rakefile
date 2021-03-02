@@ -28,28 +28,17 @@ end
 
 desc 'Clean up all temporary directories used for running tests, creating documentation, packaging, etc.'
 task :clobber do
-  rm_rf 'target'
   rm_f 'failed'
   rm_rf '_reports'
   rm_rf 'tmp'
 end
 
-desc 'Compile Java libraries used by Buildr'
-task 'compile' do
-  puts 'Compiling Java libraries ...'
-  args = RbConfig::CONFIG['ruby_install_name'], File.expand_path('_buildr'), '--buildfile', 'buildr.buildfile', 'compile'
-  args << '--trace' if Rake.application.options.trace
-  sh *args
-end
-
-gem_task = Gem::PackageTask.new(Gem::Specification.load('buildr.gemspec'))
-file gem_task.package_dir => 'compile'
-file gem_task.package_dir_path => 'compile'
+Gem::PackageTask.new(Gem::Specification.load('buildr.gemspec'))
 
 directory '_reports'
 
 desc 'Run all specs'
-RSpec::Core::RakeTask.new :spec => ['_reports', :compile] do |task|
+RSpec::Core::RakeTask.new :spec => ['_reports'] do |task|
   task.rspec_path = 'bundle exec rspec'
   task.rspec_opts = %w{--format html --out _reports/specs.html --backtrace}
 end

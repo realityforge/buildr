@@ -25,62 +25,18 @@ module Buildr #:nodoc:
       end
 
       def dependencies
-        unless @dependencies
-          super
-          # Add buildr utility classes (e.g. JavaTestFilter)
-          @dependencies |= [ File.join(File.dirname(__FILE__)) ]
-        end
-        @dependencies
+        super
       end
     end
 
   private
 
-    # Add buildr utilities (JavaTestFilter) to classpath
-    Java.classpath << lambda { dependencies }
-
-    # :call-seq:
-    #     filter_classes(dependencies, criteria)
-    #
-    # Return a list of classnames that match the given criteria.
-    # The criteria parameter is a hash that must contain at least one of:
-    #
-    # * :class_names -- List of patterns to match against class name
-    # * :interfaces -- List of java interfaces or java classes
-    # * :class_annotations -- List of annotations on class level
-    # * :method_annotations -- List of annotations on method level
-    # * :fields -- List of java field names
-    #
-    def filter_classes(dependencies, criteria = {})
+    def derive_test_candidates
       return [] unless task.compile.target
       target = task.compile.target.to_s
-      candidates = Dir["#{target}/**/*.class"].
+      Dir["#{target}/**/*.class"].
         map { |file| Util.relative_path(file, target).ext('').gsub(File::SEPARATOR, '.') }.
         reject { |name| name =~ /\$./ }
-      result = []
-      if criteria[:class_names]
-        result.concat candidates.select { |name| criteria[:class_names].flatten.any? { |pat| pat === name } }
-      end
-      begin
-        Java.load
-        filter = Java.org.apache.buildr.JavaTestFilter.new(dependencies.to_java(Java.java.lang.String))
-        if criteria[:interfaces]
-          filter.add_interfaces(criteria[:interfaces].to_java(Java.java.lang.String))
-        end
-        if criteria[:class_annotations]
-          filter.add_class_annotations(criteria[:class_annotations].to_java(Java.java.lang.String))
-        end
-        if criteria[:method_annotations]
-          filter.add_method_annotations(criteria[:method_annotations].to_java(Java.java.lang.String))
-        end
-        if criteria[:fields]
-          filter.add_fields(criteria[:fields].to_java(Java.java.lang.String))
-        end
-        result.concat filter.filter(candidates.to_java(Java.java.lang.String)).map(&:to_s)
-      rescue =>ex
-        info "#{ex.class}: #{ex.message}"
-        raise
-      end
     end
   end
 
@@ -100,9 +56,12 @@ module Buildr #:nodoc:
     end
 
     def tests(dependencies) #:nodoc:
-      filter_classes(dependencies,
-                     :class_annotations => %w{org.testng.annotations.Test},
-                     :method_annotations => %w{org.testng.annotations.Test})
+      candidates = derive_test_candidates
+
+      # Ugly hack that probably works for all of our codebases
+      test_include = /.*Test$/
+      test_exclude = /\.Abstract[^.]*$/
+      candidates.select{|c| c =~ test_include }.select{|c| !(c =~ test_exclude) }
     end
 
     def run(tests, dependencies) #:nodoc:
