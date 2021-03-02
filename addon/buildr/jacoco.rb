@@ -15,33 +15,22 @@
 
 module Buildr
   # Initial support for JaCoCo coverage reports.
-  # WARNING: Experimental and may change radically.
   module JaCoCo
     class << self
-      VERSION = '0.8.0'
-
-      def version
-        @version || Buildr.settings.build['jacoco'] || VERSION
-      end
-
-      def version=(value)
-        @version = value
-      end
-
       def agent_spec
-        ["org.jacoco:org.jacoco.agent:jar:runtime:#{version}"]
+        %w(org.jacoco:org.jacoco.agent:jar:runtime:0.8.6)
       end
 
       def ant_spec
-        [
-          "org.jacoco:org.jacoco.report:jar:#{version}",
-          "org.jacoco:org.jacoco.core:jar:#{version}",
-          "org.jacoco:org.jacoco.ant:jar:#{version}",
-          'org.ow2.asm:asm:jar:6.0',
-          'org.ow2.asm:asm-commons:jar:6.0',
-          'org.ow2.asm:asm-tree:jar:6.0',
-          'org.ow2.asm:asm-analysis:jar:6.0',
-          'org.ow2.asm:asm-util:jar:6.0',
+        %w[
+          org.jacoco:org.jacoco.report:jar:0.8.6
+          org.jacoco:org.jacoco.core:jar:0.8.6
+          org.jacoco:org.jacoco.ant:jar:0.8.6
+          org.ow2.asm:asm:jar:8.0.1
+          org.ow2.asm:asm-commons:jar:8.0.1
+          org.ow2.asm:asm-tree:jar:8.0.1
+          org.ow2.asm:asm-analysis:jar:8.0.1
+          org.ow2.asm:asm-util:jar:8.0.1
         ]
       end
     end
