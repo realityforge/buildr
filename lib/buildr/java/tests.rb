@@ -93,15 +93,9 @@ module Buildr #:nodoc:
   # * :args -- Arguments passed to the TestNG command line runner.
   class TestNG < TestFramework::Java
 
-    VERSION = '6.11'
-
     class << self
-      def version
-        Buildr.settings.build['testng'] || VERSION
-      end
-
       def dependencies
-        %W(org.testng:testng:jar:#{version} com.beust:jcommander:jar:1.27)
+        %W(org.testng:testng:jar:7.4.0 com.beust:jcommander:jar:1.78 org.webjars:jquery:jar:3.5.1)
       end
     end
 
