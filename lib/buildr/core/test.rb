@@ -480,8 +480,6 @@ module Buildr #:nodoc:
 
     def framework=(name)
       cls = TestFramework.select(name) or raise ArgumentError, "No #{name} test framework available. Did you install it?"
-      #cls.inherit_options.reject { |name| options.has_key?(name) }.
-      #  each { |name| options[name] = @parent_task.options[name] } if @parent_task.respond_to?(:options)
       @framework = cls.new(self, options)
       # Test framework dependency.
       with @framework.dependencies
