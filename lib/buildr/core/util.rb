@@ -184,37 +184,6 @@ end
 
 class Hash
 
-  class << self
-
-    # :call-seq:
-    #   Hash.from_java_properties(string)
-    #
-    # Returns a hash from a string in the Java properties file format. For example:
-    #   str = 'foo=bar\nbaz=fab'
-    #   Hash.from_properties(str)
-    #   => { 'foo'=>'bar', 'baz'=>'fab' }.to_properties
-    def from_java_properties(string)
-      hash = {}
-      input_stream = Java.java.io.StringBufferInputStream.new(string)
-      java_properties = Java.java.util.Properties.new
-      java_properties.load input_stream
-      keys = java_properties.keySet.iterator
-      while keys.hasNext
-        # Calling key.next in JRuby returns a java.lang.String, behaving as a Ruby string and life is good.
-        # MRI, unfortunately, treats next() like the interface says returning an object that's not a String,
-        # and the Hash doesn't work the way we need it to.  Unfortunately, we can call toString on MRI's object,
-        # but not on the JRuby one; calling to_s on the JRuby object returns what we need, but ... you guessed it.
-        #  So this seems like the one hack to unite them both.
-        #key = Java.java.lang.String.valueOf(keys.next.to_s)
-        key = keys.next
-        key = key.toString unless String === key
-        hash[key] = java_properties.getProperty(key)
-      end
-      hash
-    end
-
-  end
-
   # :call-seq:
   #   only(keys*) => hash
   #
@@ -239,21 +208,6 @@ class Hash
   def except(*keys)
     (self.keys - keys).inject({}) { |hash, key| hash.merge(key=>self[key]) }
   end
-
-  # :call-seq:
-  #   to_java_properties => string
-  #
-  # Convert hash to string format used for Java properties file. For example:
-  #   { 'foo'=>'bar', 'baz'=>'fab' }.to_properties
-  #   => foo=bar
-  #      baz=fab
-  def to_java_properties
-    keys.sort.map { |key|
-      value = self[key].gsub(/[\t\r\n\f\\]/) { |escape| "\\" + {"\t"=>"t", "\r"=>"r", "\n"=>"n", "\f"=>"f", "\\"=>"\\"}[escape] }
-      "#{key}=#{value}"
-    }.join("\n")
-  end
-
 end
 
   module FileUtils
