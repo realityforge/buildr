@@ -95,7 +95,7 @@ module Buildr #:nodoc:
 
     class << self
       def dependencies
-        %W(org.testng:testng:jar:7.4.0 com.beust:jcommander:jar:1.78 org.webjars:jquery:jar:3.5.1)
+        %w(org.testng:testng:jar:7.4.0 com.beust:jcommander:jar:1.78 org.webjars:jquery:jar:3.5.1)
       end
     end
 
