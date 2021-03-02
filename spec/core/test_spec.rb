@@ -841,10 +841,16 @@ describe 'test rule' do
   it 'should reset tasks to specific pattern' do
     define 'foo' do
       test.using(:testng)
-      test.instance_eval { @framework.stub(:tests).and_return(%w[something nothing]) }
+      test.instance_eval do
+        @framework.stub(:tests).and_return(%w[something nothing])
+        @framework.stub(:run).and_return(%w[something])
+      end
       define 'bar' do
         test.using(:testng)
-        test.instance_eval { @framework.stub(:tests).and_return(%w[something nothing]) }
+        test.instance_eval do
+          @framework.stub(:tests).and_return(%w[something nothing])
+          @framework.stub(:run).and_return(%w[something])
+        end
       end
     end
     task('test:something').invoke
@@ -857,7 +863,10 @@ describe 'test rule' do
   it 'should apply *name* pattern' do
     define 'foo' do
       test.using(:testng)
-      test.instance_eval { @framework.stub(:tests).and_return(['prefix-something-suffix']) }
+      test.instance_eval do
+        @framework.stub(:tests).and_return(['prefix-something-suffix'])
+        @framework.stub(:run).and_return(['prefix-something-suffix'])
+      end
     end
     task('test:something').invoke
     project('foo').test.tests.should include('prefix-something-suffix')
@@ -866,7 +875,10 @@ describe 'test rule' do
   it 'should not apply *name* pattern if asterisks used' do
     define 'foo' do
       test.using(:testng)
-      test.instance_eval { @framework.stub(:tests).and_return(%w[prefix-something prefix-something-suffix]) }
+      test.instance_eval do
+        @framework.stub(:tests).and_return(%w[prefix-something prefix-something-suffix])
+        @framework.stub(:run).and_return(%w[prefix-something])
+      end
     end
     task('test:*something').invoke
     project('foo').test.tests.should include('prefix-something')
@@ -876,7 +888,10 @@ describe 'test rule' do
   it 'should accept multiple tasks separated by commas' do
     define 'foo' do
       test.using(:testng)
-      test.instance_eval { @framework.stub(:tests).and_return(%w[foo bar baz]) }
+      test.instance_eval do
+        @framework.stub(:tests).and_return(%w[foo bar baz])
+        @framework.stub(:run).and_return(%w[foo bar])
+      end
     end
     task('test:foo,bar').invoke
     project('foo').test.tests.should include('foo')
@@ -885,18 +900,21 @@ describe 'test rule' do
   end
 
   it 'should execute only the named tests' do
-    write 'src/test/java/TestSomething.java',
-      'public class TestSomething { @org.testng.annotations.Test public void testNothing() {} }'
-    write 'src/test/java/TestFails.java',
-      'public class TestFails { @org.testng.annotations.Test public void testFailure() { fail(); } }'
+    write 'src/test/java/SomeTest.java',
+      'public class SomeTest { @org.testng.annotations.Test public void testNothing() {} }'
+    write 'src/test/java/BadTest.java',
+      'public class BadTest { @org.testng.annotations.Test public void testFailure() {} }'
     define 'foo'
-    task('test:Something').invoke
+    task('test:SomeTest').invoke
   end
 
   it 'should execute the named tests even if the test task is not needed' do
     define 'foo' do
       test.using(:testng)
-      test.instance_eval { @framework.stub(:tests).and_return(%w[something nothing]) }
+      test.instance_eval do
+        @framework.stub(:tests).and_return(%w[something nothing])
+        @framework.stub(:run).and_return(%w[something])
+      end
     end
     touch_last_successful_test_run project('foo').test
     task('test:something').invoke
@@ -906,7 +924,10 @@ describe 'test rule' do
   it 'should not execute excluded tests' do
     define 'foo' do
       test.using(:testng)
-      test.instance_eval { @framework.stub(:tests).and_return(%w[something nothing]) }
+      test.instance_eval do
+        @framework.stub(:tests).and_return(%w[something nothing])
+        @framework.stub(:run).and_return(%w[something])
+      end
     end
     task('test:*,-nothing').invoke
     project('foo').test.tests.should include('something')
@@ -914,22 +935,25 @@ describe 'test rule' do
   end
 
   it 'should not execute tests in excluded package' do
-    write 'src/test/java/com/example/foo/TestSomething.java',
-      'package com.example.foo; public class TestSomething { @org.testng.annotations.Test public void testNothing() {} }'
-    write 'src/test/java/com/example/bar/TestFails.java',
-      'package com.example.bar; public class TestFails { @org.testng.annotations.Test public void testFailure() { fail(); } }'
+    write 'src/test/java/com/example/foo/SomeTest.java',
+      'package com.example.foo; public class SomeTest { @org.testng.annotations.Test public void testNothing() {} }'
+    write 'src/test/java/com/example/bar/BadTest.java',
+      'package com.example.bar; public class BadTest { @org.testng.annotations.Test public void testFailure() {} }'
     define 'foo' do
       test.using(:testng)
     end
     task('test:-com.example.bar').invoke
-    project('foo').test.tests.should include('com.example.foo.TestSomething')
-    project('foo').test.tests.should_not include('com.example.bar.TestFails')
+    project('foo').test.tests.should include('com.example.foo.SomeTest')
+    project('foo').test.tests.should_not include('com.example.bar.BadTest')
   end
 
   it 'should not execute excluded tests with wildcards' do
     define 'foo' do
       test.using(:testng)
-      test.instance_eval { @framework.stub(:tests).and_return(%w[something nothing]) }
+      test.instance_eval do
+        @framework.stub(:tests).and_return(%w[something nothing])
+        @framework.stub(:tests).and_return(%w[])
+      end
     end
     task('test:something,-s*,-n*').invoke
     project('foo').test.tests.should_not include('something')
@@ -939,7 +963,10 @@ describe 'test rule' do
   it 'should execute all tests except excluded tests' do
     define 'foo' do
       test.using(:testng)
-      test.instance_eval { @framework.stub(:tests).and_return(%w[something anything nothing]) }
+      test.instance_eval do
+        @framework.stub(:tests).and_return(%w[something anything nothing])
+        @framework.stub(:run).and_return(%w[something anything])
+      end
     end
     task('test:-nothing').invoke
     project('foo').test.tests.should include('something', 'anything')
@@ -950,7 +977,10 @@ describe 'test rule' do
     define 'foo' do
       test.using(:testng)
       test.exclude 'something'
-      test.instance_eval { @framework.stub(:tests).and_return(%w[something anything nothing]) }
+      test.instance_eval do
+        @framework.stub(:tests).and_return(%w[something anything nothing])
+        @framework.stub(:run).and_return(%w[something anything])
+      end
     end
     task('test:-nothing').invoke
     project('foo').test.tests.should include('something', 'anything')
@@ -961,7 +991,10 @@ describe 'test rule' do
     define 'foo' do
       test.using(:testng)
       test.include 'something'
-      test.instance_eval { @framework.stub(:tests).and_return(%w[something nothing]) }
+      test.instance_eval do
+        @framework.stub(:tests).and_return(%w[something nothing])
+        @framework.stub(:run).and_return(%w[nothing])
+      end
     end
     task('test:nothing').invoke
     project('foo').test.tests.should include('nothing')
@@ -971,7 +1004,9 @@ describe 'test rule' do
   it 'should not execute a test if it''s both included and excluded' do
     define 'foo' do
       test.using(:testng)
-      test.instance_eval { @framework.stub(:tests).and_return(['nothing']) }
+      test.instance_eval do
+        @framework.stub(:tests).and_return(['nothing'])
+      end
     end
     task('test:nothing,-nothing').invoke
     project('foo').test.tests.should_not include('nothing')
@@ -980,7 +1015,10 @@ describe 'test rule' do
   it 'should not update the last successful test run timestamp' do
     define 'foo' do
       test.using(:testng)
-      test.instance_eval { @framework.stub(:tests).and_return(%w[something nothing]) }
+      test.instance_eval do
+        @framework.stub(:tests).and_return(%w[something nothing])
+        @framework.stub(:run).and_return(%w[something])
+      end
     end
     a_second_ago = Time.now - 1
     touch_last_successful_test_run project('foo').test, a_second_ago
