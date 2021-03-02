@@ -456,11 +456,11 @@ describe "ZipTask" do
   define_method(:archive) { |file| zip(file) }
 
   after(:each) do
-    checkZip(@archive)
+    check_zip(@archive)
   end
 
   # Check for possible corruption using Java's "jar" command since they are stricter than rubyzip
-  def checkZip(file)
+  def check_zip(file)
     return unless File.exist?(file)
 
     sh "#{File.join(ENV['JAVA_HOME'], 'bin', 'jar')} tvf #{file}"
