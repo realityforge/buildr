@@ -141,9 +141,9 @@ module Buildr #:nodoc:
         report = File.read(failed_tests)
         failed = report.scan(/<class name="(.*?)">/im).flatten
         # return the list of passed tests
-        return tests - failed
+        tests - failed
       else
-        return tests
+        tests
       end
     end
   end
