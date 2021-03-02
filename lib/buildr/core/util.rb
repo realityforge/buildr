@@ -100,6 +100,17 @@ module Buildr #:nodoc:
       end
     end
 
+    # Most platforms requires tools.jar to be on the classpath, tools.jar contains the
+    # Java compiler (OS X and AIX are two exceptions we know about, may be more).
+    # Guess where tools.jar is from JAVA_HOME, which hopefully points to the JDK,
+    # but maybe the JRE.  Return nil if not found.
+    def tools_jar #:nodoc:
+      @tools_jar ||= begin
+                       home = ENV['JAVA_HOME'] or fail 'Are we forgetting something? JAVA_HOME not set.'
+                       %w[lib/tools.jar ../lib/tools.jar].map { |path| File.expand_path(path, home) }.
+                         find { |path| File.exist?(path) }
+                     end
+    end
   end # Util
 end
 

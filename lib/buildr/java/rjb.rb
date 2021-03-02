@@ -107,25 +107,13 @@ module Java
       @loaded
     end
 
-    # Most platforms requires tools.jar to be on the classpath, tools.jar contains the
-    # Java compiler (OS X and AIX are two exceptions we know about, may be more).
-    # Guess where tools.jar is from JAVA_HOME, which hopefully points to the JDK,
-    # but maybe the JRE.  Return nil if not found.
-    def tools_jar #:nodoc:
-      @tools_jar ||= begin
-        home = ENV['JAVA_HOME'] or fail 'Are we forgetting something? JAVA_HOME not set.'
-        %w[lib/tools.jar ../lib/tools.jar].map { |path| File.expand_path(path, home) }.
-          find { |path| File.exist?(path) }
-      end
-    end
-
     # Loads the JVM and all the libraries listed on the classpath.  Call this
     # method before accessing any Java class, but only call it from methods
     # used in the build, giving the Buildfile a chance to load all extensions
     # that append to the classpath and specify which remote repositories to use.
     def load
       return self if @loaded
-      classpath << tools_jar if tools_jar
+      classpath << Buildr::Util.tools_jar if Buildr::Util.tools_jar
 
       classpath.map! { |path| Proc === path ? path.call : path }
       cp = Buildr.artifacts(classpath).map(&:to_s).each { |path| file(path).invoke }
