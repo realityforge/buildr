@@ -34,10 +34,12 @@ describe Buildr::TestNG do
   end
 
   it 'should parse test classes in paths containing escaped sequences' do
-    write 'bar%2F/src/test/java/com/example/AnnotatedClass.java', <<-JAVA
+    write 'bar%2F/src/test/java/com/example/MyTest.java', <<-JAVA
       package com.example;
       @org.testng.annotations.Test
-      public class AnnotatedClass { }
+      public class MyTest {
+        public void myTestMethod() { }
+      }
     JAVA
     define 'foo' do
       define 'bar%2F' do
@@ -45,25 +47,27 @@ describe Buildr::TestNG do
       end
     end
     project('foo:bar%2F').test.invoke
-    project('foo:bar%2F').test.tests.should include('com.example.AnnotatedClass')
+    project('foo:bar%2F').test.tests.should include('com.example.MyTest')
   end
 
   it 'should include classes using TestNG annotations' do
-    write 'src/test/java/com/example/AnnotatedClass.java', <<-JAVA
+    write 'src/test/java/com/example/MyTest.java', <<-JAVA
       package com.example;
       @org.testng.annotations.Test
-      public class AnnotatedClass { }
+      public class MyTest {
+        public void myTestMethod() { }
+      }
     JAVA
-    write 'src/test/java/com/example/AnnotatedMethod.java', <<-JAVA
+    write 'src/test/java/com/example/MyOtherTest.java', <<-JAVA
       package com.example;
-      public class AnnotatedMethod {
+      public class MyOtherTest {
         @org.testng.annotations.Test
         public void annotated() { }
       }
     JAVA
     define('foo') { test.using(:testng) }
     project('foo').test.invoke
-    project('foo').test.tests.should include('com.example.AnnotatedClass', 'com.example.AnnotatedMethod')
+    project('foo').test.tests.should include('com.example.MyTest', 'com.example.MyOtherTest')
   end
 
   it 'should ignore classes not using TestNG annotations' do
@@ -73,10 +77,19 @@ describe Buildr::TestNG do
     project('foo').test.tests.should be_empty
   end
 
+  it 'should ignore abstract test classes' do
+    write 'src/test/java/AbstractMyTest.java', 'public class AbstractMyTest {}'
+    define('foo') { test.using(:testng) }
+    project('foo').test.invoke
+    project('foo').test.tests.should be_empty
+  end
+
   it 'should ignore inner classes' do
     write 'src/test/java/InnerClassTest.java', <<-JAVA
       @org.testng.annotations.Test
       public class InnerClassTest {
+        public void myTestMethod() { }
+
         public class InnerTest {
         }
       }
@@ -119,16 +132,16 @@ describe Buildr::TestNG do
   end
 
   it 'should fail when multiple TestNG test case fail' do
-    write 'src/test/java/FailingTest1.java', <<-JAVA
-      public class FailingTest1 {
+    write 'src/test/java/Failing1Test.java', <<-JAVA
+      public class Failing1Test {
         @org.testng.annotations.Test
         public void testNothing() {
           org.testng.AssertJUnit.assertTrue(false);
         }
       }
     JAVA
-    write 'src/test/java/FailingTest2.java', <<-JAVA
-      public class FailingTest2 {
+    write 'src/test/java/Failing2Test.java', <<-JAVA
+      public class Failing2Test {
         @org.testng.annotations.Test
         public void testNothing() {
           org.testng.AssertJUnit.assertTrue(false);
