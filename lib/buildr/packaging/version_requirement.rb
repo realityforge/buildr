@@ -86,7 +86,7 @@ module Buildr #:nodoc:
         if str[/[^\s\(\)#{BOOL_CHARS + VER_CHARS + CMP_CHARS}]/]
           raise "version string #{str.inspect} contains invalid characters"
         end
-        str.gsub!(/\s+(and|\&\&)\s+/, ' & ')
+        str.gsub!(/\s+(and|&&)\s+/, ' & ')
         str.gsub!(/\s+(or|\|\|)\s+/, ' | ')
         str.gsub!(/(^|\s*)not\s+/, ' ! ')
         pattern = /(#{CMP_REGEX})?\s*[#{VER_CHARS}]+/
