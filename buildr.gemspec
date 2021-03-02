@@ -61,7 +61,6 @@ for those one-off tasks, with a language that's a joy to use.
   spec.add_dependency 'rubyzip',              '1.2.0'
   spec.add_dependency 'json_pure',            '1.8.3'
   spec.add_dependency 'rjb',                  '1.6.4'
-  spec.add_dependency 'atoulme-Antwrap',      '0.7.5'
   spec.add_dependency 'diff-lcs',             '1.2.5'
   spec.add_dependency 'xml-simple',           '1.1.5'
   spec.add_dependency 'bundler'
