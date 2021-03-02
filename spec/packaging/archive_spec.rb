@@ -459,22 +459,11 @@ describe "ZipTask" do
     checkZip(@archive)
   end
 
-  # Check for possible corruption using Java's ZipInputStream and Java's "jar" command since
-  # they are stricter than rubyzip
+  # Check for possible corruption using Java's "jar" command since they are stricter than rubyzip
   def checkZip(file)
     return unless File.exist?(file)
-    zip = Java.java.util.zip.ZipInputStream.new(Java.java.io.FileInputStream.new(file))
-    zip_entry_count = 0
-    while entry = zip.getNextEntry do
-      # just iterate over all entries
-      zip_entry_count = zip_entry_count + 1
-    end
-    zip.close()
 
-    # jar tool fails with "ZipException: error in opening zip file" if empty
-    if zip_entry_count > 0
-      sh "#{File.join(ENV['JAVA_HOME'], 'bin', 'jar')} tvf #{file}"
-    end
+    sh "#{File.join(ENV['JAVA_HOME'], 'bin', 'jar')} tvf #{file}"
   end
 
   def inspect_archive
