@@ -35,11 +35,7 @@ module Buildr #:nodoc:
   class VersionRequirement
 
     CMP_PROCS = Gem::Requirement::OPS.dup
-    CMP_REGEX = if defined?(Gem::Requirement::OP_RE)
-      Gem::Requirement::OP_RE
-    else
-      Gem::Requirement::OPS.keys.map { |k| Regexp.quote k }.join "|"
-    end
+    CMP_REGEX = Gem::Requirement::OPS.keys.map { |k| Regexp.quote k }.join "|"
     CMP_CHARS = CMP_PROCS.keys.join
     BOOL_CHARS = '\|\&\!'
     VER_CHARS = '\w\.\-'
