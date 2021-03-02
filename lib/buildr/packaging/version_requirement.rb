@@ -13,7 +13,6 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-
 # Rubygems 1.3.6 removed the 'version' accessor so monkey-patch it back to
 # circumvent version validation.  This is needed because Gem::Version doesn't
 # accept version specs with dashes.
