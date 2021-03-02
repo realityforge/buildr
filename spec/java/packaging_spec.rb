@@ -24,10 +24,6 @@ describe Project, '#manifest' do
     define('foo').manifest['Build-By'].should eql('MysteriousJoe')
   end
 
-  it 'should include JDK version' do
-    define('foo').manifest['Build-Jdk'].should =~ /^1\.\d+\.\w+$/
-  end
-
   it 'should include project comment' do
     desc 'My Project'
     define('foo').manifest['Implementation-Title'].should eql('My Project')
