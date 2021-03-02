@@ -21,11 +21,12 @@ module Buildr
         %w(org.jacoco:org.jacoco.agent:jar:runtime:0.8.6)
       end
 
-      def ant_spec
+      def dependencies
         %w[
+          args4j:args4j:jar:2.0.28
           org.jacoco:org.jacoco.report:jar:0.8.6
           org.jacoco:org.jacoco.core:jar:0.8.6
-          org.jacoco:org.jacoco.ant:jar:0.8.6
+          org.jacoco:org.jacoco.cli:jar:0.8.6
           org.ow2.asm:asm:jar:8.0.1
           org.ow2.asm:asm-commons:jar:8.0.1
           org.ow2.asm:asm-tree:jar:8.0.1
@@ -33,26 +34,46 @@ module Buildr
           org.ow2.asm:asm-util:jar:8.0.1
         ]
       end
+
+      def jacoco_report(execution_files, class_paths, source_paths, options = {})
+
+        xml_output_file = options[:xml_output_file]
+        csv_output_file = options[:csv_output_file]
+        html_output_directory = options[:html_output_directory]
+
+        Buildr.artifacts(self.dependencies).each { |a| a.invoke if a.respond_to?(:invoke) }
+
+        args = []
+        args << 'report'
+        args += execution_files
+        class_paths.each do |class_path|
+          args << '--classfiles' << class_path
+        end
+        args << '--csv' << csv_output_file if csv_output_file
+        args << '--encoding' << 'UTF-8'
+        args << '--html' << html_output_directory if html_output_directory
+        source_paths.each do |source_path|
+          args << '--sourcefiles' << source_path
+        end
+        args << '--xml' << xml_output_file if xml_output_file
+
+        Java::Commands.java 'org.jacoco.cli.internal.Main', *(args + [{ :classpath => Buildr.artifacts(self.dependencies), :properties => options[:properties], :java_args => options[:java_args] }])
+      end
     end
 
     class Config
-
       attr_writer :enabled
 
       def enabled?
         @enabled.nil? ? true : @enabled
       end
 
-      attr_writer :destfile
-
-      def destfile
-        @destfile || "#{self.report_dir}/jacoco.cov"
-      end
+      attr_accessor :destfile
 
       attr_writer :output
 
       def output
-        @output || 'file'
+        @output ||= 'file'
       end
 
       attr_accessor :sessionid
@@ -71,51 +92,18 @@ module Buildr
         @excludes ||= []
       end
 
-      attr_writer :report_dir
-
-      def report_dir
-        @report_dir || project._(:reports, :jacoco)
-      end
-
-      attr_writer :generate_xml
-
-      def generate_xml?
-        @generate_xml.nil? ? false : @generate_xml
-      end
-
-      attr_writer :xml_output_file
-
-      def xml_output_file
-        @xml_output_file || "#{self.report_dir}/jacoco.xml"
-      end
-
-      attr_writer :generate_html
-
-      def generate_html?
-        @generate_html.nil? ? false : @generate_html
-      end
-
-      attr_writer :html_output_directory
-
-      def html_output_directory
-        @html_output_directory || "#{self.report_dir}/jacoco"
-      end
-
       protected
 
-      def initialize(project)
-        @project = project
+      def initialize(destfile)
+        @destfile = destfile
       end
-
-      attr_reader :project
-
     end
 
     module ProjectExtension
       include Extension
 
       def jacoco
-        @jacoco ||= Buildr::JaCoCo::Config.new(project)
+        @jacoco ||= Buildr::JaCoCo::Config.new(project._(:reports, :jacoco, 'jacoco.cov'))
       end
 
       after_define do |project|
@@ -132,74 +120,35 @@ module Buildr
 
             agent_config = "-javaagent:#{agent_jar}=#{options.join(',')}"
             existing = project.test.options[:java_args] || []
-            project.test.options[:java_args] = (existing.is_a?(Array)? existing : [existing]) + [agent_config]
-          end
-          namespace 'jacoco' do
-            if project.jacoco.generate_xml?
-              desc 'Generate JaCoCo reports.'
-              task 'reports' do
-                Buildr.ant 'jacoco' do |ant|
-                  ant.taskdef(:resource => 'org/jacoco/ant/antlib.xml') do
-                    ant.classpath :path => Buildr.artifacts(Buildr::JaCoCo.ant_spec).each(&:invoke).map(&:to_s).join(File::PATH_SEPARATOR)
-                  end
-                  ant.report do
-                    ant.executiondata do
-                      ant.file :file => project.jacoco.destfile
-                    end
-
-                    ant.structure(:name => project.name) do
-                      if project.compile.target
-                        ant.classfiles do
-                          ant.fileset :dir => project.compile.target
-                        end
-                      end
-                      ant.sourcefiles(:encoding => 'UTF-8') do
-                        project.compile.sources.each do |path|
-                          ant.fileset :dir => path.to_s
-                        end
-                      end
-                    end
-
-                    ant.xml :destfile => project.jacoco.xml_output_file if project.jacoco.generate_xml?
-                    ant.html :destdir => project.jacoco.html_output_directory if project.jacoco.generate_html?
-                  end
-                end
-              end
-            end
+            project.test.options[:java_args] = (existing.is_a?(Array) ? existing : [existing]) + [agent_config]
           end
         end
       end
       namespace 'jacoco' do
         desc 'Generate JaCoCo reports.'
         task 'report' do
-          Buildr.ant('jacoco') do |ant|
-            ant.taskdef(:resource => 'org/jacoco/ant/antlib.xml') do
-              ant.classpath :path => Buildr.artifacts(Buildr::JaCoCo.ant_spec).each(&:invoke).map(&:to_s).join(File::PATH_SEPARATOR)
-            end
-            ant.report do
-              ant.executiondata do
-                Buildr.projects.select{|p|p.jacoco.enabled?}.each do |project|
-                  ant.fileset :file=>project.jacoco.destfile if File.exist?(project.jacoco.destfile)
-                end
-              end
 
-              ant.structure(:name => 'Jacoco Report') do
-                ant.classfiles do
-                  Buildr.projects.select{|p|p.jacoco.enabled?}.map(&:compile).map(&:target).flatten.map(&:to_s).each do |src|
-                    ant.fileset :dir=>src.to_s if File.exist?(src)
-                  end
-                end
-                ant.sourcefiles(:encoding => 'UTF-8') do
-                  Buildr.projects.select{|p|p.jacoco.enabled?}.map(&:compile).map(&:sources).flatten.map(&:to_s).each do |src|
-                    ant.fileset :dir=>src.to_s if File.exist?(src)
-                  end
-                end
-              end
-
-              ant.html :destdir => 'reports/jacoco'
-              ant.xml :destfile => 'reports/jacoco/jacoco.xml'
-              ant.csv :destfile => 'reports/jacoco/jacoco.csv'
+          execution_files = []
+          class_paths = []
+          source_paths = []
+          Buildr.projects.select { |p| p.jacoco.enabled? }.each do |project|
+            execution_files << project.jacoco.destfile if File.exist?(project.jacoco.destfile)
+            target = project.compile.target.to_s
+            class_paths << target.to_s if File.exist?(target)
+            project.compile.sources.flatten.map(&:to_s).each do |src|
+              source_paths << src.to_s if File.exist?(src)
             end
+          end
+
+          project = Buildr.projects[0].root_project
+
+          options = {}
+          options[:xml_output_file] = project._(:reports, :jacoco, 'jacoco.xml')
+          options[:csv_output_file] = project._(:reports, :jacoco, 'jacoco.csv')
+          options[:html_output_directory] = project._(:reports, :jacoco, 'docs')
+
+          unless execution_files.empty?
+            Buildr::JaCoCo.jacoco_report(execution_files, class_paths, source_paths, options)
           end
         end
       end
