@@ -33,25 +33,6 @@ describe Buildr::TestNG do
     project('foo:bar').test.framework.should eql(:testng)
   end
 
-  it 'should include TestNG dependencies for old version' do
-    begin
-      Buildr.settings.build['testng'] = '5.10'
-      define('foo') { test.using :testng }
-      project('foo').test.compile.dependencies.should include(artifact("org.testng:testng:jar:jdk15:#{TestNG.version}"))
-      project('foo').test.dependencies.should include(artifact("org.testng:testng:jar:jdk15:#{TestNG.version}"))
-    ensure
-      Buildr.settings.build['testng'] = nil
-    end
-  end
-
-  it 'should include TestNG dependencies for old version' do
-    define('foo') { test.using :testng }
-    project('foo').test.compile.dependencies.should include(artifact("org.testng:testng:jar:#{TestNG.version}"))
-    project('foo').test.compile.dependencies.should include(artifact("com.beust:jcommander:jar:1.27"))
-    project('foo').test.dependencies.should include(artifact("org.testng:testng:jar:#{TestNG.version}"))
-    project('foo').test.dependencies.should include(artifact("com.beust:jcommander:jar:1.27"))
-  end
-
   it 'should parse test classes in paths containing escaped sequences' do
     write 'bar%2F/src/test/java/com/example/AnnotatedClass.java', <<-JAVA
       package com.example;
