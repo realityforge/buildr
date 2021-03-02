@@ -61,7 +61,7 @@ module Buildr #:nodoc:
       # Ugly hack that probably works for all of our codebases
       test_include = /.*Test$/
       test_exclude = /\.Abstract[^.]*$/
-      candidates.select{|c| c =~ test_include }.select{|c| !(c =~ test_exclude) }
+      candidates.select{|c| c =~ test_include }.select{|c| !(c =~ test_exclude) }.dup
     end
 
     def run(tests, dependencies) #:nodoc:
