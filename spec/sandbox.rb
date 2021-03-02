@@ -25,10 +25,7 @@ RSpec.configure do |config|
   config.verbose_retry = true # show retry status in spec process
 end
 
-Java.load # Anything added to the classpath.
-artifacts(
-  TestFramework.frameworks.map(&:dependencies).flatten
-).each do |path|
+artifacts(TestNG.dependencies).each do |path|
   file(path).invoke
 end
 
