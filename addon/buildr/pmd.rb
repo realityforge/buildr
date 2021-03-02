@@ -57,14 +57,28 @@ module Buildr
         puts 'PMD: Analyzing source code...'
         mkdir_p File.dirname(output_file_prefix)
 
-        Buildr.ant('pmd-report') do |ant|
-          ant.taskdef :name => 'pmd', :classpath => cp.join(';'), :classname => 'net.sourceforge.pmd.ant.PMDTask'
-          ant.pmd :shortFilenames => true, :rulesetfiles => rule_sets.join(','), :noCache => true do
-            ant.formatter :type => format, :toFile => "#{output_file_prefix}.#{format}"
-            source_paths.each do |src|
-              ant.fileset :dir => src, :includes => '**/*.java' if File.directory?(src)
-            end
-          end
+        args = []
+        args << '-no-cache'
+        args << '-shortnames'
+        args << '-rulesets' << rule_sets.join(',')
+        args << '-format' << format
+        args << '-reportfile' << "#{output_file_prefix}.#{format}"
+
+        files = []
+        source_paths.each do |src|
+          files += Dir["#{src}/**/*.java"] if File.directory?(src)
+        end
+        files = files.sort.uniq
+
+        Tempfile.open('pmd') do |tmp|
+          tmp.write files.join(',')
+          args << '-filelist' << tmp.path.to_s
+        end
+
+        begin
+          Java::Commands.java 'net.sourceforge.pmd.PMD', *(args + [{:classpath => cp, :properties => options[:properties], :java_args => options[:java_args]}])
+        rescue Exception => e
+          raise e if options[:fail_on_error]
         end
       end
     end
