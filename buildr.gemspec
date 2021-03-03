@@ -56,7 +56,7 @@ for those one-off tasks, with a language that's a joy to use.
   spec.add_dependency 'builder',              '3.2.2'
   spec.add_dependency 'rubyzip',              '1.2.0'
   spec.add_dependency 'json_pure',            '2.5.1'
-  spec.add_dependency 'xml-simple',           '1.1.5'
+  spec.add_dependency 'xml-simple',           '1.1.8'
   spec.add_dependency 'bundler'
 
   spec.add_development_dependency 'rspec-expectations',   '2.14.3'
