@@ -75,7 +75,9 @@ describe Artifact do
   end
 
   it 'should have one POM artifact for all classifiers' do
-    @classified.pom.to_hash.should == @classified.to_hash.merge(:type=>:pom).except(:classifier)
+    spec_hash = @classified.to_hash.merge(:type => :pom)
+    spec_hash.delete(:classifier)
+    @classified.pom.to_hash.should == spec_hash
   end
 
   it 'should have associated sources artifact' do

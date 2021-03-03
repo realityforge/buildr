@@ -169,7 +169,7 @@ module Buildr #:nodoc:
           # Make it an artifact using the specifications, and tell it how to create a POM.
           package.extend ActsAsArtifact
           package.buildr_project = self
-          package.send :apply_spec, spec.only(*Artifact::ARTIFACT_ATTRIBUTES)
+          package.send :apply_spec, spec.dup.delete_if{|key, _|!ActsAsArtifact::ARTIFACT_ATTRIBUTES.include?(key)}
 
           # Create pom associated with package
           class << package

@@ -129,32 +129,3 @@ class OpenObject < Hash
     end
   end
 end
-
-
-class Hash
-
-  # :call-seq:
-  #   only(keys*) => hash
-  #
-  # Returns a new hash with only the specified keys.
-  #
-  # For example:
-  #   { :a=>1, :b=>2, :c=>3, :d=>4 }.only(:a, :c)
-  #   => { :a=>1, :c=>3 }
-  def only(*keys)
-    keys.inject({}) { |hash, key| has_key?(key) ? hash.merge(key=>self[key]) : hash }
-  end
-
-
-  # :call-seq:
-  #   except(keys*) => hash
-  #
-  # Returns a new hash without the specified keys.
-  #
-  # For example:
-  #   { :a=>1, :b=>2, :c=>3, :d=>4 }.except(:a, :c)
-  #   => { :b=>2, :d=>4 }
-  def except(*keys)
-    (self.keys - keys).inject({}) { |hash, key| hash.merge(key=>self[key]) }
-  end
-end

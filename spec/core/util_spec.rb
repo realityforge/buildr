@@ -32,18 +32,6 @@ describe Buildr do
   end
 end
 
-describe Hash do
-  describe "#only" do
-    it "should find value for one key" do
-      {:a => 1, :b => 2, :c => 3}.only(:a).should == {:a => 1}
-    end
-
-    it "should find values for multiple keys" do
-      {:a => 1, :b => 2, :c => 3}.only(:b, :c).should == {:b => 2, :c => 3}
-    end
-  end
-end
-
 describe OpenObject do
   before do
     @obj = OpenObject.new({:a => 1, :b => 2, :c => 3})
@@ -75,10 +63,6 @@ describe OpenObject do
 
   it "should allow changing a value by calling its name= method" do
     lambda { @obj.c = 17 }.should change { @obj.c }.to(17)
-  end
-
-  it "should implement only method like a hash" do
-    @obj.only(:a).should == { :a => 1 }
   end
 end
 
