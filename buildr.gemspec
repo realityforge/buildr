@@ -53,7 +53,7 @@ for those one-off tasks, with a language that's a joy to use.
 
   # Tested against these dependencies.
   spec.add_dependency 'rake',                 '0.9.2.2'
-  spec.add_dependency 'builder',              '3.2.2'
+  spec.add_dependency 'builder',              '3.2.4'
   spec.add_dependency 'rubyzip',              '1.2.0'
   spec.add_dependency 'json_pure',            '2.5.1'
   spec.add_dependency 'xml-simple',           '1.1.8'
