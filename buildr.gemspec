@@ -43,7 +43,7 @@ for those one-off tasks, with a language that's a joy to use.
   spec.files          = Dir['{addon,bin,lib,rakelib,spec}/**/*', '*.{gemspec}'] +
                         %w(LICENSE NOTICE CHANGELOG.md README.md Rakefile)
   spec.require_paths  = 'lib', 'addon'
-  spec.bindir         = 'bin'                               # Use these for applications.
+  spec.bindir         = 'bin'
   spec.executable     = 'buildr'
 
   spec.extra_rdoc_files = 'README.md', 'CHANGELOG.md', 'LICENSE', 'NOTICE'
