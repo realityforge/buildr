@@ -54,8 +54,11 @@ module Buildr
     end
 
     class Config
+
+      attr_writer :enabled
+
       def enabled?
-        File.exist?(self.configuration_file)
+        @enabled.nil? ? (File.exist?(self.configuration_file) || !self.configuration_artifact.nil?) : !!@enabled
       end
 
       def html_enabled?
