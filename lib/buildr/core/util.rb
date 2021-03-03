@@ -221,30 +221,30 @@ class Hash
   end
 end
 
-  module FileUtils
-    # code "borrowed" directly from Rake
-    def sh(*cmd, &block)
-      options = (Hash === cmd.last) ? cmd.pop : {}
-      unless block_given?
-        show_command = cmd.join(" ")
-        show_command = show_command[0,42] + "..."
+module FileUtils
+  # code "borrowed" directly from Rake
+  def sh(*cmd, &block)
+    options = (Hash === cmd.last) ? cmd.pop : {}
+    unless block_given?
+      show_command = cmd.join(" ")
+      show_command = show_command[0, 42] + "..."
 
-        block = lambda { |ok, status|
-          ok or fail "Command failed with status (#{status.exitstatus}): [#{show_command}]"
-        }
-      end
-      if RakeFileUtils.verbose_flag == Rake::FileUtilsExt::DEFAULT
-        options[:verbose] = false
-      else
-        options[:verbose] ||= RakeFileUtils.verbose_flag
-      end
-      options[:noop]    ||= RakeFileUtils.nowrite_flag
-      rake_check_options options, :noop, :verbose
-      rake_output_message cmd.join(" ") if options[:verbose]
-      unless options[:noop]
-        args = if cmd.size > 1 then cmd[1..cmd.size] else [] end
-        res = system("cd '#{Dir.pwd}' && " + cmd.first + ' ' + args.map { |a| "'#{a}'" }.join(' '))
-        block.call(res, $?)
-      end
+      block = lambda { |ok, status|
+        ok or fail "Command failed with status (#{status.exitstatus}): [#{show_command}]"
+      }
+    end
+    if RakeFileUtils.verbose_flag == Rake::FileUtilsExt::DEFAULT
+      options[:verbose] = false
+    else
+      options[:verbose] ||= RakeFileUtils.verbose_flag
+    end
+    options[:noop] ||= RakeFileUtils.nowrite_flag
+    rake_check_options options, :noop, :verbose
+    rake_output_message cmd.join(" ") if options[:verbose]
+    unless options[:noop]
+      args = if cmd.size > 1 then cmd[1..cmd.size] else [] end
+      res = system("cd '#{Dir.pwd}' && " + cmd.first + ' ' + args.map { |a| "'#{a}'" }.join(' '))
+      block.call(res, $?)
     end
   end
+end
