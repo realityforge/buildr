@@ -246,7 +246,7 @@ module Buildr
           args << style
         end
         args << '-localWorkers'
-        args << workers
+        args << workers.to_s
         args << '-war'
         args << output_dir
         if options[:compile_report_dir]
@@ -288,7 +288,7 @@ module Buildr
         cp = Buildr.artifacts(self.superdev_dependencies(options[:version])).each(&:invoke).map(&:to_s) + Buildr.artifacts(source_artifacts).each(&:invoke).map(&:to_s)
 
         args = []
-        args << '-port' << (options[:port] || 5050)
+        args << '-port' << (options[:port] || 5050).to_s
         args << '-workDir' << work_dir
         (options[:src] || []).each do |src|
           args << '-src' << src
