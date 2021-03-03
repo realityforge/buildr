@@ -535,8 +535,8 @@ describe Buildr::Filter do
     @filter.from('src').into('target').run.should be(false)
   end
 
-  it 'should fail if source directory doesn\'t exist' do
-    lambda { Filter.new.from('srced').into('target').run }.should raise_error(RuntimeError, /doesn't exist/)
+  it 'should not fail if source directory does not exist' do
+    lambda { Filter.new.from('srced').into('target').run }.should_not raise_error#(RuntimeError)
   end
 
   it 'should fail is target directory not set' do

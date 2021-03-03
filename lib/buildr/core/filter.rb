@@ -222,7 +222,6 @@ module Buildr #:nodoc:
 
   private
     def copy_map
-      sources.each { |source| raise "Source directory #{source} doesn't exist" unless File.exist?(source.to_s) }
       raise 'No target directory specified, where am I going to copy the files to?' if target.nil?
 
       sources.flatten.map(&:to_s).inject({}) do |map, source|
