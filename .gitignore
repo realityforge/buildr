@@ -1,6 +1,7 @@
 /pkg
 /failed
 /_reports
+/_target
 /tmp
 /.rakeTasks
 /*.iml
