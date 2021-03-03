@@ -36,7 +36,7 @@ describe Buildr::Checkstyle do
   before do
     # Reloading the extension because the sandbox removes all its actions
     Buildr.module_eval { remove_const :Checkstyle }
-    load File.expand_path('../addon/buildr/checkstyle.rb')
+    load File.expand_path('../../addon/buildr/checkstyle.rb', File.dirname(__FILE__))
     @tool_module = Buildr::Checkstyle
 
     write 'src/main/java/SomeClass.java', GOOD_CONTENT
