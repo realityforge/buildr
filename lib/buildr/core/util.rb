@@ -114,68 +114,6 @@ module Buildr #:nodoc:
   end # Util
 end
 
-
-class Object #:nodoc:
-  unless defined? instance_exec # 1.9
-    module InstanceExecMethods #:nodoc:
-    end
-    include InstanceExecMethods
-
-    # Evaluate the block with the given arguments within the context of
-    # this object, so self is set to the method receiver.
-    #
-    # From Mauricio's http://eigenclass.org/hiki/bounded+space+instance_exec
-    def instance_exec(*args, &block)
-      begin
-        old_critical, Thread.critical = Thread.critical, true
-        n = 0
-        n += 1 while respond_to?(method_name = "__instance_exec#{n}")
-        InstanceExecMethods.module_eval { define_method(method_name, &block) }
-      ensure
-        Thread.critical = old_critical
-      end
-
-      begin
-        send(method_name, *args)
-      ensure
-        InstanceExecMethods.module_eval { remove_method(method_name) } rescue nil
-      end
-    end
-  end
-end
-
-module Kernel #:nodoc:
-  unless defined? tap # 1.9
-    def tap
-      yield self if block_given?
-      self
-    end
-  end
-end
-
-class Symbol #:nodoc:
-  unless defined? to_proc # 1.9
-    # Borrowed from Ruby 1.9.
-    def to_proc
-      Proc.new{|*args| args.shift.__send__(self, *args)}
-    end
-  end
-end
-
-unless defined? BasicObject # 1.9
-  class BasicObject #:nodoc:
-    (instance_methods - %w[__send__ __id__ == send send! respond_to? equal? object_id]).
-      each do |method|
-        undef_method method
-      end
-
-    def self.ancestors
-      [Kernel]
-    end
-  end
-end
-
-
 class OpenObject < Hash
 
   def initialize(source=nil, &block)
@@ -218,33 +156,5 @@ class Hash
   #   => { :b=>2, :d=>4 }
   def except(*keys)
     (self.keys - keys).inject({}) { |hash, key| hash.merge(key=>self[key]) }
-  end
-end
-
-module FileUtils
-  # code "borrowed" directly from Rake
-  def sh(*cmd, &block)
-    options = (Hash === cmd.last) ? cmd.pop : {}
-    unless block_given?
-      show_command = cmd.join(" ")
-      show_command = show_command[0, 42] + "..."
-
-      block = lambda { |ok, status|
-        ok or fail "Command failed with status (#{status.exitstatus}): [#{show_command}]"
-      }
-    end
-    if RakeFileUtils.verbose_flag == Rake::FileUtilsExt::DEFAULT
-      options[:verbose] = false
-    else
-      options[:verbose] ||= RakeFileUtils.verbose_flag
-    end
-    options[:noop] ||= RakeFileUtils.nowrite_flag
-    rake_check_options options, :noop, :verbose
-    rake_output_message cmd.join(" ") if options[:verbose]
-    unless options[:noop]
-      args = if cmd.size > 1 then cmd[1..cmd.size] else [] end
-      res = system("cd '#{Dir.pwd}' && " + cmd.first + ' ' + args.map { |a| "'#{a}'" }.join(' '))
-      block.call(res, $?)
-    end
   end
 end
