@@ -18,14 +18,10 @@ unless defined?(Buildr::VERSION)
   $LOADED_FEATURES << 'buildr/version.rb'
 end
 
-# Rakefile needs to create spec for all platforms (ruby and java), using the
-# BUILDR_PLATFORM environment variable. In all other cases, we figure it out
-# from RUBY_PLATFORM.
-$platform = ENV['BUILDR_PLATFORM'] || Gem::Platform::CURRENT
-
 Gem::Specification.new do |spec|
   spec.name           = 'buildr'
   spec.version        = Buildr::VERSION.dup
+  spec.platform       = Gem::Platform::RUBY
   spec.author         = 'Apache Buildr'
   spec.email          = 'users@buildr.apache.org'
   spec.homepage       = 'http://buildr.apache.org/'
@@ -37,8 +33,6 @@ something that's simple and intuitive to use, so we only need to tell it what
 to do, and it takes care of the rest.  But also something we can easily extend
 for those one-off tasks, with a language that's a joy to use.
   TEXT
-
-  spec.platform       = $platform
 
   spec.files          = Dir['{addon,bin,lib,rakelib,spec}/**/*', '*.{gemspec}'] +
                         %w(LICENSE NOTICE CHANGELOG.md README.md Rakefile)
