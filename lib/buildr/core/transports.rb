@@ -432,7 +432,7 @@ module URI
     # Returns the file system path based that corresponds to the URL path.
     # On all platforms this method unescapes the URL path.
     def real_path #:nodoc:
-      URI.unescape(path)
+      CGI.unescape(path)
     end
 
   protected
