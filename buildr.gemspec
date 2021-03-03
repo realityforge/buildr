@@ -48,7 +48,7 @@ for those one-off tasks, with a language that's a joy to use.
 
   spec.extra_rdoc_files = 'README.md', 'CHANGELOG.md', 'LICENSE', 'NOTICE'
   spec.rdoc_options     = '--title', 'Buildr', '--main', 'README.md',
-                          '--webcvs', 'https://github.com/apache/buildr'
+                          '--webcvs', 'https://github.com/realityforge/buildr'
   spec.post_install_message = 'To get started run buildr --help'
 
   spec.required_rubygems_version = '>= 1.8.6'
