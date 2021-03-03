@@ -1,7 +1,6 @@
 # DO NOT EDIT: File is auto-generated
 * -text
 *.gemspec text
-*.java text
 *.md text
 *.png binary
 *.rake text
