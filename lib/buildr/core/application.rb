@@ -598,8 +598,8 @@ end
 alias :warn_without_color :warn
 
 # Show warning message.
-def warn(message)
-  warn_without_color Buildr::Console.color(message.to_s, :blue) if verbose
+def warn(*message, uplevel: nil)
+  warn_without_color(Buildr::Console.color(message.join(' '), :blue), :uplevel => uplevel) if verbose
 end
 
 # Show error message.  Use this when you need to show an error message and not throwing
