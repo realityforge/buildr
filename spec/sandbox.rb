@@ -29,7 +29,7 @@ artifacts(TestNG.dependencies).each do |path|
   file(path).invoke
 end
 
-ENV['HOME'] = File.expand_path(File.join(File.dirname(__FILE__), '..', 'tmp', 'home'))
+ENV['HOME'] = File.expand_path(File.join(File.dirname(__FILE__), '..', '_target', 'home'))
 mkpath ENV['HOME']
 
 # We need to run all tests inside a _sandbox, tacking a snapshot of Buildr before the test,
@@ -74,7 +74,7 @@ module Sandbox
     # for projects, compilation. We need a place that does not depend
     # on the current directory.
     @_sandbox[:original_dir] = Dir.pwd
-    @temp = File.join(File.dirname(__FILE__), '../tmp')
+    @temp = File.join(File.dirname(__FILE__), '../_target/tmp')
     FileUtils.mkpath @temp
     Dir.chdir @temp
 

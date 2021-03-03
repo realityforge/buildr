@@ -30,7 +30,7 @@ desc 'Clean up all temporary directories used for running tests, creating docume
 task :clobber do
   rm_f 'failed'
   rm_rf '_reports'
-  rm_rf 'tmp'
+  rm_rf '_target'
 end
 
 Gem::PackageTask.new(Gem::Specification.load('buildr.gemspec'))
