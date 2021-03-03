@@ -640,9 +640,7 @@ module Buildr #:nodoc:
   # Holds the path to the local repository, URLs for remote repositories, and settings for release server.
   #
   # You can access this object from the #repositories method. For example:
-  #   puts repositories.local
   #   repositories.remote << 'http://example.com/repo'
-  #   repositories.release_to = 'sftp://example.com/var/www/public/repo'
   class Repositories
     include Singleton
 
@@ -830,17 +828,15 @@ module Buildr #:nodoc:
     # Besides the URL, all other settings depend on the transport protocol in use.
     #
     # For example:
-    #   repositories.release_to = 'sftp://john:secret@example.com/var/www/repo/'
-    #
-    #   repositories.release_to = { :url=>'sftp://example.com/var/www/repo/',
+    #   repositories.release_to = { :url=>'https://example.com/var/www/repo/',
     #                                :username='john', :password=>'secret' }
     # Or in the settings.yaml file:
     #   repositories:
-    #     release_to: sftp://john:secret@example.com/var/www/repo/
+    #     release_to: https://john:secret@example.com/var/www/repo/
     #
     #   repositories:
     #     release_to:
-    #       url: sftp://example.com/var/www/repo/
+    #       url: https://example.com/var/www/repo/
     #       username: john
     #       password: secret
     def release_to=(options)
@@ -855,7 +851,7 @@ module Buildr #:nodoc:
     # configure the settings, as it allows you to specify the settings progressively.
     #
     # For example, the Buildfile will contain the repository URL used by all developers:
-    #   repositories.release_to[:url] ||= 'sftp://example.com/var/www/repo'
+    #   repositories.release_to[:url] ||= 'https://example.com/var/www/repo'
     # Your private buildr.rb will contain your credentials:
     #   repositories.release_to[:username] = 'john'
     #   repositories.release_to[:password] = 'secret'
@@ -878,17 +874,17 @@ module Buildr #:nodoc:
     # Besides the URL, all other settings depend on the transport protocol in use.
     #
     # For example:
-    #   repositories.snapshot_to = 'sftp://john:secret@example.com/var/www/repo/'
+    #   repositories.snapshot_to = 'https://john:secret@example.com/var/www/repo/'
     #
-    #   repositories.snapshot_to = { :url=>'sftp://example.com/var/www/repo/',
+    #   repositories.snapshot_to = { :url=>'https://example.com/var/www/repo/',
     #                                :username='john', :password=>'secret' }
     # Or in the settings.yaml file:
     #   repositories:
-    #     snapshot_to: sftp://john:secret@example.com/var/www/repo/
+    #     snapshot_to: https://john:secret@example.com/var/www/repo/
     #
     #   repositories:
     #     snapshot_to:
-    #       url: sftp://example.com/var/www/repo/
+    #       url: https://example.com/var/www/repo/
     #       username: john
     #       password: secret
     def snapshot_to=(options)
@@ -903,7 +899,7 @@ module Buildr #:nodoc:
     # configure the settings, as it allows you to specify the settings progressively.
     #
     # For example, the Buildfile will contain the repository URL used by all developers:
-    #   repositories.snapshot_to[:url] ||= 'sftp://example.com/var/www/repo'
+    #   repositories.snapshot_to[:url] ||= 'https://example.com/var/www/repo'
     # Your private buildr.rb will contain your credentials:
     #   repositories.snapshot_to[:username] = 'john'
     #   repositories.snapshot_to[:password] = 'secret'

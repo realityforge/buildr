@@ -973,7 +973,7 @@ describe Buildr, '#upload' do
   before do
     @spec = 'group:id:jar:1.0'
     write @file = 'test.jar'
-    repositories.release_to = 'sftp://buildr.apache.org/repository/noexist/base'
+    repositories.release_to = 'https://buildr.apache.org/repository/noexist/base'
   end
 
   it 'should return the upload task' do
@@ -989,9 +989,9 @@ describe Buildr, '#upload' do
     write @file
     upload artifact(@spec).from(@file)
     URI.should_receive(:upload).once.
-      with(URI.parse('sftp://buildr.apache.org/repository/noexist/base/group/id/1.0/id-1.0.jar'), artifact(@spec).to_s, anything)
+      with(URI.parse('https://buildr.apache.org/repository/noexist/base/group/id/1.0/id-1.0.jar'), artifact(@spec).to_s, anything)
     URI.should_receive(:upload).once.
-      with(URI.parse('sftp://buildr.apache.org/repository/noexist/base/group/id/1.0/id-1.0.pom'), artifact(@spec).pom.to_s, anything)
+      with(URI.parse('https://buildr.apache.org/repository/noexist/base/group/id/1.0/id-1.0.pom'), artifact(@spec).pom.to_s, anything)
     upload.invoke
   end
 end
@@ -1005,10 +1005,10 @@ describe ActsAsArtifact, '#upload' do
     write repositories.locate(artifact)
     write repositories.locate(artifact.pom)
     URI.should_receive(:upload).once.
-      with(URI.parse('sftp://buildr.apache.org/repository/noexist/base/com/example/library/2.0/library-2.0.pom'), artifact.pom.to_s, anything)
+      with(URI.parse('https://buildr.apache.org/repository/noexist/base/com/example/library/2.0/library-2.0.pom'), artifact.pom.to_s, anything)
     URI.should_receive(:upload).once.
-      with(URI.parse('sftp://buildr.apache.org/repository/noexist/base/com/example/library/2.0/library-2.0.jar'), artifact.to_s, anything)
-    verbose(false) { artifact.upload(:url=>'sftp://buildr.apache.org/repository/noexist/base') }
+      with(URI.parse('https://buildr.apache.org/repository/noexist/base/com/example/library/2.0/library-2.0.jar'), artifact.to_s, anything)
+    verbose(false) { artifact.upload(:url=>'https://buildr.apache.org/repository/noexist/base') }
   end
 
   it 'should support artifact classifier and should not upload pom if artifact has classifier' do
@@ -1016,8 +1016,8 @@ describe ActsAsArtifact, '#upload' do
     # Prevent artifact from downloading anything.
     write repositories.locate(artifact)
     URI.should_receive(:upload).exactly(:once).
-      with(URI.parse('sftp://buildr.apache.org/repository/noexist/base/com/example/library/2.0/library-2.0-all.jar'), artifact.to_s, anything)
-    verbose(false) { artifact.upload(:url=>'sftp://buildr.apache.org/repository/noexist/base') }
+      with(URI.parse('https://buildr.apache.org/repository/noexist/base/com/example/library/2.0/library-2.0-all.jar'), artifact.to_s, anything)
+    verbose(false) { artifact.upload(:url=>'https://buildr.apache.org/repository/noexist/base') }
   end
 
   it 'should complain without any repository configuration' do
@@ -1038,12 +1038,12 @@ describe ActsAsArtifact, '#upload' do
     Time.stub(:now).and_return(time)
 
     URI.should_receive(:upload).once.
-    with(URI.parse('sftp://example.com/base/com/example/library/2.0-SNAPSHOT/library-2.0-20110311.140236-1.pom'), artifact.pom.to_s, anything)
+    with(URI.parse('https://example.com/base/com/example/library/2.0-SNAPSHOT/library-2.0-20110311.140236-1.pom'), artifact.pom.to_s, anything)
     URI.should_receive(:upload).once.
-    with(URI.parse('sftp://example.com/base/com/example/library/2.0-SNAPSHOT/library-2.0-20110311.140236-1.jar'), artifact.to_s, anything)
+    with(URI.parse('https://example.com/base/com/example/library/2.0-SNAPSHOT/library-2.0-20110311.140236-1.jar'), artifact.to_s, anything)
     URI.should_receive(:write).once.
-    with(URI.parse('sftp://example.com/base/com/example/library/2.0-SNAPSHOT/maven-metadata.xml'), anything, anything)
-    verbose(false) { artifact.upload(:url=>'sftp://example.com/base') }
+    with(URI.parse('https://example.com/base/com/example/library/2.0-SNAPSHOT/maven-metadata.xml'), anything, anything)
+    verbose(false) { artifact.upload(:url=>'https://example.com/base') }
   end
 
   it 'should accept repositories.release_to setting' do
@@ -1052,7 +1052,7 @@ describe ActsAsArtifact, '#upload' do
     write repositories.locate(artifact)
     write repositories.locate(artifact.pom)
     URI.should_receive(:upload).at_least(:once)
-    repositories.release_to = 'sftp://buildr.apache.org/repository/noexist/base'
+    repositories.release_to = 'https://buildr.apache.org/repository/noexist/base'
     artifact.upload
     lambda { artifact.upload }.should_not raise_error
   end
@@ -1065,12 +1065,12 @@ describe ActsAsArtifact, '#upload' do
     write repositories.locate(artifact)
     write repositories.locate(artifact.pom)
     URI.should_receive(:upload).once.
-      with(URI.parse('sftp://buildr.apache.org/repository/noexist/base/com/example/library/2.0-SNAPSHOT/library-2.0-20161111.140236-1.pom'), artifact.pom.to_s, anything)
+      with(URI.parse('https://buildr.apache.org/repository/noexist/base/com/example/library/2.0-SNAPSHOT/library-2.0-20161111.140236-1.pom'), artifact.pom.to_s, anything)
     URI.should_receive(:upload).once.
-      with(URI.parse('sftp://buildr.apache.org/repository/noexist/base/com/example/library/2.0-SNAPSHOT/library-2.0-20161111.140236-1.jar'), artifact.to_s, anything)
+      with(URI.parse('https://buildr.apache.org/repository/noexist/base/com/example/library/2.0-SNAPSHOT/library-2.0-20161111.140236-1.jar'), artifact.to_s, anything)
     URI.should_receive(:write).once.
-      with(URI.parse('sftp://buildr.apache.org/repository/noexist/base/com/example/library/2.0-SNAPSHOT/maven-metadata.xml'), anything, anything)
-    repositories.release_to = 'sftp://buildr.apache.org/repository/noexist/base'
+      with(URI.parse('https://buildr.apache.org/repository/noexist/base/com/example/library/2.0-SNAPSHOT/maven-metadata.xml'), anything, anything)
+    repositories.release_to = 'https://buildr.apache.org/repository/noexist/base'
     artifact.upload
     lambda { artifact.upload }.should_not raise_error
   end
@@ -1083,13 +1083,13 @@ describe ActsAsArtifact, '#upload' do
     write repositories.locate(artifact)
     write repositories.locate(artifact.pom)
     URI.should_receive(:upload).once.
-      with(URI.parse('sftp://buildr.apache.org/repository/noexist/snapshot/com/example/library/2.0-SNAPSHOT/library-2.0-20161111.140236-1.pom'), artifact.pom.to_s, anything)
+      with(URI.parse('https://buildr.apache.org/repository/noexist/snapshot/com/example/library/2.0-SNAPSHOT/library-2.0-20161111.140236-1.pom'), artifact.pom.to_s, anything)
     URI.should_receive(:upload).once.
-      with(URI.parse('sftp://buildr.apache.org/repository/noexist/snapshot/com/example/library/2.0-SNAPSHOT/library-2.0-20161111.140236-1.jar'), artifact.to_s, anything)
+      with(URI.parse('https://buildr.apache.org/repository/noexist/snapshot/com/example/library/2.0-SNAPSHOT/library-2.0-20161111.140236-1.jar'), artifact.to_s, anything)
       URI.should_receive(:write).once.
-        with(URI.parse('sftp://buildr.apache.org/repository/noexist/snapshot/com/example/library/2.0-SNAPSHOT/maven-metadata.xml'), anything, anything)
-    repositories.release_to = 'sftp://buildr.apache.org/repository/noexist/base'
-    repositories.snapshot_to = 'sftp://buildr.apache.org/repository/noexist/snapshot'
+        with(URI.parse('https://buildr.apache.org/repository/noexist/snapshot/com/example/library/2.0-SNAPSHOT/maven-metadata.xml'), anything, anything)
+    repositories.release_to = 'https://buildr.apache.org/repository/noexist/base'
+    repositories.snapshot_to = 'https://buildr.apache.org/repository/noexist/snapshot'
     artifact.upload
     lambda { artifact.upload }.should_not raise_error
   end
@@ -1099,7 +1099,7 @@ describe ActsAsArtifact, '#upload' do
     # Prevent artifact from downloading anything.
     write repositories.locate(artifact)
     write repositories.locate(artifact.pom)
-    repositories.snapshot_to = 'sftp://buildr.apache.org/repository/noexist/snapshot'
+    repositories.snapshot_to = 'https://buildr.apache.org/repository/noexist/snapshot'
     lambda { artifact.upload }.should raise_error(Exception, /where to upload/)
   end
 end
