@@ -63,7 +63,6 @@ for those one-off tasks, with a language that's a joy to use.
   spec.add_dependency 'xml-simple',           '1.1.5'
   spec.add_dependency 'bundler'
 
-  spec.add_development_dependency 'hoe',                  '3.15.1'
   spec.add_development_dependency 'rspec-expectations',   '2.14.3'
   spec.add_development_dependency 'rspec-mocks',          '2.14.3'
   spec.add_development_dependency 'rspec-core',           '2.14.5'
