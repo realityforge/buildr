@@ -203,8 +203,6 @@ module Java
         end
       end
 
-    protected
-
       # :call-seq:
       #   path_to_bin(cmd?) => path
       #
@@ -215,6 +213,8 @@ module Java
         fail 'JAVA_HOME environment variable does not point to a valid JRE/JDK installation.' unless File.exist? bin
         File.expand_path(File.join(bin, name.to_s))
       end
+
+      protected
 
       # :call-seq:
       #    classpath_from(options) => files
