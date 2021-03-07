@@ -18,27 +18,6 @@ module Buildr #:nodoc:
   module Util
     extend self
 
-    # Runs Ruby with these command line arguments.  The last argument may be a hash,
-    # supporting the following keys:
-    #   :command  -- Runs the specified script (e.g., :command=>'gem')
-    #   :sudo     -- Run as sudo on operating systems that require it.
-    #   :verbose  -- Override Rake's verbose flag.
-    def ruby(*args)
-      options = Hash === args.last ? args.pop : {}
-      cmd = []
-      ruby_bin = File.expand_path(RbConfig::CONFIG['ruby_install_name'], RbConfig::CONFIG['bindir'])
-      if options.delete(:sudo) && !(Process.uid == File.stat(ruby_bin).uid)
-        cmd << 'sudo' << '-u' << "##{File.stat(ruby_bin).uid}"
-      end
-      cmd << ruby_bin
-      cmd << '-S' << options.delete(:command) if options[:command]
-      cmd.concat args.flatten
-      cmd.push options
-      sh *cmd do |ok, status|
-        ok or fail "Command ruby failed with status (#{status ? status.exitstatus : 'unknown'}): [#{cmd.join(" ")}]"
-      end
-    end
-
     # Return the timestamp of file, without having to create a file task
     def timestamp(file)
       if File.exist?(file)
