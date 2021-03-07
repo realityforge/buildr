@@ -18,15 +18,6 @@ module Buildr #:nodoc:
   module Util
     extend self
 
-    # Return the timestamp of file, without having to create a file task
-    def timestamp(file)
-      if File.exist?(file)
-        File.mtime(file)
-      else
-        Rake::EARLY
-      end
-    end
-
     # Return the path to the first argument, starting from the path provided by the
     # second argument.
     #
