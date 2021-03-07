@@ -175,7 +175,7 @@ module Buildr #:nodoc:
           class << package
             def pom
               unless @pom
-                pom_filename = Util.replace_extension(self.name, 'pom')
+                pom_filename = self.name.sub(/\.[^.]+\z/, '.pom')
                 spec = {:group=>group, :id=>id, :version=>version, :type=>:pom}
                 @pom = Buildr.artifact(spec, pom_filename)
                 @pom.content Buildr::CustomPom.pom_xml(self.buildr_project, self)

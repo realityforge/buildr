@@ -46,22 +46,6 @@ module Buildr #:nodoc:
       FileList[dirs.map { |dir| File.join(dir, '/**/{*,.*}') }].reject { |file| File.basename(file) =~ /^[.]{1,2}$/ }
     end
 
-    # :call-seq:
-    #   replace_extension(filename) => filename_with_updated_extension
-    #
-    # Replace the file extension, e.g.,
-    #   replace_extension("foo.zip", "txt") => "foo.txt"
-    def replace_extension(filename, new_ext)
-      ext = File.extname(filename)
-      if filename =~ /\.$/
-        filename + new_ext
-      elsif ext == ""
-        filename + "." + new_ext
-      else
-        filename[0..-ext.length] + new_ext
-      end
-    end
-
     # Most platforms requires tools.jar to be on the classpath, tools.jar contains the
     # Java compiler (OS X and AIX are two exceptions we know about, may be more).
     # Guess where tools.jar is from JAVA_HOME, which hopefully points to the JDK,
