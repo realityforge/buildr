@@ -840,7 +840,7 @@ module Buildr #:nodoc:
           data_source_options = {
             :source => 'LOCAL',
             :name => name,
-            :uuid => Buildr::Util.uuid
+            :uuid => SecureRandom.uuid
           }
           classpath = options[:classpath] || []
           xml.tag!('data-source', data_source_options) do |xml|
