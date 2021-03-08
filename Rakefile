@@ -31,6 +31,7 @@ task :clobber do
   rm_f 'failed'
   rm_rf '_reports'
   rm_rf '_target'
+  rm_rf 'pkg'
 end
 
 Gem::PackageTask.new(Gem::Specification.load('buildr.gemspec'))
