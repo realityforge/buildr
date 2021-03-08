@@ -32,7 +32,6 @@ module URI
   RW_CHUNK_SIZE = 128 * 1024 #:nodoc:
 
   class << self
-
     # :call-seq:
     #   read(uri, options?) => content
     #   read(uri, options?) { |chunk| ... }
@@ -378,7 +377,6 @@ module URI
   # is not used, so typically all you will see are three backslashes. This methods accept common variants,
   # like <code>file:/path</code> but always returns a valid URL.
   class FILE < Generic
-
     COMPONENT = [ :host, :path ].freeze
 
     def upload(source, options = nil)
@@ -454,7 +452,5 @@ module URI
     end
 
     @@schemes['FILE'] = FILE
-
   end
-
 end
