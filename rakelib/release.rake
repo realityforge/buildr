@@ -79,7 +79,7 @@ task 'perform_release' do
 
     stage('PostReleaseUpdateVersion', 'Update the version to the non-dev version') do
       filename = 'lib/buildr/version.rb'
-      parts = ENV['PRODUCT_VERSION'].split
+      parts = ENV['PRODUCT_VERSION'].split('.')
       next_version = "#{parts[0]}.#{parts[1]}.#{parts[2].to_i + 1}"
       content = IO.read(filename).sub(/VERSION = '(.*)'\.freeze/, "VERSION = '#{next_version}.dev'.freeze")
       IO.write(filename, content)
