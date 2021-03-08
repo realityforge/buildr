@@ -35,12 +35,12 @@ for those one-off tasks, with a language that's a joy to use.
   TEXT
 
   spec.files          = Dir['{addon,bin,lib,rakelib,spec}/**/*', '*.{gemspec}'] +
-                        %w(LICENSE NOTICE CHANGELOG.md README.md Rakefile)
+                        %w(LICENSE NOTICE README.md Rakefile)
   spec.require_paths  = 'lib', 'addon'
   spec.bindir         = 'bin'
   spec.executable     = 'buildr'
 
-  spec.extra_rdoc_files = 'README.md', 'CHANGELOG.md', 'LICENSE', 'NOTICE'
+  spec.extra_rdoc_files = 'README.md', 'LICENSE', 'NOTICE'
   spec.rdoc_options     = '--title', 'Buildr', '--main', 'README.md',
                           '--webcvs', 'https://github.com/realityforge/buildr'
   spec.post_install_message = 'To get started run buildr --help'
