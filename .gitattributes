@@ -2,10 +2,8 @@
 * -text
 *.gemspec text
 *.md text
-*.png binary
 *.rake text
 *.rb text
-*.txt text
 *.xsl text
 *.yml text
 .gitattributes text
