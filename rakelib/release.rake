@@ -35,7 +35,7 @@ task 'perform_release' do
   in_dir(WORKSPACE_DIR) do
     stage('ExtractVersion', 'Extract the version from the version constant', :always_run => true) do
       ENV['PRODUCT_VERSION'] ||= IO.read('lib/buildr/version.rb')[/VERSION = '(\d+\.\d+\.\d+)(\.dev)?'\.freeze/, 1]
-      raise "Unable to extract version from lib/buildr/version.rb"
+      raise "Unable to extract version from lib/buildr/version.rb" unless ENV['PRODUCT_VERSION']
     end
 
     stage('PreReleaseUpdateVersion', 'Update the version to the non-dev version') do
