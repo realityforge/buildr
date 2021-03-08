@@ -34,7 +34,9 @@ task :clobber do
   rm_rf 'pkg'
 end
 
-Gem::PackageTask.new(Gem::Specification.load('buildr.gemspec'))
+Gem::PackageTask.new(Gem::Specification.load('buildr.gemspec')) do
+  # Empty block required to actually define package task
+end
 
 directory '_reports'
 
