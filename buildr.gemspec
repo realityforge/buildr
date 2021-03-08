@@ -19,7 +19,7 @@ unless defined?(Buildr::VERSION)
 end
 
 Gem::Specification.new do |spec|
-  spec.name           = 'buildr'
+  spec.name           = 'realityforge-buildr'
   spec.version        = Buildr::VERSION.dup
   spec.platform       = Gem::Platform::RUBY
   spec.author         = 'Apache Buildr'
