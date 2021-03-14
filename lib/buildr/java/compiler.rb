@@ -35,7 +35,7 @@ module Buildr #:nodoc:
 
       OPTIONS = [:warnings, :debug, :deprecation, :source, :target, :lint, :other]
 
-      specify :language=>:java, :target=>'classes', :target_ext=>'class', :packaging=>:jar
+      specify :language => :java, :target => 'classes', :target_ext => 'class', :packaging => :jar
 
       def initialize(project, options) #:nodoc:
         super
