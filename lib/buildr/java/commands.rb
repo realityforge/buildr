@@ -112,8 +112,7 @@ module Java
       #
       # The last argument may be a Hash with additional options:
       # * :output -- Target directory for all compiled class files.
-      # * :classpath -- One or more file names, tasks or artifact specifications.
-      #   These are all expanded into artifacts, and all tasks are invoked.
+      # * :classpath -- One or more file names, tasks or artifact specifications. These are all expanded into artifacts, and all tasks are invoked.
       # * :sourcepath -- Additional source paths to use.
       # * :javac_args -- Any additional arguments to pass (e.g. -extdirs, -encoding)
       # * :name -- Shows this name, otherwise shows the working directory.
