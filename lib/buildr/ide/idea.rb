@@ -799,7 +799,7 @@ module Buildr #:nodoc:
         }.merge(options)
 
         if params[:url]
-          if /jdbc\:jtds\:sqlserver\:\/\/[^:\\]+(\:\d+)?\/([^;]*)(\;.*)?/ =~ params[:url]
+          if /jdbc:jtds:sqlserver:\/\/[^:\\]+(:\d+)?\/([^;]*)(;.*)?/ =~ params[:url]
             database_name = $2
             params[:schema_pattern] = "#{database_name}.*"
             params[:default_schemas] = "#{database_name}.*"
