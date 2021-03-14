@@ -63,7 +63,7 @@ module Java
           cmd_args << "cd '#{options[:dir]}' && "
         end
         cmd_args << path_to_bin('java')
-        cp = classpath_from(options)
+        cp = classpath_from(options[:classpath])
 
         unless cp.empty?
           if options[:pathing_jar] == true
@@ -127,7 +127,7 @@ module Java
 
         cmd_args = []
         cmd_args << path_to_bin('javac')
-        cp = classpath_from(options)
+        cp = classpath_from(options[:classpath])
         cmd_args << '-classpath' << cp.join(File::PATH_SEPARATOR) unless cp.empty?
         cmd_args << '-sourcepath' << [options[:sourcepath]].flatten.join(File::PATH_SEPARATOR) if options[:sourcepath]
         cmd_args << '-d' << File.expand_path(options[:output].to_s) if options[:output]
@@ -221,9 +221,8 @@ module Java
       #
       # Extracts the classpath from the options, expands it by calling artifacts, invokes
       # each of the artifacts and returns an array of paths.
-      def classpath_from(options)
-        Buildr.artifacts(options[:classpath] || []).map(&:to_s).
-          map { |t| task(t).invoke; File.expand_path(t) }
+      def classpath_from(classpath)
+        Buildr.artifacts(classpath || []).flatten.map(&:to_s).map { |t| task(t).invoke; File.expand_path(t) }
       end
     end
   end
