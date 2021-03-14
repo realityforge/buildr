@@ -731,6 +731,10 @@ module Buildr #:nodoc:
 
       attr_writer :nonnull_assertions
 
+      def wildcard_resource_patterns
+        @wildcard_resource_patterns ||= %w(!?*.java !?*.form !?*.class !?*.groovy !?*.scala !?*.flex !?*.kt !?*.clj !?*.aj)
+      end
+
       def add_artifact(name, type, build_on_make = false)
         add_to_composite_component(self.artifacts) do |xml|
           xml.artifact(:name => name, :type => type, 'build-on-make' => build_on_make) do |xml|
