@@ -56,6 +56,12 @@ module Buildr #:nodoc:
         self.components << create_component(name, attrs, &xml)
       end
 
+      def add_component_in_lambda(name, attrs = {}, &xml)
+        self.components << lambda do
+          create_component(name, attrs, &xml)
+        end
+      end
+
       def add_component_from_file(filename)
         self.components << lambda do
           raise "Unable to locate file #{filename} adding component to idea file" unless File.exist?(filename)
