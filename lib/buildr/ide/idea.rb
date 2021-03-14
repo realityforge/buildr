@@ -725,6 +725,12 @@ module Buildr #:nodoc:
         @jdk_version ||= buildr_project.compile.options.source || '1.7'
       end
 
+      def nonnull_assertions?
+        @nonnull_assertions.nil? ? true : !!@nonnull_assertions
+      end
+
+      attr_writer :nonnull_assertions
+
       def add_artifact(name, type, build_on_make = false)
         add_to_composite_component(self.artifacts) do |xml|
           xml.artifact(:name => name, :type => type, 'build-on-make' => build_on_make) do |xml|
