@@ -1392,6 +1392,7 @@ module Buildr #:nodoc:
           lambda { modules_component },
           vcs_component,
           artifacts_component,
+          compiler_configuration_component,
           lambda { data_sources_component },
           configurations_component,
           lambda { framework_detection_exclusion_component }
@@ -1491,6 +1492,26 @@ module Buildr #:nodoc:
 
       def artifacts_component
         create_composite_component('ArtifactManager', {}, self.artifacts)
+      end
+
+      def compiler_configuration_component
+        add_component_in_lambda('CompilerConfiguration') do |component|
+          component.addNotNullAssertions :enabled => 'false' unless nonnull_assertions?
+          wildcard_resource_patterns
+          component.wildcardResourcePatterns do |xml|
+            wildcard_resource_patterns.each do |pattern|
+              xml.entry :name => pattern.to_s
+            end
+          end
+          component.annotationProcessing do |xml|
+            xml.profile(:default => true, :name => 'Default', :enabled => true) do
+              xml.sourceOutputDir :name => 'generated/processors/main/java'
+              xml.sourceTestOutputDir :name => 'generated/processors/test/java'
+              xml.outputRelativeToContentRoot :value => true
+              xml.processorPath :useClasspath => true
+            end
+          end
+        end
       end
 
       def configurations_component
