@@ -119,7 +119,9 @@ module Java
       # * :name -- Shows this name, otherwise shows the working directory.
       def javac(*args, &block)
         options = Hash === args.last ? args.pop : {}
-        rake_check_options options, :classpath, :sourcepath, :output, :javac_args, :name, :processor_path
+        rake_check_options options, :classpath, :sourcepath, :output, :javac_args, :name, :processor, :processor_path
+
+        processor = !!options[:processor]
 
         files = args.flatten.each { |f| f.invoke if f.respond_to?(:invoke) }.map(&:to_s).
           collect { |arg| File.directory?(arg) ? FileList["#{File.expand_path(arg)}/**/*.java"] : File.expand_path(arg) }.flatten
@@ -130,8 +132,12 @@ module Java
         cp = classpath_from(options[:classpath])
         cmd_args << '-classpath' << cp.join(File::PATH_SEPARATOR) unless cp.empty?
         cmd_args << '-sourcepath' << [options[:sourcepath]].flatten.join(File::PATH_SEPARATOR) if options[:sourcepath]
-        processor_path = classpath_from(options[:processor_path])
-        cmd_args << '-processorpath' << processor_path.join(File::PATH_SEPARATOR) unless processor_path.empty?
+        if processor
+          processor_path = classpath_from(options[:processor_path])
+          cmd_args << '-processorpath' << processor_path.join(File::PATH_SEPARATOR) unless processor_path.empty?
+        else
+          cmd_args << '-proc:none'
+        end
         cmd_args << '-d' << File.expand_path(options[:output].to_s) if options[:output]
         cmd_args += options[:javac_args].flatten if options[:javac_args]
         Tempfile.open('javac') do |tmp|

@@ -57,6 +57,7 @@ module Buildr #:nodoc:
                              :classpath => dependencies,
                              :sourcepath => sources.select { |source| File.directory?(source) },
                              :output => target,
+                             :processor => processor?,
                              :processor_path => (processor? ? options[:processor_path] : []),
                              :javac_args => self.javac_args)
       end
