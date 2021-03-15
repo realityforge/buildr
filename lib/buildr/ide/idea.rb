@@ -820,7 +820,7 @@ module Buildr #:nodoc:
       end
 
       def add_code_insight_settings(options = {})
-        excluded_names = options[:excluded_names] || %w(com.sun.istack.internal.NotNull com.sun.istack.internal.Nullable org.jetbrains.annotations.Nullable org.jetbrains.annotations.NotNull org.testng.AssertJUnit)
+        excluded_names = options[:excluded_names] || default_code_sight_excludes
         excluded_names += (options[:extra_excluded_names] || [])
         add_component('JavaProjectCodeInsightSettings') do |xml|
           xml.tag!('excluded-names') do
@@ -1564,6 +1564,21 @@ module Buildr #:nodoc:
       end
 
     private
+
+      def default_code_sight_excludes
+        %w(
+          com.sun.istack.internal.NotNull
+          com.sun.istack.internal.Nullable
+          org.jetbrains.annotations.Nullable
+          org.jetbrains.annotations.NotNull
+          org.testng.AssertJUnit
+          org.testng.internal.Nullable
+          org.mockito.internal.matchers.NotNull
+          edu.umd.cs.findbugs.annotations.Nonnull
+          edu.umd.cs.findbugs.annotations.Nullable
+          edu.umd.cs.findbugs.annotations.SuppressWarnings
+      )
+      end
 
       def to_artifact_name(project, options)
         options[:name] || project.iml.id
