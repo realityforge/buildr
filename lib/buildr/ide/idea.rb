@@ -1497,7 +1497,6 @@ module Buildr #:nodoc:
       def compiler_configuration_component
         add_component_in_lambda('CompilerConfiguration') do |component|
           component.addNotNullAssertions :enabled => 'false' unless nonnull_assertions?
-          wildcard_resource_patterns
           component.wildcardResourcePatterns do |xml|
             wildcard_resource_patterns.each do |pattern|
               xml.entry :name => pattern.to_s
