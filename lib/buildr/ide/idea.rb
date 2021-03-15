@@ -819,6 +819,12 @@ module Buildr #:nodoc:
         add_data_source(name, params)
       end
 
+      def add_javac_settings(javac_args)
+        ipr.add_component('JavacSettings') do |xml|
+          xml.option(:name => 'ADDITIONAL_OPTIONS_STRING', :value => javac_args)
+        end
+      end
+
       def add_code_insight_settings(options = {})
         excluded_names = options[:excluded_names] || default_code_sight_excludes
         excluded_names += (options[:extra_excluded_names] || [])
