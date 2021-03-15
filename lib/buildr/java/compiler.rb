@@ -47,14 +47,17 @@ module Buildr #:nodoc:
         options[:processor_path] ||= []
       end
 
+      def processor?
+        !!options[:processor] || options[:processor].nil?
+      end
+
       def compile(sources, target, dependencies) #:nodoc:
         check_options options, OPTIONS
-        processor = !!options[:processor] || options[:processor].nil?
         Java::Commands.javac(files_from_sources(sources),
                              :classpath => dependencies,
                              :sourcepath => sources.select { |source| File.directory?(source) },
                              :output => target,
-                             :processor_path => (processor ? options[:processor_path] : []),
+                             :processor_path => (processor? ? options[:processor_path] : []),
                              :javac_args => self.javac_args)
       end
 
