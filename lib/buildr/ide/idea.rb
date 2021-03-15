@@ -819,6 +819,18 @@ module Buildr #:nodoc:
         add_data_source(name, params)
       end
 
+      def add_code_insight_settings(options = {})
+        excluded_names = options[:excluded_names] || %w(com.sun.istack.internal.NotNull com.sun.istack.internal.Nullable org.jetbrains.annotations.Nullable org.jetbrains.annotations.NotNull org.testng.AssertJUnit)
+        excluded_names += (options[:extra_excluded_names] || [])
+        add_component('JavaProjectCodeInsightSettings') do |xml|
+          xml.tag!('excluded-names') do
+            excluded_names.each do |excluded_name|
+              xml << "<name>#{excluded_name}</name>"
+            end
+          end
+        end
+      end
+
       def add_less_compiler_component(project, options = {})
         source_dir = options[:source_dir] || project._(:source, :main, :webapp, :less).to_s
         source_pattern = options[:pattern] || '*.less'
