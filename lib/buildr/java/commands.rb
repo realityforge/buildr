@@ -114,11 +114,12 @@ module Java
       # * :output -- Target directory for all compiled class files.
       # * :classpath -- One or more file names, tasks or artifact specifications. These are all expanded into artifacts, and all tasks are invoked.
       # * :sourcepath -- Additional source paths to use.
+      # * :processor_path -- Annotation processor path. These are all expanded into artifacts, and all tasks are invoked.
       # * :javac_args -- Any additional arguments to pass (e.g. -extdirs, -encoding)
       # * :name -- Shows this name, otherwise shows the working directory.
       def javac(*args, &block)
         options = Hash === args.last ? args.pop : {}
-        rake_check_options options, :classpath, :sourcepath, :output, :javac_args, :name
+        rake_check_options options, :classpath, :sourcepath, :output, :javac_args, :name, :processor_path
 
         files = args.flatten.each { |f| f.invoke if f.respond_to?(:invoke) }.map(&:to_s).
           collect { |arg| File.directory?(arg) ? FileList["#{File.expand_path(arg)}/**/*.java"] : File.expand_path(arg) }.flatten
@@ -129,6 +130,8 @@ module Java
         cp = classpath_from(options[:classpath])
         cmd_args << '-classpath' << cp.join(File::PATH_SEPARATOR) unless cp.empty?
         cmd_args << '-sourcepath' << [options[:sourcepath]].flatten.join(File::PATH_SEPARATOR) if options[:sourcepath]
+        processor_path = classpath_from(options[:processor_path])
+        cmd_args << '-processorpath' << processor_path.join(File::PATH_SEPARATOR) unless processor_path.empty?
         cmd_args << '-d' << File.expand_path(options[:output].to_s) if options[:output]
         cmd_args += options[:javac_args].flatten if options[:javac_args]
         Tempfile.open('javac') do |tmp|

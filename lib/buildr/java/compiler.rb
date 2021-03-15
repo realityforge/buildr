@@ -33,7 +33,7 @@ module Buildr #:nodoc:
     # (e.g. ['-implicit:none', '-encoding', 'iso-8859-1'])
     class Javac < Base
 
-      OPTIONS = [:warnings, :debug, :deprecation, :source, :target, :lint, :other]
+      OPTIONS = [:warnings, :debug, :deprecation, :source, :target, :lint, :other, :processor_path, :processor]
 
       specify :language => :java, :target => 'classes', :target_ext => 'class', :packaging => :jar
 
@@ -43,14 +43,18 @@ module Buildr #:nodoc:
         options[:warnings] ||= false
         options[:deprecation] ||= false
         options[:lint] ||= false
+        options[:processor] ||= nil
+        options[:processor_path] ||= []
       end
 
       def compile(sources, target, dependencies) #:nodoc:
         check_options options, OPTIONS
+        processor = !!options[:processor] || options[:processor].nil?
         Java::Commands.javac(files_from_sources(sources),
                              :classpath => dependencies,
                              :sourcepath => sources.select { |source| File.directory?(source) },
                              :output => target,
+                             :processor_path => (processor ? options[:processor_path] : []),
                              :javac_args => self.javac_args)
       end
 
