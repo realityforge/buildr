@@ -1495,45 +1495,47 @@ module Buildr #:nodoc:
       end
 
       def compiler_configuration_component
-        add_component_in_lambda('CompilerConfiguration') do |component|
-          component.addNotNullAssertions :enabled => 'false' unless nonnull_assertions?
-          component.wildcardResourcePatterns do |xml|
-            wildcard_resource_patterns.each do |pattern|
-              xml.entry :name => pattern.to_s
+        lambda do
+          create_component('CompilerConfiguration') do |component|
+            component.addNotNullAssertions :enabled => 'false' unless nonnull_assertions?
+            component.wildcardResourcePatterns do |xml|
+              wildcard_resource_patterns.each do |pattern|
+                xml.entry :name => pattern.to_s
+              end
             end
-          end
-          component.annotationProcessing do |xml|
-            xml.profile(:default => true, :name => 'Default', :enabled => true) do
-              xml.sourceOutputDir :name => 'generated/processors/main/java'
-              xml.sourceTestOutputDir :name => 'generated/processors/test/java'
-              xml.outputRelativeToContentRoot :value => true
-              xml.processorPath :useClasspath => true
-            end
-            Buildr.projects.each do |prj|
-              if prj.iml? && (prj.compile.processor? || prj.test.compile.processor?)
-                xml.profile(:name => "#{prj.name}", :enabled => true) do
-                  xml.sourceOutputDir :name => 'generated/processors/main/java' if prj.compile.processor?
-                  xml.sourceTestOutputDir :name => 'generated/processors/test/java' if prj.test.compile.processor?
-                  xml.outputRelativeToContentRoot :value => true
-                  xml.module :name => prj.iml.name
-                  processor_path = prj.compile.processor_path + prj.test.compile.processor_path
-                  if processor_path.empty?
-                    xml.processorPath :useClasspath => true
-                  else
-                    xml.processorPath :useClasspath => false do
-                      Buildr.artifacts(processor_path).each do |path|
-                        xml.entry :name => resolve_path(path.to_s)
+            component.annotationProcessing do |xml|
+              xml.profile(:default => true, :name => 'Default', :enabled => true) do
+                xml.sourceOutputDir :name => 'generated/processors/main/java'
+                xml.sourceTestOutputDir :name => 'generated/processors/test/java'
+                xml.outputRelativeToContentRoot :value => true
+                xml.processorPath :useClasspath => true
+              end
+              Buildr.projects.each do |prj|
+                if prj.iml? && (prj.compile.options.processor? || prj.test.compile.options.processor?)
+                  xml.profile(:name => "#{prj.name}", :enabled => true) do
+                    xml.sourceOutputDir :name => 'generated/processors/main/java' if prj.compile.options.processor?
+                    xml.sourceTestOutputDir :name => 'generated/processors/test/java' if prj.test.compile.options.processor?
+                    xml.outputRelativeToContentRoot :value => true
+                    xml.module :name => prj.iml.name
+                    processor_path = prj.compile.processor_path + prj.test.compile.processor_path
+                    if processor_path.empty?
+                      xml.processorPath :useClasspath => true
+                    else
+                      xml.processorPath :useClasspath => false do
+                        Buildr.artifacts(processor_path).each do |path|
+                          xml.entry :name => resolve_path(path.to_s)
+                        end
                       end
                     end
                   end
                 end
               end
-            end
-            disabled = Buildr.projects.select { |p| p.iml? && !p.compile.processor? && !p.test.compile.processor? }
-            unless disabled.empty?
-              xml.profile(:name => 'Disabled') do
-                disabled.each do |p|
-                  xml.module :name => p.iml.name
+              disabled = Buildr.projects.select { |p| p.iml? && !p.compile.options.processor? && !p.test.compile.options.processor? }
+              unless disabled.empty?
+                xml.profile(:name => 'Disabled') do
+                  disabled.each do |p|
+                    xml.module :name => p.iml.name
+                  end
                 end
               end
             end
