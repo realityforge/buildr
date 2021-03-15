@@ -24,7 +24,7 @@ module Buildr
       end
 
       after_define do |project|
-        if project.compile.processor?
+        if project.compile.options.processor?
           project.file(project._(:target, :generated, 'processors/main/java'))
           project.compile.enhance do
             mkdir_p project._(:target, :generated, 'processors/main/java')
@@ -37,7 +37,7 @@ module Buildr
             rm_rf project._(:target, :generated, 'processors/main/java')
           end
         end
-        if project.test.compile.processor?
+        if project.test.compile.options.processor?
           project.file(project._(:target, :generated, 'processors/test/java'))
           project.test.compile.enhance do
             mkdir_p project._(:target, :generated, 'processors/test/java')
