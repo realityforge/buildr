@@ -1510,6 +1510,34 @@ module Buildr #:nodoc:
               xml.outputRelativeToContentRoot :value => true
               xml.processorPath :useClasspath => true
             end
+            Buildr.projects.each do |prj|
+              if prj.iml? && (prj.compile.processor? || prj.test.compile.processor?)
+                xml.profile(:name => "#{prj.name}", :enabled => true) do
+                  xml.sourceOutputDir :name => 'generated/processors/main/java' if prj.compile.processor?
+                  xml.sourceTestOutputDir :name => 'generated/processors/test/java' if prj.test.compile.processor?
+                  xml.outputRelativeToContentRoot :value => true
+                  xml.module :name => prj.iml.name
+                  processor_path = prj.compile.processor_path + prj.test.compile.processor_path
+                  if processor_path.empty?
+                    xml.processorPath :useClasspath => true
+                  else
+                    xml.processorPath :useClasspath => false do
+                      Buildr.artifacts(processor_path).each do |path|
+                        xml.entry :name => resolve_path(path.to_s)
+                      end
+                    end
+                  end
+                end
+              end
+            end
+            disabled = Buildr.projects.select { |p| p.iml? && !p.compile.processor? && !p.test.compile.processor? }
+            unless disabled.empty?
+              xml.profile(:name => 'Disabled') do
+                disabled.each do |p|
+                  xml.module :name => p.iml.name
+                end
+              end
+            end
           end
         end
       end

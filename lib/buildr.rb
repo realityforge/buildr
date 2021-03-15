@@ -65,6 +65,7 @@ require 'buildr/java/packaging'
 require 'buildr/java/commands'
 require 'buildr/java/doc'
 require 'buildr/java/custom_pom'
+require 'buildr/java/annotation_processor'
 require 'buildr/ide/idea'
 
 # Methods defined in Buildr are both instance methods (e.g. when included in Project)
