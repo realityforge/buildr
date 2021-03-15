@@ -820,7 +820,7 @@ module Buildr #:nodoc:
       end
 
       def add_javac_settings(javac_args)
-        ipr.add_component('JavacSettings') do |xml|
+        add_component('JavacSettings') do |xml|
           xml.option(:name => 'ADDITIONAL_OPTIONS_STRING', :value => javac_args)
         end
       end
