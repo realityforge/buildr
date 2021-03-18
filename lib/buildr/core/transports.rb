@@ -273,7 +273,7 @@ module URI
         headers['Cache-Control'] = 'no-cache'
         headers['User-Agent'] = "Buildr-#{Buildr::VERSION}"
         request = Net::HTTP::Get.new(request_uri.empty? ? '/' : request_uri, headers)
-        request.basic_auth URI.decode(self.user), URI.decode(self.password) if self.user
+        request.basic_auth CGI.unescape(self.user), CGI.unescape(self.password) if self.user
         http.verify_mode = ::OpenSSL::SSL.const_get(ENV['SSL_VERIFY_MODE']) if ENV['SSL_VERIFY_MODE']
         http.ca_path = ENV['SSL_CA_CERTS'] if ENV['SSL_CA_CERTS']
         http.request request do |response|
@@ -330,7 +330,7 @@ module URI
         end
         headers = { 'Content-MD5'=>Digest::MD5.hexdigest(content.string), 'Content-Type'=>'application/octet-stream', 'User-Agent'=>"Buildr-#{Buildr::VERSION}" }
         request = Net::HTTP::Put.new(request_uri.empty? ? '/' : request_uri, headers)
-        request.basic_auth URI.decode(self.user), URI.decode(self.password) if self.user
+        request.basic_auth CGI.unescape(self.user), CGI.unescape(self.password) if self.user
         response = nil
         with_progress_bar options[:progress], path.split('/').last, content.size do |progress|
           request.content_length = content.size
