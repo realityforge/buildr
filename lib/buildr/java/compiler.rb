@@ -56,7 +56,7 @@ module Buildr #:nodoc:
                              :output => target,
                              :processor => processor,
                              :processor_path => (processor ? options[:processor_path] : []),
-                             :javac_args => self.javac_args)
+                             :javac_args => javac_args)
       end
 
       # Filter out source files that are known to not produce any corresponding .class output file. If we leave
