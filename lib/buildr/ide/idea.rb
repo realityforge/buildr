@@ -1551,14 +1551,18 @@ module Buildr #:nodoc:
                 xml.outputRelativeToContentRoot :value => true
                 xml.processorPath :useClasspath => true
               end
+              disabled = []
               Buildr.projects.each do |prj|
-                if prj.iml? && (prj.compile.options.processor? || prj.test.compile.options.processor?)
+                next unless prj.iml?
+                main_processor = !!prj.compile.options[:processor] || prj.compile.options[:processor].nil?
+                test_processor = !!prj.test.compile.options[:processor] || prj.test.compile.options[:processor].nil?
+                if main_processor || test_processor
                   xml.profile(:name => "#{prj.name}", :enabled => true) do
-                    xml.sourceOutputDir :name => 'generated/processors/main/java' if prj.compile.options.processor?
-                    xml.sourceTestOutputDir :name => 'generated/processors/test/java' if prj.test.compile.options.processor?
+                    xml.sourceOutputDir :name => 'generated/processors/main/java' if main_processor
+                    xml.sourceTestOutputDir :name => 'generated/processors/test/java' if test_processor
                     xml.outputRelativeToContentRoot :value => true
                     xml.module :name => prj.iml.name
-                    processor_path = prj.compile.processor_path + prj.test.compile.processor_path
+                    processor_path = prj.compile.options[:processor_path] + prj.test.compile.options[:processor_path]
                     if processor_path.empty?
                       xml.processorPath :useClasspath => true
                     else
@@ -1569,9 +1573,10 @@ module Buildr #:nodoc:
                       end
                     end
                   end
+                else
+                  disabled << prj
                 end
               end
-              disabled = Buildr.projects.select { |p| p.iml? && !p.compile.options.processor? && !p.test.compile.options.processor? }
               unless disabled.empty?
                 xml.profile(:name => 'Disabled') do
                   disabled.each do |p|
