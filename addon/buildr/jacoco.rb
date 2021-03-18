@@ -148,6 +148,9 @@ module Buildr
           options[:html_output_directory] = project._(:reports, :jacoco, 'docs')
 
           unless execution_files.empty?
+            FileUtils.mkdir_p File.dirname(options[:xml_output_file])
+            FileUtils.mkdir_p File.dirname(options[:csv_output_file])
+            FileUtils.mkdir_p options[:html_output_directory]
             Buildr::JaCoCo.jacoco_report(execution_files, class_paths, source_paths, options)
           end
         end
