@@ -1562,7 +1562,7 @@ module Buildr #:nodoc:
                     xml.sourceTestOutputDir :name => 'generated/processors/test/java' if test_processor
                     xml.outputRelativeToContentRoot :value => true
                     xml.module :name => prj.iml.name
-                    processor_path = prj.compile.options[:processor_path] + prj.test.compile.options[:processor_path]
+                    processor_path = (prj.compile.options[:processor_path] || []) + (prj.test.compile.options[:processor_path] || [])
                     if processor_path.empty?
                       xml.processorPath :useClasspath => true
                     else
