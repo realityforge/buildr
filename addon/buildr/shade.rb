@@ -39,7 +39,7 @@ module Buildr
       def shade(input_jar, output_jar, relocations = {})
 
         shaded_jar = (input_jar.to_s + '-shaded')
-        a = artifact('org.realityforge.shade:shade-cli:jar:1.0.0')
+        a = Buildr.artifact('org.realityforge.shade:shade-cli:jar:1.0.0')
         a.invoke
 
         args = []
