@@ -3,6 +3,9 @@ jdk:
   - openjdk8
 rvm:
   - 2.7.2
+install:
+  - rvm install ruby-2.7.2
+  - rvm use 2.7.2
 git:
   depth: 10
 env:
