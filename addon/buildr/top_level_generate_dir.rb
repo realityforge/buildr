@@ -25,7 +25,7 @@ module Buildr
       include Extension
 
       before_define do |project|
-        project.layout[:target, :generated] = "generated"
+        project.layout[:target, :generated] = 'generated'
         project.clean { rm_rf project._(:target, :generated) }
       end
     end
