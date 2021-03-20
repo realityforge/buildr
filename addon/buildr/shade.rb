@@ -31,7 +31,7 @@ module Buildr
         args << '--output'
         args << shaded_jar.to_s
         relocations.each_pair do |k, v|
-          args << "-r#{k}#{v}"
+          args << "-r#{k}=#{v}"
         end
 
         sh args.join(' ')
