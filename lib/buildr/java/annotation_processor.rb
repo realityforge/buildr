@@ -24,29 +24,31 @@ module Buildr
 
       after_define do |project|
         if !!project.compile.options[:processor] || (project.compile.options[:processor].nil? && !(project.compile.options[:processor_path] || []).empty?)
-          project.file(project._(:target, :generated, 'processors/main/java'))
-          project.compile.enhance do
-            mkdir_p project._(:target, :generated, 'processors/main/java')
+          path = project._(:target, :generated, 'processors/main/java')
+          f = project.file(path) do |t|
+            mkdir_p t.to_s
           end
+          project.compile.enhance([f])
           project.compile.options[:other] = [] unless project.compile.options[:other]
-          project.compile.options[:other] += ['-s', project._(:target, :generated, 'processors/main/java')]
-          project.iml.main_generated_source_directories << project._(:target, :generated, 'processors/main/java') if project.iml?
+          project.compile.options[:other] += ['-s', path]
+          project.iml.main_generated_source_directories << path if project.iml?
 
           project.clean do
-            rm_rf project._(:target, :generated, 'processors/main/java')
+            rm_rf path
           end
         end
         if !!project.test.compile.options[:processor] || (project.test.compile.options[:processor].nil? && !(project.test.compile.options[:processor_path] || []).empty?)
-          project.file(project._(:target, :generated, 'processors/test/java'))
-          project.test.compile.enhance do
-            mkdir_p project._(:target, :generated, 'processors/test/java')
+          path = project._(:target, :generated, 'processors/test/java')
+          f = project.file(path) do |t|
+            mkdir_p t.to_s
           end
+          project.test.compile.enhance([f])
           project.test.compile.options[:other] = [] unless project.test.compile.options[:other]
-          project.test.compile.options[:other] += ['-s', project._(:target, :generated, 'processors/test/java')]
-          project.iml.test_generated_source_directories << project._(:target, :generated, 'processors/test/java') if project.iml?
+          project.test.compile.options[:other] += ['-s', path]
+          project.iml.test_generated_source_directories << path if project.iml?
 
           project.clean do
-            rm_rf project._(:target, :generated, 'processors/test/java')
+            rm_rf path
           end
         end
       end
