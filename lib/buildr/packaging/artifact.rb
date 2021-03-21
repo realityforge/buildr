@@ -246,9 +246,8 @@ module Buildr #:nodoc:
       # Username/password may be part of URI, or separate entities.
       uri = URI.parse(upload_to[:url].clone)
       uri.path = uri.path + '/' unless uri.path[-1] == '/'
-      to_escape = "!\"\#$%&'()*+,-./:;<=>?@{}|~`'"
-      uri.user = CGI.escape(upload_to[:username], to_escape) if upload_to[:username]
-      uri.password = CGI.escape(upload_to[:password], to_escape) if upload_to[:password]
+      uri.user = CGI.escape(upload_to[:username]) if upload_to[:username]
+      uri.password = CGI.escape(upload_to[:password]) if upload_to[:password]
 
       path = group.gsub('.', '/') + "/#{id}/#{version}/#{upload_name}"
 
