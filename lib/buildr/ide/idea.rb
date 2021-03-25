@@ -725,6 +725,10 @@ module Buildr #:nodoc:
         @jdk_version ||= buildr_project.compile.options.source || '1.7'
       end
 
+      def compiler_configuration_options
+        @compiler_configuration_options ||= {}
+      end
+
       def nonnull_assertions?
         @nonnull_assertions.nil? ? true : !!@nonnull_assertions
       end
@@ -1538,6 +1542,9 @@ module Buildr #:nodoc:
       def compiler_configuration_component
         lambda do
           create_component('CompilerConfiguration') do |component|
+            compiler_configuration_options.each_pair do |k, v|
+              component.option :name => k, :value => v
+            end
             component.addNotNullAssertions :enabled => 'false' unless nonnull_assertions?
             component.wildcardResourcePatterns do |xml|
               wildcard_resource_patterns.each do |pattern|
