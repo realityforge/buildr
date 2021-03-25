@@ -117,7 +117,7 @@ module Buildr #:nodoc:
 
       def create_component(name, attrs = {})
         target = StringIO.new
-        Builder::XmlMarkup.new(:target => target, :indent => 2).component({:name => name}.merge(attrs)) do |xml|
+        Builder::XmlMarkup.new(:target => target, :indent => 2).component({ :name => name }.merge(attrs)) do |xml|
           yield xml if block_given?
         end
         Buildr::IntellijIdea.new_document(target.string).root
@@ -219,7 +219,7 @@ module Buildr #:nodoc:
       end
 
       def annotation_paths
-        @annotation_paths ||= [buildr_project._(:source, :main, :annotations)].select {|p| File.exist?(p)}
+        @annotation_paths ||= [buildr_project._(:source, :main, :annotations)].select { |p| File.exist?(p) }
       end
 
       def main_source_directories
@@ -349,7 +349,7 @@ module Buildr #:nodoc:
         name = options[:name] || 'Web'
         default_webroots = {}
         default_webroots[buildr_project._(:source, :main, :webapp)] = '/' if File.exist?(buildr_project._(:source, :main, :webapp))
-        buildr_project.assets.paths.each {|p| default_webroots[p] = '/' }
+        buildr_project.assets.paths.each { |p| default_webroots[p] = '/' }
         webroots = options[:webroots] || default_webroots
         default_deployment_descriptors = []
         %w(web.xml sun-web.xml glassfish-web.xml jetty-web.xml geronimo-web.xml context.xml weblogic.xml jboss-deployment-structure.xml jboss-web.xml ibm-web-bnd.xml ibm-web-ext.xml ibm-web-ext-pme.xml).
@@ -375,7 +375,7 @@ module Buildr #:nodoc:
               end
             end
           end
-          default_enable_jsf = webroots.keys.any?{|webroot| File.exist?("#{webroot}/WEB-INF/faces-config.xml")}
+          default_enable_jsf = webroots.keys.any? { |webroot| File.exist?("#{webroot}/WEB-INF/faces-config.xml") }
           enable_jsf = options[:enable_jsf].nil? ? default_enable_jsf : options[:enable_jsf]
           enable_jsf = false if buildr_project.root_project.ipr? && buildr_project.root_project.ipr.version >= '13'
           f.facet(:type => 'jsf', :name => 'JSF') do |jsf|
@@ -404,8 +404,8 @@ module Buildr #:nodoc:
           provider = options[:provider_enabled]
         else
           provider = nil
-          {'org.hibernate.ejb.HibernatePersistence' => 'Hibernate',
-           'org.eclipse.persistence.jpa.PersistenceProvider' => 'EclipseLink'}.
+          { 'org.hibernate.ejb.HibernatePersistence' => 'Hibernate',
+            'org.eclipse.persistence.jpa.PersistenceProvider' => 'EclipseLink' }.
             each_pair do |match, candidate_provider|
             deployment_descriptors.each do |descriptor|
               if File.exist?(descriptor) && /#{Regexp.escape(match)}/ =~ IO.read(descriptor)
@@ -608,7 +608,7 @@ module Buildr #:nodoc:
         unless paths.empty?
           xml.tag!('annotation-paths') do |xml|
             paths.each do |path|
-              xml.root(:url=> file_path(path))
+              xml.root(:url => file_path(path))
             end
           end
         end
@@ -618,14 +618,14 @@ module Buildr #:nodoc:
         xml.content(:url => 'file://$MODULE_DIR$') do
           # Source folders
           [
-            {:dirs => (self.main_source_directories.dup - self.main_generated_source_directories)},
-            {:dirs => self.main_generated_source_directories, :generated => true},
-            {:type => 'resource', :dirs => (self.main_resource_directories.dup - self.main_generated_resource_directories)},
-            {:type => 'resource', :dirs => self.main_generated_resource_directories, :generated => true},
-            {:test => true, :dirs => (self.test_source_directories - self.test_generated_source_directories)},
-            {:test => true, :dirs => self.test_generated_source_directories, :generated => true},
-            {:test => true, :type => 'resource', :dirs => (self.test_resource_directories - self.test_generated_resource_directories)},
-            {:test => true, :type => 'resource', :dirs => self.test_generated_resource_directories, :generated => true},
+            { :dirs => (self.main_source_directories.dup - self.main_generated_source_directories) },
+            { :dirs => self.main_generated_source_directories, :generated => true },
+            { :type => 'resource', :dirs => (self.main_resource_directories.dup - self.main_generated_resource_directories) },
+            { :type => 'resource', :dirs => self.main_generated_resource_directories, :generated => true },
+            { :test => true, :dirs => (self.test_source_directories - self.test_generated_source_directories) },
+            { :test => true, :dirs => self.test_generated_source_directories, :generated => true },
+            { :test => true, :type => 'resource', :dirs => (self.test_resource_directories - self.test_generated_resource_directories) },
+            { :test => true, :type => 'resource', :dirs => self.test_generated_resource_directories, :generated => true },
           ].each do |content|
             content[:dirs].map { |dir| dir.to_s }.compact.sort.uniq.each do |dir|
               options = {}
@@ -658,14 +658,14 @@ module Buildr #:nodoc:
       end
 
       def generate_project_dependency(xml, other_project, export, test = false)
-        attribs = {:type => 'module', 'module-name' => other_project}
+        attribs = { :type => 'module', 'module-name' => other_project }
         attribs[:exported] = '' if export
         attribs[:scope] = 'TEST' if test
         xml.orderEntry attribs
       end
 
       def generate_module_lib(xml, path, export, source_path, annotations_path, test = false)
-        attribs = {:type => 'module-library'}
+        attribs = { :type => 'module-library' }
         attribs[:exported] = '' if export
         attribs[:scope] = 'TEST' if test
         xml.orderEntry attribs do
@@ -691,7 +691,7 @@ module Buildr #:nodoc:
         net = []
         all = self.excluded_directories.map { |dir| buildr_project._(dir.to_s) }.sort_by { |d| d.size }
         all.each_with_index do |dir, i|
-          unless all[0 ... i].find { |other| dir =~ /^#{other}/ }
+          unless all[0...i].find { |other| dir =~ /^#{other}/ }
             net << dir
           end
         end
@@ -781,7 +781,7 @@ module Buildr #:nodoc:
 
       def add_postgres_data_source(name, options = {})
         if options[:url].nil? && options[:database]
-         default_url = "jdbc:postgresql://#{(options[:host] || '127.0.0.1')}:#{(options[:port] || '5432')}/#{options[:database]}"
+          default_url = "jdbc:postgresql://#{(options[:host] || '127.0.0.1')}:#{(options[:port] || '5432')}/#{options[:database]}"
         end
 
         params = {
@@ -901,7 +901,7 @@ module Buildr #:nodoc:
           }
           classpath = options[:classpath] || []
           xml.tag!('data-source', data_source_options) do |xml|
-            xml.tag!('synchronize', (options[:synchronize]||'true'))
+            xml.tag!('synchronize', (options[:synchronize] || 'true'))
             xml.tag!('jdbc-driver', options[:driver]) if options[:driver]
             xml.tag!('jdbc-url', options[:url]) if options[:url]
             xml.tag!('user-name', options[:username]) if options[:username]
@@ -1002,7 +1002,7 @@ module Buildr #:nodoc:
         end
       end
 
-      def add_exploded_ear_artifact(project, options ={})
+      def add_exploded_ear_artifact(project, options = {})
         artifact_name = to_artifact_name(project, options)
 
         add_artifact(artifact_name, 'exploded-ear', build_on_make(options)) do |xml|
@@ -1478,7 +1478,7 @@ module Buildr #:nodoc:
             buildr_project.projects.select { |subp| subp.iml? }.each do |subproject|
               module_path = subproject.base_dir.gsub(/^#{buildr_project.base_dir}\//, '')
               path = "#{module_path}/#{subproject.iml.name}.iml"
-              attribs = {:fileurl => "file://$PROJECT_DIR$/#{path}", :filepath => "$PROJECT_DIR$/#{path}"}
+              attribs = { :fileurl => "file://$PROJECT_DIR$/#{path}", :filepath => "$PROJECT_DIR$/#{path}" }
               if subproject.iml.group == true
                 attribs[:group] = subproject.parent.name.gsub(':', '/')
               elsif !subproject.iml.group.nil?
@@ -1528,7 +1528,7 @@ module Buildr #:nodoc:
       end
 
       def data_sources_component
-        create_composite_component('DataSourceManagerImpl', {:format => 'xml', :hash => '3208837817'}, self.data_sources)
+        create_composite_component('DataSourceManagerImpl', { :format => 'xml', :hash => '3208837817' }, self.data_sources)
       end
 
       def artifacts_component
@@ -1597,7 +1597,7 @@ module Buildr #:nodoc:
         resolve_path_from_base(path, '$PROJECT_DIR$')
       end
 
-    private
+      private
 
       def default_code_sight_excludes
         %w(
@@ -1717,7 +1717,7 @@ module Buildr #:nodoc:
         ].compact
 
         files.each do |ideafile|
-          module_dir =  File.dirname(ideafile.filename)
+          module_dir = File.dirname(ideafile.filename)
           idea.enhance do |task|
             mkdir_p module_dir
             info "Writing #{ideafile.filename}"
