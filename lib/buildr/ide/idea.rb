@@ -1554,8 +1554,8 @@ module Buildr #:nodoc:
               disabled = []
               Buildr.projects.each do |prj|
                 next unless prj.iml?
-                main_processor = !!prj.compile.options[:processor] || prj.compile.options[:processor].nil?
-                test_processor = !!prj.test.compile.options[:processor] || prj.test.compile.options[:processor].nil?
+                main_processor = !!prj.compile.options[:processor] || (prj.compile.options[:processor].nil? && !(prj.compile.options[:processor_path] || []).empty?)
+                test_processor = !!prj.test.compile.options[:processor] || (prj.test.compile.options[:processor].nil? && !(prj.test.compile.options[:processor_path] || []).empty?)
                 if main_processor || test_processor
                   xml.profile(:name => "#{prj.name}", :enabled => true) do
                     xml.sourceOutputDir :name => 'generated/processors/main/java' if main_processor
