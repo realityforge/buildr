@@ -132,11 +132,11 @@ module Buildr
           if change_descriptions.size > 0
             description = "The release includes "
             if 1 == change_descriptions.size
-              description += "#{change_descriptions[0]}"
+              description += "#{change_descriptions[0]}."
             elsif 2 == change_descriptions.size
-              description += "#{change_descriptions[0]} and #{change_descriptions[1]}"
+              description += "#{change_descriptions[0]} and #{change_descriptions[1]}."
             else
-              description += "#{change_descriptions[0]}, #{change_descriptions[1]} and #{change_descriptions[2]}"
+              description += "#{change_descriptions[0]}, #{change_descriptions[1]} and #{change_descriptions[2]}."
             end
 
             sub_header_text = description
