@@ -274,7 +274,7 @@ module Buildr #:nodoc:
       include Extension
 
       before_define(:package => :build) do |project|
-        if project.parent && project.parent.manifest
+        if project.parent&.manifest
           project.manifest = project.parent.manifest.dup
         else
           project.manifest = {
@@ -282,7 +282,7 @@ module Buildr #:nodoc:
             'Implementation-Title'=>project.comment || project.name,
             'Implementation-Version'=>project.version }
         end
-        if project.parent && project.parent.meta_inf
+        if project.parent&.meta_inf
           project.meta_inf = project.parent.meta_inf.dup
         else
           project.meta_inf = [project.file('LICENSE')].select { |file| File.exist?(file.to_s) }
