@@ -126,7 +126,7 @@ module Buildr
 
       # An array of paths that should be excluded no matter how they are added to pmd
       def exclude_paths
-        @source_paths ||= []
+        @exclude_paths ||= []
       end
 
       # An array of additional projects to scan for main and test sources
