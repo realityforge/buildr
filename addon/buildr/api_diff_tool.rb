@@ -42,17 +42,14 @@ module Buildr
         sh args.join(' ')
         if File.exist?(output_file)
           data = JSON.parse(IO.read(output_file, :encoding => 'UTF-8'))
-          if data.empty?
-            FileUtils.rm_f output_file
-          else
-            sh "git add #{output_file}"
-          end
+          FileUtils.rm_f output_file if data.empty?
         end
       end
 
       def update_differences_report(artifact_coordinate, old_version, new_version, new_file, output_directory, options = {})
         output_file = "#{output_directory}/#{old_version}-#{new_version}.json"
         generate_differences_report(artifact_coordinate, old_version, new_version, new_file, output_file, options)
+        sh "git add #{output_file}" if File.exist?(output_file)
       end
 
       def test_differences_report(artifact_coordinate, old_version, new_version, new_file, output_directory, options = {})
