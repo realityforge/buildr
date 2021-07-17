@@ -148,6 +148,15 @@ module Buildr
         header += "\n\n#{sub_header_text}" unless sub_header_text.empty?
         header += "\n"
 
+        release_notes_file = options[:release_notes_summary_file]
+        if release_notes_file && File.exist?(release_notes_file)
+          summary_content = IO.read(release_notes_file).strip
+          unless summary_content.empty?
+            header += summary_content + "\n"
+            IO.write(release_notes_file, "\n")
+          end
+        end
+
         header += <<CONTENT
 
 Changes in this release:
@@ -156,6 +165,7 @@ CONTENT
         IO.write('CHANGELOG.md', changelog.gsub("### Unreleased\n", header))
 
         sh 'git reset 2>&1 1> /dev/null'
+        sh "git add #{release_notes_file}" if File.exist?(release_notes_file)
         sh 'git add CHANGELOG.md'
         sh 'git commit -m "Update CHANGELOG.md in preparation for release"'
       end
