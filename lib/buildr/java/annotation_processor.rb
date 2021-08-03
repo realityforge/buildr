@@ -23,6 +23,9 @@ module Buildr
       end
 
       after_define do |project|
+        Buildr.artifacts((project.compile.options[:processor_path] || []) + (project.test.compile.options[:processor_path] || [])).flatten.map(&:to_s).map do |t|
+          Rake::Task['rake:artifacts'].enhance([task(t)])
+        end
         if !!project.compile.options[:processor] || (project.compile.options[:processor].nil? && !(project.compile.options[:processor_path] || []).empty?)
           path = project._(:target, :generated, 'processors/main/java')
           f = project.file(path) do |t|
