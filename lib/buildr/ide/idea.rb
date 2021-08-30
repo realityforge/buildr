@@ -850,14 +850,16 @@ module Buildr #:nodoc:
               value.list :size => '2' do |list|
                 list.item :index => '0', :class => 'java.lang.String', :itemvalue => 'org.jetbrains.annotations.Nullable'
                 list.item :index => '1', :class => 'java.lang.String', :itemvalue => 'javax.annotation.Nullable'
+                list.item :index => '2', :class => 'java.lang.String', :itemvalue => 'jsinterop.annotations.JsNullable'
               end
             end
           end
           component.option :name => 'myNotNulls' do |option|
             option.value do |value|
-              value.list :size => '2' do |list|
+              value.list :size => '3' do |list|
                 list.item :index => '0', :class => 'java.lang.String', :itemvalue => 'org.jetbrains.annotations.NotNull'
                 list.item :index => '1', :class => 'java.lang.String', :itemvalue => 'javax.annotation.Nonnull'
+                list.item :index => '2', :class => 'java.lang.String', :itemvalue => 'jsinterop.annotations.JsNonNull'
               end
             end
           end
