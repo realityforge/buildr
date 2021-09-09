@@ -1,5 +1,3 @@
-WORKSPACE_DIR = File.expand_path(File.dirname(__FILE__) + '/..')
-
 ENV['PREVIOUS_PRODUCT_VERSION'] = nil if ENV['PREVIOUS_PRODUCT_VERSION'].to_s == ''
 ENV['PRODUCT_VERSION'] = nil if ENV['PRODUCT_VERSION'].to_s == ''
 
@@ -32,7 +30,8 @@ end
 desc 'Perform a release'
 task 'perform_release' do
 
-  in_dir(WORKSPACE_DIR) do
+  base_directory = File.dirname(Buildr.application.buildfile.to_s)
+  in_dir(base_directory) do
     stage('ExtractVersion', 'Extract the version from the version constant', :always_run => true) do
       ENV['PRODUCT_VERSION'] ||= IO.read('lib/buildr/version.rb')[/VERSION = '(\d+\.\d+\.\d+)(\.dev)?'\.freeze/, 1]
       raise "Unable to extract version from lib/buildr/version.rb" unless ENV['PRODUCT_VERSION']
