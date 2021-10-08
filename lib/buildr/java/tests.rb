@@ -95,10 +95,10 @@ module Buildr #:nodoc:
         tmp.close unless tmp.nil?
       end
       # testng-failed.xml contains the list of failed tests *only*
-      failed_tests = File.join(task.report_to.to_s, 'testng-failed.xml')
+      failed_tests = File.join(task.report_to.to_s, task.project.id.to_s, 'Command line test.xml')
       if File.exist?(failed_tests)
         report = File.read(failed_tests)
-        failed = report.scan(/<class name="(.*?)">/im).flatten
+        failed = report.scan(/<testcase [^>]+ classname="([^"]+)">/im).flatten
         # return the list of passed tests
         tests - failed
       else
