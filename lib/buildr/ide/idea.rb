@@ -431,40 +431,6 @@ module Buildr #:nodoc:
         end
       end
 
-      def add_ejb_facet(options = {})
-        name = options[:name] || 'EJB'
-
-        default_ejb_roots = [buildr_project.iml.main_source_directories, buildr_project.compile.sources, buildr_project.resources.sources].flatten.compact
-        ejb_roots = options[:ejb_roots] || default_ejb_roots
-
-        default_deployment_descriptors = []
-        %w(ejb-jar.xml glassfish-ejb-jar.xml ibm-ejb-jar-bnd.xml ibm-ejb-jar-ext-pme.xml ibm-ejb-jar-ext.xml jboss.xml jbosscmp-jdbc.xml openejb-jar.xml sun-cmp-mapping.xml sun-ejb-jar.xml weblogic-cmp-rdbms-jar.xml weblogic-ejb-jar.xml).
-          each do |descriptor|
-          ejb_roots.each do |path|
-            d = "#{path}/WEB-INF/#{descriptor}"
-            default_deployment_descriptors << d if File.exist?(d)
-            d = "#{path}/META-INF/#{descriptor}"
-            default_deployment_descriptors << d if File.exist?(d)
-          end
-        end
-        deployment_descriptors = options[:deployment_descriptors] || default_deployment_descriptors
-
-        add_facet(name, 'ejb') do |facet|
-          facet.configuration do |c|
-            c.descriptors do |d|
-              deployment_descriptors.each do |deployment_descriptor|
-                d.deploymentDescriptor :name => File.basename(deployment_descriptor), :url => file_path(deployment_descriptor)
-              end
-            end
-            c.ejbRoots do |e|
-              ejb_roots.each do |ejb_root|
-                e.root :url => file_path(ejb_root)
-              end
-            end
-          end
-        end
-      end
-
       protected
 
       def main_dependency_details
@@ -1421,7 +1387,6 @@ module Buildr #:nodoc:
       def artifact_content(xml, project, projects, options)
         emit_module_output(xml, projects)
         emit_jpa_descriptors(xml, project, options)
-        emit_ejb_descriptors(xml, project, options)
       end
 
       def extension
@@ -1653,16 +1618,6 @@ module Buildr #:nodoc:
         ## The content here can not be indented
         output_dir = options[:output_dir] || buildr_project._(:artifacts, artifact_name)
         xml.tag!('output-path', resolve_path(output_dir))
-      end
-
-      def emit_ejb_descriptors(xml, project, options)
-        if options[:enable_ejb] || (options[:ejb_module_names] && options[:ejb_module_names].size > 0)
-          module_names = options[:ejb_module_names] || [project.iml.name]
-          module_names.each do |module_name|
-            facet_name = options[:ejb_facet_name] || 'EJB'
-            xml.element :id => 'javaee-facet-resources', :facet => "#{module_name}/ejb/#{facet_name}"
-          end
-        end
       end
 
       def emit_jpa_descriptors(xml, project, options)
