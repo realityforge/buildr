@@ -33,7 +33,7 @@ module Buildr #:nodoc:
     # (e.g. ['-implicit:none', '-encoding', 'iso-8859-1'])
     class Javac < Base
 
-      OPTIONS = [:warnings, :debug, :deprecation, :source, :target, :lint, :other, :processor_path, :processor]
+      OPTIONS = [:warnings, :debug, :deprecation, :source, :target, :lint, :other, :processor_path, :processor_options, :processor]
 
       specify :language => :java, :target => 'classes', :target_ext => 'class', :packaging => :jar
 
@@ -45,6 +45,7 @@ module Buildr #:nodoc:
         options[:lint] ||= false
         options[:processor] ||= nil
         options[:processor_path] ||= []
+        options[:processor_options] ||= {}
       end
 
       def compile(sources, target, dependencies) #:nodoc:
@@ -76,6 +77,9 @@ module Buildr #:nodoc:
         args << '-deprecation' if options[:deprecation]
         args << '-source' << options[:source].to_s if options[:source]
         args << '-target' << options[:target].to_s if options[:target]
+        options[:processor_options].each do |k, v|
+          args << "-A#{k}=#{v}"
+        end
         case options[:lint]
           when Array  then args << "-Xlint:#{options[:lint].join(',')}"
           when String then args << "-Xlint:#{options[:lint]}"

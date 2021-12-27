@@ -115,13 +115,15 @@ module Java
       # * :classpath -- One or more file names, tasks or artifact specifications. These are all expanded into artifacts, and all tasks are invoked.
       # * :sourcepath -- Additional source paths to use.
       # * :processor_path -- Annotation processor path. These are all expanded into artifacts, and all tasks are invoked.
+      # * :processor_options -- Annotation processor options.
       # * :javac_args -- Any additional arguments to pass (e.g. -extdirs, -encoding)
       # * :name -- Shows this name, otherwise shows the working directory.
       def javac(*args, &block)
         options = Hash === args.last ? args.pop : {}
-        rake_check_options options, :classpath, :sourcepath, :output, :javac_args, :name, :processor, :processor_path
+        rake_check_options options, :classpath, :sourcepath, :output, :javac_args, :name, :processor, :processor_path, :processor_options
 
         processor = !!options[:processor]
+        processor_options = options[:processor_options] || {}
 
         files = args.flatten.each { |f| f.invoke if f.respond_to?(:invoke) }.map(&:to_s).
           collect { |arg| File.directory?(arg) ? FileList["#{File.expand_path(arg)}/**/*.java"] : File.expand_path(arg) }.flatten
@@ -135,6 +137,9 @@ module Java
         if processor
           processor_path = classpath_from(options[:processor_path])
           cmd_args << '-processorpath' << processor_path.join(File::PATH_SEPARATOR) unless processor_path.empty?
+          processor_options.each do |k, v|
+            cmd_args << "-A#{k}=#{v}"
+          end
         else
           cmd_args << '-proc:none'
         end

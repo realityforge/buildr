@@ -1530,12 +1530,17 @@ module Buildr #:nodoc:
                 next unless prj.iml?
                 main_processor = !!prj.compile.options[:processor] || (prj.compile.options[:processor].nil? && !(prj.compile.options[:processor_path] || []).empty?)
                 test_processor = !!prj.test.compile.options[:processor] || (prj.test.compile.options[:processor].nil? && !(prj.test.compile.options[:processor_path] || []).empty?)
+                processor_options = (prj.compile.options[:processor_options] || {}).merge(prj.test.compile.options[:processor_options] || {})
                 if main_processor || test_processor
                   xml.profile(:name => "#{prj.name}", :enabled => true) do
                     xml.sourceOutputDir :name => 'generated/processors/main/java' if main_processor
                     xml.sourceTestOutputDir :name => 'generated/processors/test/java' if test_processor
                     xml.outputRelativeToContentRoot :value => true
                     xml.module :name => prj.iml.name
+                    processor_options.each do |k, v|
+                      xml.option :name => k, :value => v
+                    end
+
                     processor_path = (prj.compile.options[:processor_path] || []) + (prj.test.compile.options[:processor_path] || [])
                     if processor_path.empty?
                       xml.processorPath :useClasspath => true
