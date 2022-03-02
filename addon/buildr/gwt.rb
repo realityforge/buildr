@@ -266,10 +266,6 @@ module Buildr
           args << '-XenableClosureCompiler'
         end
 
-        if options[:js_exports]
-          args << '-generateJsInteropExports'
-        end
-
         args += modules
 
         properties = options[:properties] ? options[:properties].dup : {}
