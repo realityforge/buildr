@@ -165,7 +165,7 @@ CONTENT
         IO.write('CHANGELOG.md', changelog.gsub("### Unreleased\n", header))
 
         sh 'git reset 2>&1 1> /dev/null'
-        sh "git add #{release_notes_file}" if File.exist?(release_notes_file)
+        sh "git add #{release_notes_file}" if release_notes_file && File.exist?(release_notes_file)
         sh 'git add CHANGELOG.md'
         sh 'git commit -m "Update CHANGELOG.md in preparation for release"'
       end
