@@ -6,6 +6,7 @@ rvm:
 install:
   - rvm install ruby-2.7.2
   - rvm use 2.7.2
+  - bundle install
 git:
   depth: 10
 env:
