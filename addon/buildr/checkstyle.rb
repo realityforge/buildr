@@ -220,7 +220,7 @@ module Buildr
           project.task('checkstyle:xml') do
             puts 'Checkstyle: Analyzing source code...'
             mkdir_p File.dirname(project.checkstyle.xml_output_file)
-            source_paths = project.checkstyle.complete_source_paths.select{|p| !p.start_with?(project._(:target, :generated).to_s)}
+            source_paths = project.checkstyle.complete_source_paths.select{|p| !p.to_s.start_with?(project._(:target, :generated).to_s)}
             source_paths = source_paths.collect{|p|::Buildr::Util.relative_path(File.expand_path(p.to_s), project.base_dir)}
             Buildr::Checkstyle.checkstyle(project.checkstyle.configuration_file,
                                           project.checkstyle.format,
