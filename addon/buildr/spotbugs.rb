@@ -23,24 +23,30 @@ module Buildr
       # The specs for requirements
       def dependencies
         %w(
-          com.github.spotbugs:spotbugs:jar:4.2.1
-          com.github.spotbugs:spotbugs-annotations:jar:4.2.1
+          commons-codec:commons-codec:jar:1.15
+          com.github.spotbugs:spotbugs:jar:4.7.3
+          com.github.spotbugs:spotbugs-annotations:jar:4.7.3
           com.google.code.findbugs:jsr305:jar:3.0.2
+          com.google.code.gson:gson:jar:2.9.1
           net.jcip:jcip-annotations:jar:1.0
           org.apache.bcel:bcel:jar:6.5.0
-          org.apache.commons:commons-lang3:jar:3.11
-          org.apache.commons:commons-text:jar:1.9
+          org.apache.commons:commons-lang3:jar:3.12.0
+          org.apache.commons:commons-text:jar:1.10.0
+          org.apache.httpcomponents.client5:httpclient5:jar:5.1.3
+          org.apache.httpcomponents.core5:httpcore5:jar:5.1.3
+          org.apache.httpcomponents.core5:httpcore5-h2:jar:5.1.3
           org.dom4j:dom4j:jar:2.1.3
           org.json:json:jar:20201115
-          org.ow2.asm:asm:jar:9.0
-          org.ow2.asm:asm-analysis:jar:9.0
-          org.ow2.asm:asm-tree:jar:9.0
-          org.ow2.asm:asm-commons:jar:9.0
-          org.ow2.asm:asm-util:jar:9.0
-          org.slf4j:slf4j-api:jar:1.7.30
-          org.slf4j:slf4j-jdk14:jar:1.7.30
+          org.ow2.asm:asm:jar:9.4
+          org.ow2.asm:asm-analysis:jar:9.4
+          org.ow2.asm:asm-tree:jar:9.4
+          org.ow2.asm:asm-commons:jar:9.4
+          org.ow2.asm:asm-util:jar:9.4
+          org.slf4j:slf4j-api:jar:2.0.0
+          org.xmlresolver:xmlresolver:jar:4.4.3
           jaxen:jaxen:jar:1.2.0
-          net.sf.saxon:Saxon-HE:jar:10.3
+          net.sf.saxon:Saxon-HE:jar:11.4
+          xml-apis:xml-apis:jar:1.4.01
         )
       end
 
