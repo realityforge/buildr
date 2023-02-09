@@ -22,7 +22,7 @@ module Buildr
 
       # The specs for requirements
       def dependencies
-        version = '8.40'
+        version = '10.7.0'
         spec = "com.puppycrawl.tools:checkstyle-all:jar:#{version}"
         Buildr.download(Buildr.artifact(spec) => "https://github.com/checkstyle/checkstyle/releases/download/checkstyle-#{version}/checkstyle-#{version}-all.jar")
         [spec]
