@@ -65,7 +65,7 @@ module Buildr
 
         files = []
         source_paths.each do |src|
-          files += Dir["#{src}/**/*.java"] if File.directory?(src)
+          files += Dir["#{src}/**/*.java"] if File.directory?(src.to_s)
         end
         files = files.sort.uniq
 
