@@ -24,18 +24,16 @@ module Buildr
       # The specs for requirements
       def dependencies
         %w(
-          net.sourceforge.pmd:pmd-core:jar:6.11.0
-          net.sourceforge.pmd:pmd-java:jar:6.11.0
-          net.sourceforge.pmd:pmd-java8:jar:6.11.0
+          net.sourceforge.pmd:pmd-core:jar:6.54.0
+          net.sourceforge.pmd:pmd-java:jar:6.54.0
           jaxen:jaxen:jar:1.1.6
-          commons-io:commons-io:jar:2.6
-          com.beust:jcommander:jar:1.72
-          org.ow2.asm:asm:jar:7.1
-          com.google.code.gson:gson:jar:2.8.5
+          com.beust:jcommander:jar:1.48
+          org.ow2.asm:asm:jar:9.3
+          com.google.code.gson:gson:jar:2.8.9
           net.java.dev.javacc:javacc:jar:5.0
           net.sourceforge.saxon:saxon:jar:9.1.0.8
           org.apache.commons:commons-lang3:jar:3.8.1
-          org.antlr:antlr4-runtime:jar:4.7
+          org.antlr:antlr4-runtime:jar:4.7.2
         )
       end
 
@@ -58,11 +56,12 @@ module Buildr
         mkdir_p File.dirname(output_file_prefix)
 
         args = []
-        args << '-no-cache'
-        args << '-shortnames'
-        args << '-rulesets' << rule_sets.join(',')
-        args << '-format' << format
-        args << '-reportfile' << "#{output_file_prefix}.#{format}"
+        args << '--no-cache'
+        args << '--relativize-paths-with'
+        args << '--rulesets' << rule_sets.join(',')
+        args << '--format' << format
+        args << '--report-file' << "#{output_file_prefix}.#{format}"
+        #args << '--aux-classpath' << cp.join(':')
 
         files = []
         source_paths.each do |src|
@@ -72,7 +71,7 @@ module Buildr
 
         Tempfile.open('pmd') do |tmp|
           tmp.write files.join(',')
-          args << '-filelist' << tmp.path.to_s
+          args << '--file-list' << tmp.path.to_s
         end
 
         begin
