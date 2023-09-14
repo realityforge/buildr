@@ -47,7 +47,7 @@ module Buildr
         project.file(base_wsdl_dir)
         project.task('java2wsdl').enhance([base_wsdl_dir])
 
-        services = classnames.is_a?(Array) ? classnames.inject({}) {|result, element| result[element] = {}; result} : classnames
+        services = classnames.is_a?(Array) ? classnames.inject({}) { |result, element| result[element] = {}; result } : classnames
 
         services.each_pair do |classname, config|
 
