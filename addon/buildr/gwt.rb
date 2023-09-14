@@ -166,6 +166,10 @@ module Buildr
         end
       end
 
+      before_define do |project|
+        project.clean { rm_rf project._(:target, :generated, :gwt) }
+      end
+
       def gwt(module_names, options = {})
         p = options[:target_project]
         target_project = p.nil? ? project : p.is_a?(String) ? project(p) : p

@@ -19,6 +19,7 @@ module Buildr
         if project.iml?
           project.iml.instance_variable_set('@main_generated_source_directories', [])
           project.iml.instance_variable_set('@test_generated_source_directories', [])
+          project.clean { rm_rf project._(:target, :generated, :processors) }
         end
       end
 

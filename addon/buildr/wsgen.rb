@@ -188,5 +188,14 @@ module Buildr
         ws_dir
       end
     end
+
+    module ProjectExtension
+      include Extension
+
+      before_define do |project|
+        project.clean { rm_rf project._(:target, :generated, :ws) }
+        project.clean { rm_rf project._(:target, :generated, :wsgen) }
+      end
+    end
   end
 end
