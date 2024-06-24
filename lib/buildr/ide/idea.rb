@@ -73,7 +73,7 @@ module Buildr #:nodoc:
         self.components << lambda do
           a = Buildr.artifact(artifact)
           a.invoke
-          Buildr::IntellijIdea.new_document(IO.read(a.to_s)).root
+          Buildr::IntellijIdea.new_document(CGI.escapeHTML(IO.read(a.to_s))).root
         end
       end
 
