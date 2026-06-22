@@ -35,14 +35,6 @@ describe Buildr::IntellijIdea do
     task('idea:clean').invoke
   end
 
-  def root_project_filename(project)
-    project._("#{project.name}#{Buildr::IntellijIdea::IdeaFile::DEFAULT_SUFFIX}.ipr")
-  end
-
-  def root_project_xml(project)
-    xml_document(root_project_filename(project))
-  end
-
   def root_module_filename(project)
     project._("#{project.name}#{Buildr::IntellijIdea::IdeaFile::DEFAULT_SUFFIX}.iml")
   end
@@ -70,23 +62,16 @@ describe Buildr::IntellijIdea do
 
   describe "idea:clean" do
     before do
-      write "foo.ipr"
       write "foo.iml"
-      write "other.ipr"
       write "other.iml"
       mkdir_p 'bar'
       write "bar/bar.iml"
-      write "bar/other.ipr"
       write "bar/other.iml"
 
       @foo = define "foo" do
         define "bar"
       end
       invoke_clean_task
-    end
-
-    it "should remove the ipr file" do
-      File.exists?("foo.ipr").should be_false
     end
 
     it "should remove the project iml file" do
@@ -97,10 +82,8 @@ describe Buildr::IntellijIdea do
       File.exists?("foo.iml").should be_false
     end
 
-    it "should not remove other iml and ipr files" do
-      File.exists?("other.ipr").should be_true
+    it "should not remove other iml files" do
       File.exists?("other.iml").should be_true
-      File.exists?("bar/other.ipr").should be_true
       File.exists?("bar/other.iml").should be_true
     end
   end
@@ -249,27 +232,6 @@ describe Buildr::IntellijIdea do
       end
     end
 
-    describe "with extra_modules specified" do
-      before do
-        @foo = define "foo" do
-          ipr.extra_modules << 'other.iml'
-          ipr.extra_modules << 'other_other.iml'
-        end
-        invoke_generate_task
-      end
-
-      it "generate an IPR with extra modules specified" do
-        doc = xml_document(@foo._("foo.ipr"))
-        doc.should have_nodes("#{xpath_to_module}", 3)
-        module_ref = "$PROJECT_DIR$/foo.iml"
-        doc.should have_xpath("#{xpath_to_module}[@fileurl='file://#{module_ref}' && @filepath='#{module_ref}']")
-        module_ref = "$PROJECT_DIR$/other.iml"
-        doc.should have_xpath("#{xpath_to_module}[@fileurl='file://#{module_ref}' && @filepath='#{module_ref}']")
-        module_ref = "$PROJECT_DIR$/other_other.iml"
-        doc.should have_xpath("#{xpath_to_module}[@fileurl='file://#{module_ref}' && @filepath='#{module_ref}']")
-      end
-    end
-
     describe "with web and webservice facet added to root project" do
       before do
         @foo = define "foo" do
@@ -382,80 +344,6 @@ describe Buildr::IntellijIdea do
         doc.should have_xpath("#{setting_xpath}[@name='zang', value='zang']")
         doc.should have_xpath("#{setting_xpath}[@name='gwtScriptOutputStyle', value='OTHER']")
         doc.should have_xpath("#{setting_xpath}[@name='compilerMaxHeapSize', value='1024']")
-      end
-    end
-
-    describe "using add_web_facet with jsf and idea version 12" do
-      before do
-        write "src/main/webapp/WEB-INF/web.xml"
-        write "src/main/webapp/WEB-INF/faces-config.xml"
-
-        @foo = define "foo" do
-          ipr.version = "12"
-          iml.add_web_facet
-        end
-        invoke_generate_task
-      end
-
-      it "generates a web facet with jsf facet auto-detected" do
-        doc = xml_document(@foo._("foo.iml"))
-        web_facet_xpath = ensure_facet_xpath(doc, 'web', 'Web')
-        doc.should have_xpath("#{web_facet_xpath}/facet[@type='jsf' && @name='JSF']")
-      end
-    end
-
-    describe "using add_web_facet should default to no jsf" do
-      before do
-        write "src/main/webapp/WEB-INF/web.xml"
-
-        @foo = define "foo" do
-          iml.add_web_facet
-        end
-        invoke_generate_task
-      end
-
-      it "does not generate a web facet with jsf facet" do
-        doc = xml_document(@foo._("foo.iml"))
-        web_facet_xpath = ensure_facet_xpath(doc, 'web', 'Web')
-        doc.should_not have_xpath("#{web_facet_xpath}/facet[@type='jsf' && @name='JSF']")
-      end
-    end
-
-    describe "using add_web_facet with jsf and idea version 13" do
-      before do
-        write "src/main/webapp/WEB-INF/web.xml"
-        write "src/main/webapp/WEB-INF/faces-config.xml"
-
-        @foo = define "foo" do
-          ipr.version = "13"
-          iml.add_web_facet
-        end
-        invoke_generate_task
-      end
-
-      it "does not generate a web facet with jsf facet" do
-        doc = xml_document(@foo._("foo.iml"))
-        web_facet_xpath = ensure_facet_xpath(doc, 'web', 'Web')
-        doc.should_not have_xpath("#{web_facet_xpath}/facet[@type='jsf' && @name='JSF']")
-      end
-    end
-
-    describe "using add_web_facet with jsf and idea version 13 and jsf 'enabled'" do
-      before do
-        write "src/main/webapp/WEB-INF/web.xml"
-        write "src/main/webapp/WEB-INF/faces-config.xml"
-
-        @foo = define "foo" do
-          ipr.version = "13"
-          iml.add_web_facet(:enable_jsf => true)
-        end
-        invoke_generate_task
-      end
-
-      it "does not generate a web facet with jsf facet" do
-        doc = xml_document(@foo._("foo.iml"))
-        web_facet_xpath = ensure_facet_xpath(doc, 'web', 'Web')
-        doc.should_not have_xpath("#{web_facet_xpath}/facet[@type='jsf' && @name='JSF']")
       end
     end
 
@@ -625,399 +513,6 @@ describe Buildr::IntellijIdea do
       end
     end
 
-    describe "with add_data_source" do
-      before do
-        artifact("org.postgresql:postgresql:jar:9.not-a-version") { |task| write task.name }
-        @foo = define "foo" do
-          ipr.add_data_source("Postgres",
-                              :driver => 'org.postgresql.Driver',
-                              :url => "jdbc:postgresql://127.0.0.1:5432/MyDb",
-                              :username => "MyDBUser",
-                              :password => "secreto",
-                              :dialect => "PostgreSQL",
-                              :classpath => ["org.postgresql:postgresql:jar:9.not-a-version"])
-        end
-        invoke_generate_task
-      end
-
-      it "generates a data source manager with specified data source" do
-        doc = xml_document(@foo._("foo.ipr"))
-        prefix_xpath = "/project/component[@name='DataSourceManagerImpl' && @format='xml' && @hash='3208837817']/data-source"
-        doc.should have_nodes(prefix_xpath, 1)
-        ds_path = "#{prefix_xpath}[@source='LOCAL' && @name='Postgres']"
-        doc.should have_xpath(ds_path)
-        doc.should have_xpath("#{ds_path}/synchronize/text() = 'true'")
-        doc.should have_xpath("#{ds_path}/jdbc-driver/text() = 'org.postgresql.Driver'")
-        doc.should have_xpath("#{ds_path}/jdbc-url/text() = 'jdbc:postgresql://127.0.0.1:5432/MyDb'")
-        doc.should have_xpath("#{ds_path}/user-name/text() = 'MyDBUser'")
-        doc.should have_xpath("#{ds_path}/user-password/text() = 'dfd9dfcfdfc9dfd8dfcfdfdedfc5'")
-        doc.should have_xpath("#{ds_path}/default-dialect/text() = 'PostgreSQL'")
-        doc.should have_xpath("#{ds_path}/libraries/library/url/text() = '$MAVEN_REPOSITORY$/org/postgresql/postgresql/9.not-a-version/postgresql-9.not-a-version.jar'")
-      end
-    end
-
-    describe "with add_postgres_data_source" do
-      before do
-        ENV["USER"] = "Bob"
-        artifact("org.postgresql:postgresql:jar:9.2-1003-jdbc4") { |task| write task.name }
-        @foo = define "foo" do
-          ipr.add_postgres_data_source("Postgres", :database => 'MyDb')
-        end
-        invoke_generate_task
-      end
-
-      it "generates a data source manager with specified data source" do
-        doc = xml_document(@foo._("foo.ipr"))
-        prefix_xpath = "/project/component[@name='DataSourceManagerImpl' && @format='xml' && @hash='3208837817']/data-source"
-        doc.should have_nodes(prefix_xpath, 1)
-        ds_path = "#{prefix_xpath}[@source='LOCAL' && @name='Postgres']"
-        doc.should have_xpath(ds_path)
-        doc.should have_xpath("#{ds_path}/synchronize/text() = 'true'")
-        doc.should have_xpath("#{ds_path}/jdbc-driver/text() = 'org.postgresql.Driver'")
-        doc.should have_xpath("#{ds_path}/jdbc-url/text() = 'jdbc:postgresql://127.0.0.1:5432/MyDb'")
-        doc.should have_xpath("#{ds_path}/user-name/text() = 'Bob'")
-        doc.should have_xpath("#{ds_path}/default-dialect/text() = 'PostgreSQL'")
-        doc.should have_xpath("#{ds_path}/libraries/library/url/text() = '$MAVEN_REPOSITORY$/org/postgresql/postgresql/9.2-1003-jdbc4/postgresql-9.2-1003-jdbc4.jar'")
-      end
-    end
-
-    describe "with add_sql_server_data_source" do
-      before do
-        ENV["USER"] = "Bob"
-        artifact('net.sourceforge.jtds:jtds:jar:1.2.7') { |task| write task.name }
-        @foo = define "foo" do
-          ipr.add_sql_server_data_source("SqlServer", :database => 'MyDb')
-        end
-        invoke_generate_task
-      end
-
-      it "generates a data source manager with specified data source" do
-        doc = xml_document(@foo._("foo.ipr"))
-        prefix_xpath = "/project/component[@name='DataSourceManagerImpl' && @format='xml' && @hash='3208837817']/data-source"
-        doc.should have_nodes(prefix_xpath, 1)
-        ds_path = "#{prefix_xpath}[@source='LOCAL' && @name='SqlServer']"
-        doc.should have_xpath(ds_path)
-
-        doc.should have_xpath("#{ds_path}/synchronize/text() = 'true'")
-        doc.should have_xpath("#{ds_path}/jdbc-driver/text() = 'net.sourceforge.jtds.jdbc.Driver'")
-        doc.should have_xpath("#{ds_path}/jdbc-url/text() = 'jdbc:jtds:sqlserver://127.0.0.1:1433/MyDb'")
-        doc.should have_xpath("#{ds_path}/user-name/text() = 'Bob'")
-        doc.should have_xpath("#{ds_path}/default-dialect/text() = 'TSQL'")
-        doc.should have_xpath("#{ds_path}/libraries/library/url/text() = '$MAVEN_REPOSITORY$/net/sourceforge/jtds/1.2.7/jtds-1.2.7.jar'")
-      end
-    end
-
-    describe "with artifacts added to root project" do
-      before do
-        @foo = define "foo" do
-          ipr.add_artifact("MyFancy.jar", "jar") do |xml|
-            xml.tag!('output-path', project._(:artifacts, "MyFancy.jar"))
-            xml.element :id => "module-output", :name => "foo"
-          end
-          ipr.add_artifact("MyOtherFancy.jar", "jar") do |xml|
-            xml.tag!('output-path', project._(:artifacts, "MyOtherFancy.jar"))
-            xml.element :id => "module-output", :name => "foo"
-          end
-        end
-        invoke_generate_task
-      end
-
-      it "generates an IPR with multiple jar artifacts" do
-        doc = xml_document(@foo._("foo.ipr"))
-        facet_xpath = "/project/component[@name='ArtifactManager']/artifact"
-        doc.should have_nodes(facet_xpath, 2)
-        doc.should have_xpath("#{facet_xpath}[@type='jar' && @name='MyFancy.jar']")
-        doc.should have_xpath("#{facet_xpath}[@type='jar' && @name='MyOtherFancy.jar']")
-      end
-    end
-
-    describe "that uses add_jar_artifact with no overrides" do
-      before do
-        write 'foo/bar/src/main/java/foo/Foo.java' # needed so that buildr will treat as a java project
-        artifact('net.sourceforge.jtds:jtds:jar:1.2.7.XX') { |task| write task.name }
-
-        @foo = define "foo" do
-          project.version = '1.0'
-          define "bar" do
-            compile.with 'net.sourceforge.jtds:jtds:jar:1.2.7.XX'
-            package :war
-          end
-          ipr.add_jar_artifact(project("bar"))
-        end
-        invoke_generate_task
-      end
-
-      it "generates an IPR with a jar artifact" do
-        doc = xml_document(@foo._("foo.ipr"))
-        base_xpath = "/project/component[@name='ArtifactManager']/artifact"
-        facet_xpath = "#{base_xpath}[@type='jar' && @name='bar.jar' && @build-on-make='false']"
-        doc.should have_xpath(facet_xpath)
-
-        doc.should have_xpath("#{facet_xpath}/output-path/text() = $PROJECT_DIR$/artifacts/bar")
-        doc.should have_xpath("#{facet_xpath}/root[@id='archive' && @name='bar.jar']/element[@id='module-output' && @name='bar']")
-      end
-    end
-
-    describe "that uses add_jar_artifact with overrides" do
-      before do
-        write 'foo/bar/src/main/java/foo/Foo.java' # needed so that buildr will treat as a java project
-        artifact('net.sourceforge.jtds:jtds:jar:1.2.7.XX') { |task| write task.name }
-
-        @foo = define "foo" do
-          project.version = '1.0'
-          define "bar" do
-            compile.with 'net.sourceforge.jtds:jtds:jar:1.2.7.XX'
-            package :war
-          end
-          ipr.add_jar_artifact(project,
-                               :name => 'bar',
-                               :output_dir => _('bink'),
-                               :build_on_make => true,
-                               :ejb_module_names => ['x'],
-                               :jpa_module_names => ['p'],
-                               :dependencies => [project('bar')])
-        end
-        invoke_generate_task
-      end
-
-      it "generates an IPR with a jar artifact" do
-        doc = xml_document(@foo._("foo.ipr"))
-        base_xpath = "/project/component[@name='ArtifactManager']/artifact"
-        facet_xpath = "#{base_xpath}[@type='jar' && @name='bar.jar' && @build-on-make='true']"
-        doc.should have_xpath(facet_xpath)
-
-        doc.should have_xpath("#{facet_xpath}/output-path/text() = $PROJECT_DIR$/bink")
-        doc.should have_xpath("#{facet_xpath}/root[@id='archive' && @name='bar.jar']/element[@id='module-output' && @name='bar']")
-        doc.should have_xpath("#{facet_xpath}/root[@id='archive' && @name='bar.jar']/element[@id='jpa-descriptors' && @facet='p/jpa/JPA']")
-        doc.should have_xpath("#{facet_xpath}/root[@id='archive' && @name='bar.jar']/element[@id='javaee-facet-resources' && @facet='x/ejb/EJB']")
-      end
-    end
-
-    describe "that uses add_exploded_ejb_artifact with overrides" do
-      before do
-        write 'foo/bar/src/main/java/foo/Foo.java' # needed so that buildr will treat as a java project
-        artifact('net.sourceforge.jtds:jtds:jar:1.2.7.XX') { |task| write task.name }
-
-        @foo = define "foo" do
-          project.version = '1.0'
-          define "bar" do
-            compile.with 'net.sourceforge.jtds:jtds:jar:1.2.7.XX'
-            package :jar
-          end
-          ipr.add_exploded_ejb_artifact(project("bar"),
-                                        :ejb_module_names => ['x'],
-                                        :jpa_module_names => ['p'])
-        end
-        invoke_generate_task
-      end
-
-      it "generates an IPR with an ejb artifact" do
-        doc = xml_document(@foo._("foo.ipr"))
-        base_xpath = "/project/component[@name='ArtifactManager']/artifact"
-        facet_xpath = "#{base_xpath}[@type='exploded-ejb' && @name='bar' && @build-on-make='false']"
-        doc.should have_xpath(facet_xpath)
-        doc.should have_xpath("#{facet_xpath}/output-path/text() = $PROJECT_DIR$/artifacts/bar")
-        doc.should have_xpath("#{facet_xpath}/root[@id='root']/element[@id='module-output' && @name='bar']")
-        doc.should have_xpath("#{facet_xpath}/root[@id='root']/element[@id='jpa-descriptors' && @facet='p/jpa/JPA']")
-        doc.should have_xpath("#{facet_xpath}/root[@id='root']/element[@id='javaee-facet-resources' && @facet='x/ejb/EJB']")
-      end
-    end
-
-    describe "that uses add_exploded_ejb_artifact with no overrides" do
-      before do
-        write 'foo/bar/src/main/java/foo/Foo.java' # needed so that buildr will treat as a java project
-        artifact('net.sourceforge.jtds:jtds:jar:1.2.7.XX') { |task| write task.name }
-
-        @foo = define "foo" do
-          project.version = '1.0'
-          define "bar" do
-            compile.with 'net.sourceforge.jtds:jtds:jar:1.2.7.XX'
-            package :war
-          end
-          ipr.add_exploded_ejb_artifact(project("bar"))
-        end
-        invoke_generate_task
-      end
-
-      it "generates an IPR with an ejb artifact" do
-        doc = xml_document(@foo._("foo.ipr"))
-        base_xpath = "/project/component[@name='ArtifactManager']/artifact"
-        facet_xpath = "#{base_xpath}[@type='exploded-ejb' && @name='bar' && @build-on-make='false']"
-        doc.should have_xpath(facet_xpath)
-
-        doc.should have_xpath("#{facet_xpath}/output-path/text() = $PROJECT_DIR$/artifacts/bar")
-        doc.should have_xpath("#{facet_xpath}/root[@id='root']/element[@id='module-output' && @name='bar']")
-      end
-    end
-
-
-    describe "that uses add_exploded_war_artifact with no overrides" do
-      before do
-        write 'foo/bar/src/main/java/foo/Foo.java' # needed so that buildr will treat as a java project
-        artifact('net.sourceforge.jtds:jtds:jar:1.2.7.XX') { |task| write task.name }
-
-        @foo = define "foo" do
-          project.version = '1.0'
-          define "bar" do
-            compile.with 'net.sourceforge.jtds:jtds:jar:1.2.7.XX'
-            package :war
-          end
-          ipr.add_exploded_war_artifact(project("bar"))
-        end
-        invoke_generate_task
-      end
-
-      it "generates an IPR with a war artifact" do
-        doc = xml_document(@foo._("foo.ipr"))
-        base_xpath = "/project/component[@name='ArtifactManager']/artifact"
-        facet_xpath = "#{base_xpath}[@type='exploded-war' && @name='bar' && @build-on-make='false']"
-        doc.should have_xpath(facet_xpath)
-
-        doc.should have_xpath("#{facet_xpath}/output-path/text() = $PROJECT_DIR$/artifacts/bar")
-        doc.should have_xpath("#{facet_xpath}/root[@id='root']/element[@id='directory' && @name='WEB-INF']/element[@id='directory' && @name='classes']/element[@id='module-output' && @name='bar']")
-        doc.should have_xpath("#{facet_xpath}/root[@id='root']/element[@id='directory' && @name='WEB-INF']/element[@id='directory' && @name='lib']/element[@id='file-copy' && @path='$MAVEN_REPOSITORY$/net/sourceforge/jtds/jtds/1.2.7.XX/jtds-1.2.7.XX.jar']")
-        doc.should have_xpath("#{facet_xpath}/root[@id='root']/element[@id='javaee-facet-resources' && @facet='bar/web/Web']")
-      end
-    end
-
-    describe "that uses add_exploded_war_artifact with overrides" do
-      before do
-        write 'foo/bar/src/main/java/foo/Foo.java' # needed so that buildr will treat as a java project
-        artifact('net.sourceforge.jtds:jtds:jar:1.2.7.XX') { |task| write task.name }
-
-        @foo = define "foo" do
-          project.version = '1.0'
-          define "bar" do
-            compile.with 'net.sourceforge.jtds:jtds:jar:1.2.7.XX'
-            package :war
-          end
-          ipr.add_exploded_war_artifact(project,
-                                        :name => 'gar',
-                                        :war_module_names => %w[x y],
-                                        :gwt_module_names => %w[p q],
-                                        :artifacts => %w[baz biz],
-                                        :dependencies => ['net.sourceforge.jtds:jtds:jar:1.2.7.XX', project('bar')])
-        end
-        invoke_generate_task
-      end
-
-      it "generates an IPR with a war artifact" do
-        doc = xml_document(@foo._("foo.ipr"))
-        base_xpath = "/project/component[@name='ArtifactManager']/artifact"
-        facet_xpath = "#{base_xpath}[@type='exploded-war' @name='MyFancy.jar' && @build-on-make='false']"
-        doc.should have_xpath(facet_xpath)
-
-        doc.should have_xpath("#{facet_xpath}/output-path/text() = $PROJECT_DIR$/artifacts/gar")
-        doc.should have_xpath("#{facet_xpath}/root[@id='root']/element[@id='directory' && @name='WEB-INF']/element[@id='directory' && @name='classes']/element[@id='module-output' && @name='bar']")
-        doc.should have_xpath("#{facet_xpath}/root[@id='root']/element[@id='directory' && @name='WEB-INF']/element[@id='directory' && @name='lib']/element[@id='file-copy' && @path='$MAVEN_REPOSITORY$/net/sourceforge/jtds/jtds/1.2.7.XX/jtds-1.2.7.XX.jar']")
-        doc.should have_xpath("#{facet_xpath}/root[@id='root']/element[@id='javaee-facet-resources' && @facet='x/web/Web']")
-        doc.should have_xpath("#{facet_xpath}/root[@id='root']/element[@id='javaee-facet-resources' && @facet='y/web/Web']")
-        doc.should have_xpath("#{facet_xpath}/root[@id='root']/element[@id='gwt-compiler-output' && @facet='p/gwt/GWT']")
-        doc.should have_xpath("#{facet_xpath}/root[@id='root']/element[@id='gwt-compiler-output' && @facet='q/gwt/GWT']")
-        doc.should have_xpath("#{facet_xpath}/root[@id='root']/element[@id='directory' && @name='WEB-INF']/element[@id='directory' && @name='lib']/element[@id='artifact' && @artifact-name='baz.jar']")
-        doc.should have_xpath("#{facet_xpath}/root[@id='root']/element[@id='directory' && @name='WEB-INF']/element[@id='directory' && @name='lib']/element[@id='artifact' && @artifact-name='biz.jar']")
-      end
-    end
-
-    describe "with configurations added to root project" do
-      before do
-        @foo = define "foo" do
-          ipr.add_configuration("Run Contacts.html", "GWT.ConfigurationType", "GWT Configuration") do |xml|
-            xml.module(:name => project.iml.id)
-            xml.option(:name => "RUN_PAGE", :value => "Contacts.html")
-            xml.option(:name => "compilerParameters", :value => "-draftCompile -localWorkers 2")
-            xml.option(:name => "compilerMaxHeapSize", :value => "512")
-
-            xml.RunnerSettings(:RunnerId => "Run")
-            xml.ConfigurationWrapper(:RunnerId => "Run")
-            xml.tag! :method
-          end
-          ipr.add_configuration("Run Planner.html", "GWT.ConfigurationType", "GWT Configuration") do |xml|
-            xml.module(:name => project.iml.id)
-            xml.option(:name => "RUN_PAGE", :value => "Planner.html")
-            xml.option(:name => "compilerParameters", :value => "-draftCompile -localWorkers 2")
-            xml.option(:name => "compilerMaxHeapSize", :value => "512")
-
-            xml.RunnerSettings(:RunnerId => "Run")
-            xml.ConfigurationWrapper(:RunnerId => "Run")
-            xml.tag! :method
-          end
-        end
-        invoke_generate_task
-      end
-
-      it "generates an IPR with multiple configurations" do
-        doc = xml_document(@foo._("foo.ipr"))
-        facet_xpath = "/project/component[@name='ProjectRunConfigurationManager']/configuration"
-        doc.should have_nodes(facet_xpath, 2)
-        doc.should have_xpath("#{facet_xpath}[@type='GWT.ConfigurationType' && @name='Run Contacts.html']")
-        doc.should have_xpath("#{facet_xpath}[@type='GWT.ConfigurationType' && @name='Run Planner.html']")
-      end
-    end
-
-    describe "with default configuration added to root project" do
-      before do
-        @foo = define "foo" do
-          ipr.add_default_configuration("GWT.ConfigurationType", "GWT Configuration") do |xml|
-            xml.module(:name => project.iml.id)
-            xml.option(:name => "RUN_PAGE", :value => "Planner.html")
-            xml.option(:name => "compilerParameters", :value => "-draftCompile -localWorkers 2")
-            xml.option(:name => "compilerMaxHeapSize", :value => "512")
-
-            xml.RunnerSettings(:RunnerId => "Run")
-            xml.ConfigurationWrapper(:RunnerId => "Run")
-            xml.tag! :method
-          end
-        end
-        invoke_generate_task
-      end
-
-      it "generates an IPR with default configuration" do
-        doc = xml_document(@foo._("foo.ipr"))
-        facet_xpath = "/project/component[@name='ProjectRunConfigurationManager']/configuration"
-        doc.should have_nodes(facet_xpath, 1)
-        doc.should have_xpath("#{facet_xpath}[@type='GWT.ConfigurationType' && @factoryName='GWT Configuration' && @default='true']")
-      end
-    end
-
-    describe "with add_default_testng_configuration using defaults" do
-      before do
-        @foo = define "foo" do
-          ipr.add_default_testng_configuration
-        end
-        invoke_generate_task
-      end
-
-      it "generates an IPR with default configuration" do
-        doc = xml_document(@foo._("foo.ipr"))
-        configurations_xpath = "/project/component[@name='ProjectRunConfigurationManager']/configuration"
-        doc.should have_nodes(configurations_xpath, 1)
-        configuration_xpath = "#{configurations_xpath}[@type='TestNG' && @factoryName='TestNG' && @default='true']"
-        doc.should have_xpath(configuration_xpath)
-        doc.should have_xpath("#{configuration_xpath}/option[@name='VM_PARAMETERS' && @value='-ea']")
-        doc.should have_xpath("#{configuration_xpath}/option[@name='WORKING_DIRECTORY' && @value='$PROJECT_DIR$']")
-      end
-    end
-
-    describe "with add_default_testng_configuration specifying values" do
-      before do
-        @foo = define "foo" do
-          ipr.add_default_testng_configuration(:dir => 'C:/blah', :jvm_args => '-ea -Dtest.db.url=xxxx')
-        end
-        invoke_generate_task
-      end
-
-      it "generates an IPR with default configuration" do
-        doc = xml_document(@foo._("foo.ipr"))
-        configurations_xpath = "/project/component[@name='ProjectRunConfigurationManager']/configuration"
-        doc.should have_nodes(configurations_xpath, 1)
-        configuration_xpath = "#{configurations_xpath}[@type='TestNG' && @factoryName='TestNG' && @default='true']"
-        doc.should have_xpath(configuration_xpath)
-        doc.should have_xpath("#{configuration_xpath}/option[@name='VM_PARAMETERS' && @value='-ea -Dtest.db.url=xxxx']")
-        doc.should have_xpath("#{configuration_xpath}/option[@name='WORKING_DIRECTORY' && @value='C:/blah']")
-      end
-    end
-
     describe "with iml.group specified" do
       before do
         @foo = define "foo" do
@@ -1033,19 +528,6 @@ describe Buildr::IntellijIdea do
         end
         invoke_generate_task
       end
-
-      it "generate an IPR with correct group references" do
-        doc = xml_document(@foo._("foo.ipr"))
-        doc.should have_nodes("#{xpath_to_module}", 4)
-        module_ref = "$PROJECT_DIR$/foo.iml"
-        doc.should have_xpath("#{xpath_to_module}[@fileurl='file://#{module_ref}' && @filepath='#{module_ref}']")
-        module_ref = "$PROJECT_DIR$/rab/rab.iml"
-        doc.should have_xpath("#{xpath_to_module}[@fileurl='file://#{module_ref}' && @filepath='#{module_ref}' @group = 'MyGroup']")
-        module_ref = "$PROJECT_DIR$/bar/bar.iml"
-        doc.should have_xpath("#{xpath_to_module}[@fileurl='file://#{module_ref}' && @filepath='#{module_ref}' @group = 'foo']")
-        module_ref = "$PROJECT_DIR$/bar/baz/baz.iml"
-        doc.should have_xpath("#{xpath_to_module}[@fileurl='file://#{module_ref}' && @filepath='#{module_ref}' @group = 'foo/bar']")
-      end
     end
 
     describe "with a single project definition" do
@@ -1055,27 +537,12 @@ describe Buildr::IntellijIdea do
           invoke_generate_task
         end
 
-        it "generates a single IPR" do
-          Dir[@foo._("**/*.ipr")].should have(1).entry
-        end
-
-        it "generate an IPR in the root directory" do
-          File.should be_exist(@foo._("foo.ipr"))
-        end
-
         it "generates a single IML" do
           Dir[@foo._("**/*.iml")].should have(1).entry
         end
 
         it "generates an IML in the root directory" do
           File.should be_exist(@foo._("foo.iml"))
-        end
-
-        it "generate an IPR with the reference to correct module file" do
-          File.should be_exist(@foo._("foo.ipr"))
-          doc = xml_document(@foo._("foo.ipr"))
-          module_ref = "$PROJECT_DIR$/foo.iml"
-          doc.should have_nodes("#{xpath_to_module}[@fileurl='file://#{module_ref}' && @filepath='#{module_ref}']", 1)
         end
       end
 
@@ -1090,45 +557,17 @@ describe Buildr::IntellijIdea do
         it "generates no IML" do
           Dir[@foo._("**/*.iml")].should have(0).entry
         end
-
-        it "generate an IPR with no references" do
-          File.should be_exist(@foo._("foo.ipr"))
-          doc = xml_document(@foo._("foo.ipr"))
-          doc.should have_nodes("#{xpath_to_module}", 0)
-        end
-      end
-
-      describe "with ipr generation disabled" do
-        before do
-          @foo = define "foo" do
-            project.no_ipr
-          end
-          invoke_generate_task
-        end
-
-        it "generates a single IML" do
-          Dir[@foo._("**/*.iml")].should have(1).entry
-        end
-
-        it "generate no IPR" do
-          File.should_not be_exist(@foo._("foo.ipr"))
-        end
       end
 
       describe "and id overrides" do
         before do
           @foo = define "foo" do
-            ipr.id = 'fooble'
             iml.id = 'feap'
             define "bar" do
               iml.id = "baz"
             end
           end
           invoke_generate_task
-        end
-
-        it "generate an IPR in the root directory" do
-          File.should be_exist(@foo._("fooble.ipr"))
         end
 
         it "generates an IML in the root directory" do
@@ -1138,92 +577,45 @@ describe Buildr::IntellijIdea do
         it "generates an IML in the subproject directory" do
           File.should be_exist(@foo._("bar/baz.iml"))
         end
-
-        it "generate an IPR with the reference to correct module file" do
-          File.should be_exist(@foo._("fooble.ipr"))
-          doc = xml_document(@foo._("fooble.ipr"))
-          module_ref = "$PROJECT_DIR$/feap.iml"
-          doc.should have_nodes("#{xpath_to_module}[@fileurl='file://#{module_ref}' && @filepath='#{module_ref}']", 1)
-        end
       end
 
       describe "and a suffix defined" do
         before do
           @foo = define "foo" do
-            ipr.suffix = '-ipr-suffix'
             iml.suffix = '-iml-suffix'
           end
           invoke_generate_task
         end
 
-        it "generate an IPR in the root directory" do
-          File.should be_exist(@foo._("foo-ipr-suffix.ipr"))
-        end
-
         it "generates an IML in the root directory" do
           File.should be_exist(@foo._("foo-iml-suffix.iml"))
-        end
-
-        it "generate an IPR with the reference to correct module file" do
-          File.should be_exist(@foo._("foo-ipr-suffix.ipr"))
-          doc = xml_document(@foo._("foo-ipr-suffix.ipr"))
-          doc.should have_nodes("#{xpath_to_module}", 1)
-          module_ref = "$PROJECT_DIR$/foo-iml-suffix.iml"
-          doc.should have_nodes("#{xpath_to_module}[@fileurl='file://#{module_ref}' && @filepath='#{module_ref}']", 1)
         end
       end
 
       describe "and a prefix defined" do
         before do
           @foo = define "foo" do
-            ipr.prefix = 'ipr-prefix-'
             iml.prefix = 'iml-prefix-'
           end
           invoke_generate_task
         end
 
-        it "generate an IPR in the root directory" do
-          File.should be_exist(@foo._("ipr-prefix-foo.ipr"))
-        end
-
         it "generates an IML in the root directory" do
           File.should be_exist(@foo._("iml-prefix-foo.iml"))
-        end
-
-        it "generate an IPR with the reference to correct module file" do
-          File.should be_exist(@foo._("ipr-prefix-foo.ipr"))
-          doc = xml_document(@foo._("ipr-prefix-foo.ipr"))
-          doc.should have_nodes("#{xpath_to_module}", 1)
-          module_ref = "$PROJECT_DIR$/iml-prefix-foo.iml"
-          doc.should have_nodes("#{xpath_to_module}[@fileurl='file://#{module_ref}' && @filepath='#{module_ref}']", 1)
         end
       end
 
       describe "and a suffix and a prefix defined" do
         before do
           @foo = define "foo" do
-            ipr.suffix = '-ipr-suffix'
             iml.suffix = '-iml-suffix'
-            ipr.prefix = 'ipr-prefix-'
             iml.prefix = 'iml-prefix-'
           end
           invoke_generate_task
         end
 
-        it "generate an IPR in the root directory" do
-          File.should be_exist(@foo._("ipr-prefix-foo-ipr-suffix.ipr"))
-        end
-
         it "generates an IML in the root directory" do
           File.should be_exist(@foo._("iml-prefix-foo-iml-suffix.iml"))
-        end
-
-        it "generate an IPR with the reference to correct module file" do
-          File.should be_exist(@foo._("ipr-prefix-foo-ipr-suffix.ipr"))
-          doc = xml_document(@foo._("ipr-prefix-foo-ipr-suffix.ipr"))
-          doc.should have_nodes("#{xpath_to_module}", 1)
-          module_ref = "$PROJECT_DIR$/iml-prefix-foo-iml-suffix.iml"
-          doc.should have_nodes("#{xpath_to_module}[@fileurl='file://#{module_ref}' && @filepath='#{module_ref}']", 1)
         end
       end
     end
@@ -1242,16 +634,6 @@ describe Buildr::IntellijIdea do
 
       it "generates an IML in the subproject directory" do
         File.should be_exist(@foo._("bar/bar.iml"))
-      end
-
-      it "generate an IPR with the reference to correct module file" do
-        File.should be_exist(@foo._("foo.ipr"))
-        doc = xml_document(@foo._("foo.ipr"))
-        doc.should have_nodes("#{xpath_to_module}", 2)
-        module_ref = "$PROJECT_DIR$/foo.iml"
-        doc.should have_nodes("#{xpath_to_module}[@fileurl='file://#{module_ref}' && @filepath='#{module_ref}']", 1)
-        module_ref = "$PROJECT_DIR$/bar/bar.iml"
-        doc.should have_nodes("#{xpath_to_module}[@fileurl='file://#{module_ref}' && @filepath='#{module_ref}']", 1)
       end
     end
 
@@ -1282,14 +664,6 @@ describe Buildr::IntellijIdea do
 
       it "generates a sub-subproject IML that inherits the specified directory" do
         File.should be_exist(@foo._("fe/fum/fum.iml"))
-      end
-
-      it "generate an IPR with the references to correct module files" do
-        doc = xml_document(@foo._("foo.ipr"))
-        doc.should have_nodes("#{xpath_to_module}", 5)
-        %w[foo.iml fe/bar.iml fi/baz.iml fi/foe/foe.iml fe/fum/fum.iml].each do |module_ref|
-          doc.should have_nodes("#{xpath_to_module}[@fileurl='file://$PROJECT_DIR$/#{module_ref}' && @filepath='$PROJECT_DIR$/#{module_ref}']", 1)
-        end
       end
     end
 
@@ -1348,10 +722,6 @@ describe Buildr::IntellijIdea do
         @foo = define "foo"
       end
 
-      it "informs the user about generating IPR" do
-        lambda { invoke_generate_task }.should show_info(/Writing (.+)\/foo\.ipr/)
-      end
-
       it "informs the user about generating IML" do
         lambda { invoke_generate_task }.should show_info(/Writing (.+)\/foo\.iml/)
       end
@@ -1365,41 +735,6 @@ describe Buildr::IntellijIdea do
 
       it "informs the user about generating subporoject IML" do
         lambda { invoke_generate_task }.should show_info(/Writing (.+)\/bar\/bar\.iml/)
-      end
-    end
-
-    describe "with compile.options.source = '1.6'" do
-
-      before do
-        @foo = define "foo" do
-          compile.options.source = '1.5'
-        end
-        invoke_generate_task
-      end
-
-      it "generate an ProjectRootManager with 1.5 jdk specified" do
-        #raise File.read(@foo._("foo.ipr"))
-        xml_document(@foo._("foo.ipr")).
-          should have_xpath("/project/component[@name='ProjectRootManager' && @project-jdk-name = '1.5' && @languageLevel = 'JDK_1_5']")
-      end
-
-      it "generates a ProjectDetails component with the projectName option set" do
-        xml_document(@foo._("foo.ipr")).
-          should have_xpath("/project/component[@name='ProjectDetails']/option[@name = 'projectName' && @value = 'foo']")
-      end
-    end
-
-    describe "with compile.options.source = '1.6'" do
-      before do
-        @foo = define "foo" do
-          compile.options.source = '1.6'
-        end
-        invoke_generate_task
-      end
-
-      it "generate an ProjectRootManager with 1.6 jdk specified" do
-        xml_document(@foo._("foo.ipr")).
-          should have_xpath("/project/component[@name='ProjectRootManager' && @project-jdk-name = '1.6' && @languageLevel = 'JDK_1_6']")
       end
     end
 
@@ -1517,56 +852,6 @@ describe Buildr::IntellijIdea do
 
     describe "templates" do
 
-      def ipr_template
-        return <<PROJECT_XML
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="SvnBranchConfigurationManager">
-    <option name="mySupportsUserInfoFilter" value="false" />
-  </component>
-</project>
-PROJECT_XML
-      end
-
-      def ipr_existing
-        return <<PROJECT_XML
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="AntConfiguration">
-    <defaultAnt bundledAnt="true" />
-  </component>
-  <component name="SvnBranchConfigurationManager">
-    <option name="mySupportsUserInfoFilter" value="true" />
-  </component>
-  <component name="ProjectModuleManager">
-    <modules>
-      <module fileurl="file://$PROJECT_DIR$/existing.iml" filepath="$PROJECT_DIR$/existing.iml" />
-    </modules>
-  </component>
-</project>
-PROJECT_XML
-      end
-
-      def ipr_from_template_xpath
-        "/project/component[@name='SvnBranchConfigurationManager']/option[@name = 'mySupportsUserInfoFilter' && @value = 'false']"
-      end
-
-      def ipr_from_existing_xpath
-        "/project/component[@name='AntConfiguration']"
-      end
-
-      def ipr_from_existing_shadowing_template_xpath
-        "/project/component[@name='SvnBranchConfigurationManager']/option[@name = 'mySupportsUserInfoFilter' && @value = 'true']"
-      end
-
-      def ipr_from_existing_shadowing_generated_xpath
-        "/project/component[@name='ProjectModuleManager']/modules/module[@fileurl = 'file://$PROJECT_DIR$/existing.iml']"
-      end
-
-      def ipr_from_generated_xpath
-        "/project/component[@name='ProjectModuleManager']/modules/module[@fileurl = 'file://$PROJECT_DIR$/foo.iml']"
-      end
-
       def iml_template
         return <<PROJECT_XML
 <?xml version="1.0" encoding="UTF-8"?>
@@ -1623,24 +908,13 @@ PROJECT_XML
 
       describe "with existing project files" do
         before do
-          write "foo.ipr", ipr_existing
           write "foo.iml", iml_existing
           artifact('group:id:jar:1.0') { |t| write t.to_s }
           @foo = define "foo" do
-            ipr.template = nil
             iml.template = nil
             compile.with 'group:id:jar:1.0'
           end
           invoke_generate_task
-        end
-
-        it "replaces ProjectModuleManager component in existing ipr file" do
-          xml_document(@foo._("foo.ipr")).should have_xpath(ipr_from_generated_xpath)
-          xml_document(@foo._("foo.ipr")).should_not have_xpath(ipr_from_existing_shadowing_generated_xpath)
-        end
-
-        it "merges component in existing ipr file" do
-          xml_document(@foo._("foo.ipr")).should have_xpath(ipr_from_existing_xpath)
         end
 
         def iml_from_generated_xpath
@@ -1662,7 +936,6 @@ PROJECT_XML
           write "module.template.iml", iml_template
           artifact('group:id:jar:1.0') { |t| write t.to_s }
           @foo = define "foo" do
-            ipr.template = nil
             iml.template = "module.template.iml"
             compile.with 'group:id:jar:1.0'
           end
@@ -1684,7 +957,6 @@ PROJECT_XML
           write "foo.iml", iml_existing
           artifact('group:id:jar:1.0') { |t| write t.to_s }
           @foo = define "foo" do
-            ipr.template = nil
             iml.template = "module.template.iml"
             compile.with 'group:id:jar:1.0'
           end
@@ -1703,55 +975,6 @@ PROJECT_XML
           xml_document(@foo._("foo.iml")).should have_xpath(iml_from_existing_xpath)
           xml_document(@foo._("foo.iml")).should_not have_xpath(iml_from_existing_shadowing_template_xpath)
           xml_document(@foo._("foo.iml")).should_not have_xpath(iml_from_existing_shadowing_generated_xpath)
-        end
-      end
-
-      describe "with an ipr template" do
-        before do
-          write "project.template.iml", ipr_template
-          artifact('group:id:jar:1.0') { |t| write t.to_s }
-          @foo = define "foo" do
-            ipr.template = "project.template.iml"
-            iml.template = nil
-            compile.with 'group:id:jar:1.0'
-          end
-          invoke_generate_task
-        end
-
-        it "replaces generated component in ipr template" do
-          xml_document(@foo._("foo.ipr")).should have_xpath(ipr_from_generated_xpath)
-        end
-
-        it "merges component in ipr template" do
-          xml_document(@foo._("foo.ipr")).should have_xpath(ipr_from_template_xpath)
-        end
-      end
-
-      describe "with an ipr template and existing ipr" do
-        before do
-          write "project.template.iml", ipr_template
-          write "foo.ipr", ipr_existing
-          artifact('group:id:jar:1.0') { |t| write t.to_s }
-          @foo = define "foo" do
-            ipr.template = "project.template.iml"
-            iml.template = nil
-            compile.with 'group:id:jar:1.0'
-          end
-          invoke_generate_task
-        end
-
-        it "replaces generated component in ipr template" do
-          xml_document(@foo._("foo.ipr")).should have_xpath(ipr_from_generated_xpath)
-        end
-
-        it "merges component in ipr template" do
-          xml_document(@foo._("foo.ipr")).should have_xpath(ipr_from_template_xpath)
-        end
-
-        it "merges components not in ipr template and not generated by task" do
-          xml_document(@foo._("foo.ipr")).should have_xpath(ipr_from_existing_xpath)
-          xml_document(@foo._("foo.ipr")).should_not have_xpath(ipr_from_existing_shadowing_generated_xpath)
-          xml_document(@foo._("foo.ipr")).should have_xpath(ipr_from_existing_shadowing_template_xpath)
         end
       end
     end
