@@ -43,11 +43,11 @@ module Buildr
               org.eclipse.jdt:ecj:jar:3.33.0
               org.eclipse.jdt:org.eclipse.jdt.core:jar:3.33.0
 
-              org.ow2.asm:asm:jar:9.6
-              org.ow2.asm:asm-util:jar:9.6
-              org.ow2.asm:asm-tree:jar:9.6
-              org.ow2.asm:asm-analysis:jar:9.6
-              org.ow2.asm:asm-commons:jar:9.6
+              org.ow2.asm:asm:jar:9.7.1
+              org.ow2.asm:asm-util:jar:9.7.1
+              org.ow2.asm:asm-tree:jar:9.7.1
+              org.ow2.asm:asm-analysis:jar:9.7.1
+              org.ow2.asm:asm-commons:jar:9.7.1
 
               colt:colt:jar:1.2.0
 
